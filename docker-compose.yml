@@ -1,0 +1,33 @@
+services:
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: squad-mcp-server
+    ports:
+      - "3232:3232"
+    environment:
+      # Server config
+      PORT: 3232
+      NODE_ENV: development
+      BASE_URI: http://localhost:3232
+
+      # PropelAuth OAuth 2.1
+      PROPELAUTH_CLIENT_ID: ${PROPELAUTH_CLIENT_ID}
+      PROPELAUTH_CLIENT_SECRET: ${PROPELAUTH_CLIENT_SECRET}
+
+      # Squad Environment
+      SQUAD_ENV: ${SQUAD_ENV:-dev}
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3232/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    networks:
+      - squad-mcp
+    restart: unless-stopped
+
+networks:
+  squad-mcp:
+    driver: bridge

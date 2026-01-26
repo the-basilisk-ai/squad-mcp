@@ -1,3 +1,2 @@
 // Client-safe exports - no server-side dependencies
-export { toolsEnum } from "./package.js";
-
+// Note: Client exports are not currently used in this server-only package

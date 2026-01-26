@@ -1,0 +1,83 @@
+{
+  "e3327b72-5763-409e-8a86-faca7e43f6e7": {
+    "lastAccessedAt": 1769964816309,
+    "clientCapabilities": {
+      "roots": {}
+    },
+    "clientInfo": {},
+    "protocolVersion": "unknown"
+  },
+  "5406e1b5-2809-4b9b-be33-060471089f72": {
+    "lastAccessedAt": 1769964817698,
+    "clientCapabilities": {
+      "roots": {}
+    },
+    "clientInfo": {},
+    "protocolVersion": "unknown"
+  },
+  "8a745d36-c478-4ac7-9a23-a74eacd3b7de": {
+    "lastAccessedAt": 1769964936703,
+    "clientCapabilities": {
+      "roots": {}
+    },
+    "clientInfo": {},
+    "protocolVersion": "unknown"
+  },
+  "4cb66818-d816-418c-8555-78b017556c0f": {
+    "lastAccessedAt": 1769965189260
+  },
+  "6cf535f8-95c9-4dc5-aefe-5bc9b2a67667": {
+    "lastAccessedAt": 1769965792719,
+    "clientCapabilities": {
+      "roots": {}
+    },
+    "clientInfo": {},
+    "protocolVersion": "unknown"
+  },
+  "793b4bd0-dd11-4372-8e68-6c5dd41274cd": {
+    "lastAccessedAt": 1769965822605,
+    "clientCapabilities": {
+      "roots": {}
+    },
+    "clientInfo": {},
+    "protocolVersion": "unknown"
+  },
+  "91e03cdf-b2bb-46a0-84c6-1aebaca50213": {
+    "lastAccessedAt": 1769965852783,
+    "clientCapabilities": {
+      "roots": {}
+    },
+    "clientInfo": {},
+    "protocolVersion": "unknown"
+  },
+  "ccb71496-0f82-43ab-a3ff-73609b6e572c": {
+    "lastAccessedAt": 1769965853856,
+    "clientCapabilities": {
+      "roots": {}
+    },
+    "clientInfo": {},
+    "protocolVersion": "unknown"
+  },
+  "6d0414e8-bd7b-4811-b36c-130e731ec214": {
+    "lastAccessedAt": 1769972292356,
+    "clientCapabilities": {
+      "roots": {}
+    },
+    "clientInfo": {},
+    "protocolVersion": "unknown"
+  },
+  "6709acda-8fd7-4b9a-a49c-f6c6a0ea63f6": {
+    "lastAccessedAt": 1769972371650
+  },
+  "5cf237a1-53cf-4ed8-87d0-9f12faf5c4c0": {
+    "lastAccessedAt": 1769972467742,
+    "clientCapabilities": {
+      "roots": {}
+    },
+    "clientInfo": {},
+    "protocolVersion": "unknown"
+  },
+  "b57cde42-6f05-42cb-a859-9dbbdc3ee912": {
+    "lastAccessedAt": 1769972468072
+  }
+}

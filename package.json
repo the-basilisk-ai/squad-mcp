@@ -1,65 +1,50 @@
 {
-  "name": "@squadai/tools",
-  "version": "2.3.0",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "license": "MIT",
-  "type": "module",
-  "sideEffects": false,
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./client": {
-      "import": "./dist/client.js",
-      "types": "./dist/client.d.ts"
-    }
-  },
-  "bin": {
-    "meet-squad": "./dist/index.js",
-    "squadai-tools": "./dist/index.js"
-  },
-  "scripts": {
-    "build": "tsc",
-    "format": "eslint . --ignore-path .gitignore",
-    "format:fix": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts)\"",
-    "build:package": "tsup --config tsup.config.ts",
-    "inspect": "npx @modelcontextprotocol/inspector node ./dist/index.js",
-    "openapi:squad": "openapi-generator-cli generate -g typescript-fetch -c ./openapi-generator-config.json -i ./openapi/squad.json -o src/lib/openapi/squad && npx tsx ./scripts/openapi-client-esm-fix.ts",
-    "bun:build:macos:arm64": "bun build ./src/index.ts --compile --target=bun-darwin-arm64 --outfile ./bin/squad-mcp-macos-arm64",
-    "bun:build:macos:64": "bun build ./src/index.ts --compile --target=bun-darwin-x64 --outfile ./bin/squad-mcp-macos-64",
-    "bun:build:linux": "bun build ./src/index.ts --compile --target=bun-linux-x64 --outfile ./bin/squad-mcp-linux",
-    "bun:build:windows": "bun build ./src/index.ts --compile --target=bun-windows-x64 --outfile ./bin/squad-mcp.exe",
-    "bun:build": "bun run bun:build:macos:arm64 && bun run bun:build:macos:64 && bun run bun:build:linux && bun run bun:build:windows",
-    "test": "vitest run",
-    "test:watch": "vitest watch",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage"
-  },
-  "files": [
-    "dist"
-  ],
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "1.17.5",
-    "zod": "^3.24.2"
-  },
-  "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.25.0",
-    "@types/node": "^24.9.1",
-    "@vitest/ui": "^4.0.1",
-    "dotenv": "^17.2.3",
-    "eslint": "8.50.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.1.3",
-    "glob": "^11.0.1",
-    "prettier": "^3.3.0",
-    "prettier-plugin-organize-imports": "^3.2.4",
-    "ts-node": "^10.9.2",
-    "tsup": "^8.4.0",
-    "tsx": "^4.19.3",
-    "typescript": "^5.8.2",
-    "vitest": "^4.0.1"
-  },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+	"name": "@squadai/tools",
+	"version": "3.0.0",
+	"main": "./dist/server.js",
+	"types": "./dist/server.d.ts",
+	"license": "MIT",
+	"type": "module",
+	"sideEffects": false,
+	"exports": {
+		".": {
+			"import": "./dist/server.js",
+			"types": "./dist/server.d.ts"
+		},
+		"./client": {
+			"import": "./dist/client.js",
+			"types": "./dist/client.d.ts"
+		}
+	},
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsx src/server.ts",
+		"start": "node dist/server.js",
+		"format": "eslint . --ignore-path .gitignore",
+		"format:fix": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts)\"",
+		"openapi:squad": "openapi-generator-cli generate -g typescript-fetch -c ./openapi-generator-config.json -i ./openapi/squad.json -o src/lib/openapi/squad && npx tsx ./scripts/openapi-client-esm-fix.ts"
+	},
+	"files": [
+		"dist"
+	],
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "^1.24.2",
+		"dotenv": "^17.2.3",
+		"mcp-use": "^1.15.3",
+		"zod": "^4.2.0"
+	},
+	"devDependencies": {
+		"@openapitools/openapi-generator-cli": "^2.25.0",
+		"@types/node": "^24.9.1",
+		"eslint": "8.50.0",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-prettier": "^5.1.3",
+		"glob": "^11.0.1",
+		"prettier": "^3.3.0",
+		"prettier-plugin-organize-imports": "^3.2.4",
+		"ts-node": "^10.9.2",
+		"tsx": "^4.19.3",
+		"typescript": "^5.8.2"
+	},
+	"packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
