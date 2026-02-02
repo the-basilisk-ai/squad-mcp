@@ -185,10 +185,15 @@ const server = new MCPServer({
 
       return { payload: result };
     },
-    getUserInfo: (payload) => ({
-      userId: payload.sub as string,
-      email: payload.email as string | undefined,
-    }),
+    getUserInfo: (payload) => {
+      if (typeof payload.sub !== 'string') {
+        throw new Error('Token missing required "sub" claim');
+      }
+      return {
+        userId: payload.sub,
+        email: typeof payload.email === 'string' ? payload.email : undefined,
+      };
+    },
   }),
 });
 

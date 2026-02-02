@@ -62,17 +62,22 @@ function evictOldestEntries(): void {
  */
 function removeExpiredEntries(): void {
   const now = Date.now();
-  let expiredCount = 0;
+  const expiredKeys: string[] = [];
 
+  // Collect expired keys first
   for (const [userId, entry] of workspaceSelections.entries()) {
     if (now - entry.lastAccessed > WORKSPACE_CACHE_TTL_MS) {
-      workspaceSelections.delete(userId);
-      expiredCount++;
+      expiredKeys.push(userId);
     }
   }
 
-  if (expiredCount > 0) {
-    logger.debug({ expired: expiredCount }, 'Removed expired workspace selections from cache');
+  // Then delete them
+  for (const key of expiredKeys) {
+    workspaceSelections.delete(key);
+  }
+
+  if (expiredKeys.length > 0) {
+    logger.debug({ expired: expiredKeys.length }, 'Removed expired workspace selections from cache');
   }
 }
 
