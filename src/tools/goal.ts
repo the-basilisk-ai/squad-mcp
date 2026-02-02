@@ -6,22 +6,23 @@ import { type OAuthServer, getUserId, toolError, toolSuccess, WorkspaceSelection
 import { RelationshipAction, type CreateOutcomePayload } from '../lib/openapi/squad/models/index.js';
 
 /**
- * Register outcome tools with the MCP server
+ * Register goal tools with the MCP server
+ * Note: "Goal" is the user-facing term for what the API calls "Outcome"
  */
-export function registerOutcomeTools(server: OAuthServer) {
-  // Create Outcome
+export function registerGoalTools(server: OAuthServer) {
+  // Create Goal
   server.tool(
     {
-      name: 'create_outcome',
-      description: 'Create a new outcome. An outcome is a business objective or goal that the organization aims to achieve.',
+      name: 'create_goal',
+      description: 'Create a new goal. A goal is a business objective that the organization aims to achieve.',
       schema: z.object({
-        title: z.string().describe('A short title for the outcome'),
-        description: z.string().describe('A detailed description of the outcome'),
-        priority: z.number().optional().describe('Priority level of the outcome (numeric)'),
-        trend: z.number().optional().describe('Trend indicator for the outcome (numeric)'),
-        analyticEvents: z.array(z.string()).optional().describe('List of analytic events associated with the outcome'),
-        hideContent: z.boolean().optional().describe('Whether the outcome content should be hidden'),
-        ownerId: z.string().optional().describe('ID of the outcome owner'),
+        title: z.string().describe('A short title for the goal'),
+        description: z.string().describe('A detailed description of the goal'),
+        priority: z.number().optional().describe('Priority level of the goal (numeric)'),
+        trend: z.number().optional().describe('Trend indicator for the goal (numeric)'),
+        analyticEvents: z.array(z.string()).optional().describe('List of analytic events associated with the goal'),
+        hideContent: z.boolean().optional().describe('Whether the goal content should be hidden'),
+        ownerId: z.string().optional().describe('ID of the goal owner'),
       }),
       annotations: {
         destructiveHint: true,
@@ -50,24 +51,24 @@ export function registerOutcomeTools(server: OAuthServer) {
         return toolSuccess({
           id: result.id,
           title: result.title,
-          message: 'Outcome created successfully',
+          message: 'Goal created successfully',
         });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
         }
-        logger.debug({ err: error, tool: 'create_outcome' }, 'Tool error');
+        logger.debug({ err: error, tool: 'create_goal' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
-        return toolError(`Unable to create outcome: ${message}`);
+        return toolError(`Unable to create goal: ${message}`);
       }
     }
   );
 
-  // List Outcomes
+  // List Goals
   server.tool(
     {
-      name: 'list_outcomes',
-      description: 'List all outcomes in the workspace. Outcomes are business objectives or goals that the organization aims to achieve.',
+      name: 'list_goals',
+      description: 'List all goals in the workspace. Goals are business objectives that the organization aims to achieve.',
       schema: z.object({}),
       annotations: {
         readOnlyHint: true,
@@ -84,10 +85,10 @@ export function registerOutcomeTools(server: OAuthServer) {
         });
 
         if (outcomes.data.length === 0) {
-          return toolSuccess({ message: 'No outcomes found.' });
+          return toolSuccess({ message: 'No goals found.' });
         }
 
-        // Return summaries to reduce token usage - use get_outcome for full details
+        // Return summaries to reduce token usage - use get_goal for full details
         return toolSuccess({
           count: outcomes.data.length,
           items: outcomes.data.map(o => ({
@@ -100,25 +101,25 @@ export function registerOutcomeTools(server: OAuthServer) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
         }
-        logger.debug({ err: error, tool: 'list_outcomes' }, 'Tool error');
+        logger.debug({ err: error, tool: 'list_goals' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
-        return toolError(`Unable to list outcomes: ${message}`);
+        return toolError(`Unable to list goals: ${message}`);
       }
     }
   );
 
-  // Get Outcome
+  // Get Goal
   server.tool(
     {
-      name: 'get_outcome',
-      description: 'Get details of a specific outcome by ID. Outcomes are business objectives or goals that the organization aims to achieve.',
+      name: 'get_goal',
+      description: 'Get details of a specific goal by ID. Goals are business objectives that the organization aims to achieve.',
       schema: z.object({
-        outcomeId: z.string().describe('The ID of the outcome to retrieve'),
+        goalId: z.string().describe('The ID of the goal to retrieve'),
         relationships: z
           .array(z.enum(['opportunities', 'solutions', 'insights']))
           .optional()
           .default([])
-          .describe('Relationships to include in the response. Opportunities are problem statements identified for the organisation. Solutions are proposed approaches to address opportunities. Feedback is additional information or insights related to the opportunity.'),
+          .describe('Relationships to include in the response. Opportunities are problem statements identified for the organisation. Solutions are proposed approaches to address opportunities. Insights are additional information related to the opportunity.'),
       }),
       annotations: {
         readOnlyHint: true,
@@ -132,7 +133,7 @@ export function registerOutcomeTools(server: OAuthServer) {
         const outcome = await squadClient(userContext).getOutcome({
           orgId,
           workspaceId,
-          outcomeId: params.outcomeId,
+          outcomeId: params.goalId,
           relationships: params.relationships.join(','),
         });
 
@@ -141,27 +142,27 @@ export function registerOutcomeTools(server: OAuthServer) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
         }
-        logger.debug({ err: error, tool: 'get_outcome' }, 'Tool error');
+        logger.debug({ err: error, tool: 'get_goal' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
-        return toolError(`Unable to get outcome: ${message}`);
+        return toolError(`Unable to get goal: ${message}`);
       }
     }
   );
 
-  // Update Outcome
+  // Update Goal
   server.tool(
     {
-      name: 'update_outcome',
-      description: 'Update an existing outcome\'s details.',
+      name: 'update_goal',
+      description: 'Update an existing goal\'s details.',
       schema: z.object({
-        outcomeId: z.string().describe('The ID of the outcome to update'),
+        goalId: z.string().describe('The ID of the goal to update'),
         title: z.string().optional().describe('Updated title'),
         description: z.string().optional().describe('Updated description'),
         priority: z.number().optional().describe('Updated priority level'),
         trend: z.number().optional().describe('Updated trend indicator'),
         analyticEvents: z.array(z.string()).optional().describe('Updated list of analytic events'),
-        hideContent: z.boolean().optional().describe('Whether the outcome content should be hidden'),
-        ownerId: z.string().optional().describe('Updated ID of the outcome owner'),
+        hideContent: z.boolean().optional().describe('Whether the goal content should be hidden'),
+        ownerId: z.string().optional().describe('Updated ID of the goal owner'),
       }),
       annotations: {
         destructiveHint: true,
@@ -171,38 +172,38 @@ export function registerOutcomeTools(server: OAuthServer) {
       try {
         const userContext = await getUserContext(ctx.auth.accessToken, getUserId(ctx.auth));
         const { orgId, workspaceId } = userContext;
-        const { outcomeId, ...updatePayload } = params;
+        const { goalId, ...updatePayload } = params;
 
         const outcome = await squadClient(userContext).updateOutcome({
           orgId,
           workspaceId,
-          outcomeId,
+          outcomeId: goalId,
           updateOutcomePayload: updatePayload,
         });
 
         return toolSuccess({
           id: outcome.id,
           title: outcome.title,
-          message: 'Outcome updated successfully',
+          message: 'Goal updated successfully',
         });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
         }
-        logger.debug({ err: error, tool: 'update_outcome' }, 'Tool error');
+        logger.debug({ err: error, tool: 'update_goal' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
-        return toolError(`Unable to update outcome: ${message}`);
+        return toolError(`Unable to update goal: ${message}`);
       }
     }
   );
 
-  // Delete Outcome
+  // Delete Goal
   server.tool(
     {
-      name: 'delete_outcome',
-      description: 'Delete an outcome by ID.',
+      name: 'delete_goal',
+      description: 'Delete a goal by ID.',
       schema: z.object({
-        outcomeId: z.string().describe('The ID of the outcome to delete'),
+        goalId: z.string().describe('The ID of the goal to delete'),
       }),
       annotations: {
         destructiveHint: true,
@@ -216,30 +217,30 @@ export function registerOutcomeTools(server: OAuthServer) {
         await squadClient(userContext).deleteOutcome({
           orgId,
           workspaceId,
-          outcomeId: params.outcomeId,
+          outcomeId: params.goalId,
         });
 
-        return toolSuccess({ data: { id: params.outcomeId } });
+        return toolSuccess({ data: { id: params.goalId } });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
         }
-        logger.debug({ err: error, tool: 'delete_outcome' }, 'Tool error');
+        logger.debug({ err: error, tool: 'delete_goal' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
-        return toolError(`Unable to delete outcome: ${message}`);
+        return toolError(`Unable to delete goal: ${message}`);
       }
     }
   );
 
-  // Manage Outcome Relationships
+  // Manage Goal Relationships
   server.tool(
     {
-      name: 'manage_outcome_relationships',
-      description: 'Add or remove relationships between an outcome and opportunities for the business.',
+      name: 'manage_goal_relationships',
+      description: 'Add or remove relationships between a goal and opportunities for the business.',
       schema: z.object({
-        outcomeId: z.string().describe('The ID of the outcome to manage relationships for'),
+        goalId: z.string().describe('The ID of the goal to manage relationships for'),
         action: z.enum(['add', 'remove']).describe('Whether to add or remove the relationships'),
-        opportunityIds: z.array(z.string()).optional().describe('IDs of opportunities to relate to this outcome'),
+        opportunityIds: z.array(z.string()).optional().describe('IDs of opportunities to relate to this goal'),
       }),
       annotations: {
         destructiveHint: true,
@@ -253,7 +254,7 @@ export function registerOutcomeTools(server: OAuthServer) {
         await squadClient(userContext).manageOutcomeRelationships({
           orgId,
           workspaceId,
-          outcomeId: params.outcomeId,
+          outcomeId: params.goalId,
           action: params.action as RelationshipAction,
           outcomeRelationshipsPayload: {
             opportunityIds: params.opportunityIds || [],
@@ -261,16 +262,16 @@ export function registerOutcomeTools(server: OAuthServer) {
         });
 
         return toolSuccess({
-          id: params.outcomeId,
+          id: params.goalId,
           message: `Relationships ${params.action === 'add' ? 'added' : 'removed'} successfully`,
         });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
         }
-        logger.debug({ err: error, tool: 'manage_outcome_relationships' }, 'Tool error');
+        logger.debug({ err: error, tool: 'manage_goal_relationships' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
-        return toolError(`Unable to manage outcome relationships: ${message}`);
+        return toolError(`Unable to manage goal relationships: ${message}`);
       }
     }
   );

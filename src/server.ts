@@ -5,7 +5,7 @@ import { logger } from './lib/logger.js';
 import { registerWorkspaceTools } from './tools/workspace.js';
 import { registerOpportunityTools } from './tools/opportunity.js';
 import { registerSolutionTools } from './tools/solution.js';
-import { registerOutcomeTools } from './tools/outcome.js';
+import { registerGoalTools } from './tools/goal.js';
 import { registerKnowledgeTools } from './tools/knowledge.js';
 import { registerFeedbackTools } from './tools/feedback.js';
 import { registerInsightTools } from './tools/insight.js';
@@ -249,7 +249,7 @@ server.app.get('/health', (c) => c.json({
 registerWorkspaceTools(server);
 registerOpportunityTools(server);
 registerSolutionTools(server);
-registerOutcomeTools(server);
+registerGoalTools(server);
 registerKnowledgeTools(server);
 registerFeedbackTools(server);
 registerInsightTools(server);
