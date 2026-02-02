@@ -61,6 +61,18 @@ interface IntrospectionResult {
 }
 
 /**
+ * Validates that the introspection response has the expected shape
+ */
+function isValidIntrospectionResult(data: unknown): data is IntrospectionResult {
+  if (typeof data !== 'object' || data === null) {
+    return false;
+  }
+  const obj = data as Record<string, unknown>;
+  // 'active' is the only required field per RFC 7662
+  return typeof obj.active === 'boolean';
+}
+
+/**
  * Token validation via PropelAuth OAuth 2.1 introspection
  */
 async function introspectToken(token: string): Promise<IntrospectionResult> {
@@ -77,7 +89,13 @@ async function introspectToken(token: string): Promise<IntrospectionResult> {
     throw new Error(`Introspection failed: ${response.status} ${response.statusText}`);
   }
 
-  return response.json();
+  const data: unknown = await response.json();
+
+  if (!isValidIntrospectionResult(data)) {
+    throw new Error('Invalid introspection response: missing or invalid "active" field');
+  }
+
+  return data;
 }
 
 // Create MCP server with PropelAuth OAuth
