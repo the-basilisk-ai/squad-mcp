@@ -3,7 +3,7 @@ import { squadClient } from '../lib/clients/squad.js';
 import { logger } from '../lib/logger.js';
 import { getUserContext } from '../helpers/getUser.js';
 import { type OAuthServer, getUserId, toolError, toolSuccess } from './helpers.js';
-import { RelationshipAction } from '../lib/openapi/squad/models/index.js';
+import { RelationshipAction, type CreateOutcomePayload } from '../lib/openapi/squad/models/index.js';
 
 /**
  * Register outcome tools with the MCP server
@@ -32,22 +32,19 @@ export function registerOutcomeTools(server: OAuthServer) {
         const userContext = await getUserContext(ctx.auth.accessToken, getUserId(ctx.auth));
         const { orgId, workspaceId } = userContext;
 
-        const outcomePayload: Record<string, unknown> = {
+        const outcomePayload: CreateOutcomePayload = {
           title: params.title,
           description: params.description,
           priority: params.priority ?? 0,
-          trend: params.trend ?? 0,
-          analyticEvents: params.analyticEvents ?? [],
+          trend: params.trend,
+          analyticEvents: params.analyticEvents,
+          ownerId: params.ownerId,
         };
-
-        if (params.ownerId !== undefined) {
-          outcomePayload.ownerId = params.ownerId;
-        }
 
         const result = await squadClient(userContext).createOutcome({
           orgId,
           workspaceId,
-          createOutcomePayload: outcomePayload as any,
+          createOutcomePayload: outcomePayload,
         });
 
         return toolSuccess(result);
