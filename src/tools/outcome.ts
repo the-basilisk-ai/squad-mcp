@@ -47,7 +47,11 @@ export function registerOutcomeTools(server: OAuthServer) {
           createOutcomePayload: outcomePayload,
         });
 
-        return toolSuccess(result);
+        return toolSuccess({
+          id: result.id,
+          title: result.title,
+          message: 'Outcome created successfully',
+        });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
@@ -83,7 +87,15 @@ export function registerOutcomeTools(server: OAuthServer) {
           return toolSuccess({ message: 'No outcomes found.' });
         }
 
-        return toolSuccess(outcomes);
+        // Return summaries to reduce token usage - use get_outcome for full details
+        return toolSuccess({
+          count: outcomes.data.length,
+          items: outcomes.data.map(o => ({
+            id: o.id,
+            title: o.title,
+            priority: o.priority,
+          })),
+        });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
@@ -168,7 +180,11 @@ export function registerOutcomeTools(server: OAuthServer) {
           updateOutcomePayload: updatePayload,
         });
 
-        return toolSuccess(outcome);
+        return toolSuccess({
+          id: outcome.id,
+          title: outcome.title,
+          message: 'Outcome updated successfully',
+        });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
@@ -244,14 +260,10 @@ export function registerOutcomeTools(server: OAuthServer) {
           },
         });
 
-        // Return updated outcome
-        const updatedOutcome = await squadClient(userContext).getOutcome({
-          orgId,
-          workspaceId,
-          outcomeId: params.outcomeId,
+        return toolSuccess({
+          id: params.outcomeId,
+          message: `Relationships ${params.action === 'add' ? 'added' : 'removed'} successfully`,
         });
-
-        return toolSuccess(updatedOutcome);
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));

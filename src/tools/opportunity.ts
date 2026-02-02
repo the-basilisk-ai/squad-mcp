@@ -40,7 +40,11 @@ export function registerOpportunityTools(server: OAuthServer) {
           },
         });
 
-        return toolSuccess(result);
+        return toolSuccess({
+          id: result.id,
+          title: result.title,
+          message: 'Opportunity created successfully',
+        });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
@@ -76,7 +80,15 @@ export function registerOpportunityTools(server: OAuthServer) {
           return toolSuccess({ message: 'No opportunities found.' });
         }
 
-        return toolSuccess(opportunities);
+        // Return summaries to reduce token usage - use get_opportunity for full details
+        return toolSuccess({
+          count: opportunities.data.length,
+          items: opportunities.data.map(o => ({
+            id: o.id,
+            title: o.title,
+            status: o.status,
+          })),
+        });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
@@ -165,7 +177,12 @@ export function registerOpportunityTools(server: OAuthServer) {
           updateOpportunityPayload: updatePayload,
         });
 
-        return toolSuccess(opportunity);
+        return toolSuccess({
+          id: opportunity.id,
+          title: opportunity.title,
+          status: opportunity.status,
+          message: 'Opportunity updated successfully',
+        });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
@@ -281,14 +298,10 @@ export function registerOpportunityTools(server: OAuthServer) {
           },
         });
 
-        // Return updated opportunity
-        const updatedOpportunity = await squadClient(userContext).getOpportunity({
-          orgId,
-          workspaceId,
-          opportunityId: params.opportunityId,
+        return toolSuccess({
+          id: params.opportunityId,
+          message: `Relationships ${params.action === 'add' ? 'added' : 'removed'} successfully`,
         });
-
-        return toolSuccess(updatedOpportunity);
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));

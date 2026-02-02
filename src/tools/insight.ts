@@ -46,7 +46,12 @@ export function registerInsightTools(server: OAuthServer) {
           },
         });
 
-        return toolSuccess(result);
+        return toolSuccess({
+          id: result.id,
+          title: result.title,
+          type: result.type,
+          message: 'Insight created successfully',
+        });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
@@ -82,7 +87,15 @@ export function registerInsightTools(server: OAuthServer) {
           return toolSuccess({ message: 'No insight entries found.' });
         }
 
-        return toolSuccess(insights);
+        // Return summaries to reduce token usage - use get_insight for full details
+        return toolSuccess({
+          count: insights.data.length,
+          items: insights.data.map(i => ({
+            id: i.id,
+            title: i.title,
+            type: i.type,
+          })),
+        });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));

@@ -37,7 +37,11 @@ export function registerKnowledgeTools(server: OAuthServer) {
           },
         });
 
-        return toolSuccess(result);
+        return toolSuccess({
+          id: result.data.id,
+          title: result.data.title,
+          message: 'Knowledge entry created successfully',
+        });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
@@ -73,7 +77,15 @@ export function registerKnowledgeTools(server: OAuthServer) {
           return toolSuccess({ message: 'No knowledge entries found.' });
         }
 
-        return toolSuccess(knowledge);
+        // Return summaries to reduce token usage - use get_knowledge for full details
+        return toolSuccess({
+          count: knowledge.data.length,
+          items: knowledge.data.map(k => ({
+            id: k.id,
+            title: k.title,
+            description: k.description,
+          })),
+        });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));

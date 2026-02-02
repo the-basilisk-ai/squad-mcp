@@ -49,7 +49,11 @@ export function registerFeedbackTools(server: OAuthServer) {
           },
         });
 
-        return toolSuccess(result);
+        return toolSuccess({
+          id: result.id,
+          source: result.source,
+          message: 'Feedback created successfully',
+        });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
@@ -85,7 +89,16 @@ export function registerFeedbackTools(server: OAuthServer) {
           return toolSuccess({ message: 'No feedback entries found.' });
         }
 
-        return toolSuccess(feedback);
+        // Return summaries to reduce token usage - use get_feedback for full details
+        return toolSuccess({
+          count: feedback.data.length,
+          items: feedback.data.map(f => ({
+            id: f.id,
+            source: f.source,
+            sentimentCategory: f.sentimentCategory,
+            createdAt: f.createdAt,
+          })),
+        });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));

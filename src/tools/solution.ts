@@ -62,7 +62,12 @@ export function registerSolutionTools(server: OAuthServer) {
           },
         });
 
-        return toolSuccessPretty(result);
+        return toolSuccess({
+          id: result.id,
+          title: result.title,
+          status: result.status,
+          message: 'Solution created successfully',
+        });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
@@ -94,7 +99,19 @@ export function registerSolutionTools(server: OAuthServer) {
           workspaceId,
         });
 
-        return toolSuccess(solutions);
+        if (solutions.data.length === 0) {
+          return toolSuccess({ message: 'No solutions found.' });
+        }
+
+        // Return summaries to reduce token usage - use get_solution for full details
+        return toolSuccess({
+          count: solutions.data.length,
+          items: solutions.data.map(s => ({
+            id: s.id,
+            title: s.title,
+            status: s.status,
+          })),
+        });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
@@ -180,7 +197,12 @@ export function registerSolutionTools(server: OAuthServer) {
           },
         });
 
-        return toolSuccess(solution);
+        return toolSuccess({
+          id: solution.id,
+          title: solution.title,
+          status: solution.status,
+          message: 'Solution updated successfully',
+        });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
@@ -256,14 +278,10 @@ export function registerSolutionTools(server: OAuthServer) {
           },
         });
 
-        // Return updated solution
-        const updatedSolution = await squadClient(userContext).getSolution({
-          orgId,
-          workspaceId,
-          solutionId: params.solutionId,
+        return toolSuccess({
+          id: params.solutionId,
+          message: `Relationships ${params.action === 'add' ? 'added' : 'removed'} successfully`,
         });
-
-        return toolSuccess(updatedSolution);
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));
