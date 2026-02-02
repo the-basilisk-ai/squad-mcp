@@ -61,6 +61,55 @@ interface IntrospectionResult {
 }
 
 /**
+ * Token introspection cache to reduce latency and PropelAuth load.
+ * Uses a short TTL (60s) to balance performance with security (token revocation).
+ */
+const INTROSPECTION_CACHE_TTL_MS = 60 * 1000; // 60 seconds
+const INTROSPECTION_CACHE_MAX_SIZE = 1000;
+
+type CachedIntrospection = {
+  result: IntrospectionResult;
+  cachedAt: number;
+};
+
+const introspectionCache = new Map<string, CachedIntrospection>();
+
+/**
+ * Get cached introspection result if valid
+ */
+function getCachedIntrospection(token: string): IntrospectionResult | undefined {
+  const cached = introspectionCache.get(token);
+  if (!cached) {
+    return undefined;
+  }
+
+  // Check if expired
+  if (Date.now() - cached.cachedAt > INTROSPECTION_CACHE_TTL_MS) {
+    introspectionCache.delete(token);
+    return undefined;
+  }
+
+  return cached.result;
+}
+
+/**
+ * Cache introspection result
+ */
+function cacheIntrospection(token: string, result: IntrospectionResult): void {
+  // Evict oldest entries if cache is full
+  if (introspectionCache.size >= INTROSPECTION_CACHE_MAX_SIZE) {
+    const entries = Array.from(introspectionCache.entries());
+    entries.sort((a, b) => a[1].cachedAt - b[1].cachedAt);
+    const evictCount = Math.ceil(INTROSPECTION_CACHE_MAX_SIZE * 0.1);
+    for (let i = 0; i < evictCount && i < entries.length; i++) {
+      introspectionCache.delete(entries[i][0]);
+    }
+  }
+
+  introspectionCache.set(token, { result, cachedAt: Date.now() });
+}
+
+/**
  * Validates that the introspection response has the expected shape
  */
 function isValidIntrospectionResult(data: unknown): data is IntrospectionResult {
@@ -73,9 +122,15 @@ function isValidIntrospectionResult(data: unknown): data is IntrospectionResult 
 }
 
 /**
- * Token validation via PropelAuth OAuth 2.1 introspection
+ * Token validation via PropelAuth OAuth 2.1 introspection (with caching)
  */
 async function introspectToken(token: string): Promise<IntrospectionResult> {
+  // Check cache first
+  const cached = getCachedIntrospection(token);
+  if (cached) {
+    return cached;
+  }
+
   const response = await fetch(`${AUTH_URL}/oauth/2.1/introspect`, {
     method: 'POST',
     headers: {
@@ -93,6 +148,11 @@ async function introspectToken(token: string): Promise<IntrospectionResult> {
 
   if (!isValidIntrospectionResult(data)) {
     throw new Error('Invalid introspection response: missing or invalid "active" field');
+  }
+
+  // Cache the result (only if active, to avoid caching revoked tokens)
+  if (data.active) {
+    cacheIntrospection(token, data);
   }
 
   return data;
