@@ -116,14 +116,32 @@ const server = new MCPServer({
 
 // OAuth discovery - proxy to PropelAuth (needed to avoid CORS issues)
 server.app.get('/.well-known/oauth-authorization-server', async (c) => {
-  const response = await fetch(`${AUTH_URL}/.well-known/oauth-authorization-server/oauth/2.1`);
-  return c.json(await response.json());
+  try {
+    const response = await fetch(`${AUTH_URL}/.well-known/oauth-authorization-server/oauth/2.1`);
+    if (!response.ok) {
+      logger.error({ status: response.status }, 'OAuth discovery proxy failed');
+      return c.json({ error: 'Failed to fetch OAuth metadata' }, 502);
+    }
+    return c.json(await response.json());
+  } catch (error) {
+    logger.error({ err: error }, 'OAuth discovery proxy error');
+    return c.json({ error: 'Service unavailable' }, 503);
+  }
 });
 
 // OpenID Connect discovery - proxy to PropelAuth (needed to avoid CORS issues)
 server.app.get('/.well-known/openid-configuration', async (c) => {
-  const response = await fetch(`${AUTH_URL}/oauth/2.1/.well-known/openid-configuration`);
-  return c.json(await response.json());
+  try {
+    const response = await fetch(`${AUTH_URL}/oauth/2.1/.well-known/openid-configuration`);
+    if (!response.ok) {
+      logger.error({ status: response.status }, 'OpenID discovery proxy failed');
+      return c.json({ error: 'Failed to fetch OpenID configuration' }, 502);
+    }
+    return c.json(await response.json());
+  } catch (error) {
+    logger.error({ err: error }, 'OpenID discovery proxy error');
+    return c.json({ error: 'Service unavailable' }, 503);
+  }
 });
 
 // Protected resource metadata (RFC 9728)
