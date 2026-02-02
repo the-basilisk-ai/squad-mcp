@@ -18,21 +18,97 @@ export type WorkspaceInfo = {
   name: string;
 };
 
-// In-memory workspace selection store (keyed by user ID from OAuth token)
-const workspaceSelections = new Map<string, { orgId: string; workspaceId: string }>();
+/**
+ * In-memory workspace selection cache with LRU eviction and TTL.
+ *
+ * LIMITATION: This cache is not shared across server instances.
+ * For horizontal scaling, consider using Redis or another shared store.
+ * Users will need to re-select their workspace after server restarts
+ * or when load-balanced to a different instance.
+ */
+const WORKSPACE_CACHE_MAX_SIZE = 10000;
+const WORKSPACE_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+type WorkspaceEntry = {
+  orgId: string;
+  workspaceId: string;
+  lastAccessed: number;
+};
+
+const workspaceSelections = new Map<string, WorkspaceEntry>();
+
+/**
+ * Evict oldest entries if cache is full
+ */
+function evictOldestEntries(): void {
+  if (workspaceSelections.size < WORKSPACE_CACHE_MAX_SIZE) {
+    return;
+  }
+
+  // Find entries to evict (oldest 10%)
+  const entries = Array.from(workspaceSelections.entries());
+  entries.sort((a, b) => a[1].lastAccessed - b[1].lastAccessed);
+
+  const evictCount = Math.ceil(WORKSPACE_CACHE_MAX_SIZE * 0.1);
+  for (let i = 0; i < evictCount && i < entries.length; i++) {
+    workspaceSelections.delete(entries[i][0]);
+  }
+
+  logger.debug({ evicted: evictCount }, 'Evicted oldest workspace selections from cache');
+}
+
+/**
+ * Remove expired entries (called periodically)
+ */
+function removeExpiredEntries(): void {
+  const now = Date.now();
+  let expiredCount = 0;
+
+  for (const [userId, entry] of workspaceSelections.entries()) {
+    if (now - entry.lastAccessed > WORKSPACE_CACHE_TTL_MS) {
+      workspaceSelections.delete(userId);
+      expiredCount++;
+    }
+  }
+
+  if (expiredCount > 0) {
+    logger.debug({ expired: expiredCount }, 'Removed expired workspace selections from cache');
+  }
+}
+
+// Run cleanup every hour
+setInterval(removeExpiredEntries, 60 * 60 * 1000);
 
 /**
  * Store workspace selection for a user
  */
 export function setWorkspaceSelection(userId: string, orgId: string, workspaceId: string): void {
-  workspaceSelections.set(userId, { orgId, workspaceId });
+  evictOldestEntries();
+  workspaceSelections.set(userId, {
+    orgId,
+    workspaceId,
+    lastAccessed: Date.now(),
+  });
 }
 
 /**
  * Get stored workspace selection for a user
  */
 export function getWorkspaceSelection(userId: string): { orgId: string; workspaceId: string } | undefined {
-  return workspaceSelections.get(userId);
+  const entry = workspaceSelections.get(userId);
+  if (!entry) {
+    return undefined;
+  }
+
+  // Check if expired
+  if (Date.now() - entry.lastAccessed > WORKSPACE_CACHE_TTL_MS) {
+    workspaceSelections.delete(userId);
+    return undefined;
+  }
+
+  // Update last accessed time (LRU)
+  entry.lastAccessed = Date.now();
+  return { orgId: entry.orgId, workspaceId: entry.workspaceId };
 }
 
 /**
