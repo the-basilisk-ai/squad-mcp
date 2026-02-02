@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { squadClient } from '../lib/clients/squad.js';
 import { logger } from '../lib/logger.js';
 import { getUserContext } from '../helpers/getUser.js';
-import { type OAuthServer, getUserId, toolError, toolSuccess } from './helpers.js';
+import { type OAuthServer, getUserId, toolError, toolSuccess, WorkspaceSelectionRequired, formatWorkspaceSelectionError } from './helpers.js';
 import { CreateInsightRequestTypeEnum } from '../lib/openapi/squad/models/CreateInsightRequest.js';
 
 /**
@@ -48,6 +48,9 @@ export function registerInsightTools(server: OAuthServer) {
 
         return toolSuccess(result);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'create_insight' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to create insight: ${message}`);
@@ -81,6 +84,9 @@ export function registerInsightTools(server: OAuthServer) {
 
         return toolSuccess(insights);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'list_insights' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to list insights: ${message}`);
@@ -125,6 +131,9 @@ export function registerInsightTools(server: OAuthServer) {
 
         return toolSuccess(insight);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'get_insight' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to get insight: ${message}`);
@@ -157,6 +166,9 @@ export function registerInsightTools(server: OAuthServer) {
 
         return toolSuccess(result);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'delete_insight' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to delete insight: ${message}`);

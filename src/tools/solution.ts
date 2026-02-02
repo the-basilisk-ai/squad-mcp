@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { squadClient } from '../lib/clients/squad.js';
 import { logger } from '../lib/logger.js';
 import { getUserContext } from '../helpers/getUser.js';
-import { type OAuthServer, getUserId, toolError, toolSuccess, toolSuccessPretty } from './helpers.js';
+import { type OAuthServer, getUserId, toolError, toolSuccess, toolSuccessPretty, WorkspaceSelectionRequired, formatWorkspaceSelectionError } from './helpers.js';
 import {
   CreateSolutionPayloadStatusEnum,
   RelationshipAction,
@@ -64,6 +64,9 @@ export function registerSolutionTools(server: OAuthServer) {
 
         return toolSuccessPretty(result);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'create_solution' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to create solution: ${message}`);
@@ -93,6 +96,9 @@ export function registerSolutionTools(server: OAuthServer) {
 
         return toolSuccess(solutions);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'list_solutions' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to list solutions: ${message}`);
@@ -130,6 +136,9 @@ export function registerSolutionTools(server: OAuthServer) {
 
         return toolSuccess(solution);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'get_solution' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to get solution: ${message}`);
@@ -173,6 +182,9 @@ export function registerSolutionTools(server: OAuthServer) {
 
         return toolSuccess(solution);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'update_solution' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to update solution: ${message}`);
@@ -205,6 +217,9 @@ export function registerSolutionTools(server: OAuthServer) {
 
         return toolSuccess({ data: { id: params.solutionId } });
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'delete_solution' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to delete solution: ${message}`);
@@ -250,6 +265,9 @@ export function registerSolutionTools(server: OAuthServer) {
 
         return toolSuccess(updatedSolution);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'manage_solution_relationships' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to manage solution relationships: ${message}`);

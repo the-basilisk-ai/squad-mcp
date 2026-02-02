@@ -1,4 +1,5 @@
 import type { McpServerInstance } from 'mcp-use/server';
+import { WorkspaceSelectionRequired } from '../helpers/getUser.js';
 
 /**
  * Type alias for the server with OAuth enabled
@@ -51,3 +52,18 @@ export function toolSuccessPretty(data: unknown): { content: { type: 'text'; tex
     content: [{ type: 'text', text: JSON.stringify(data, null, 2) }],
   };
 }
+
+/**
+ * Format WorkspaceSelectionRequired error with available orgs/workspaces
+ */
+export function formatWorkspaceSelectionError(error: WorkspaceSelectionRequired): string {
+  let message = error.message;
+  message += `\n\nAvailable organisations:\n${error.orgs.map(o => `- ${o.name} (${o.id})`).join('\n')}`;
+  if (error.workspaces) {
+    message += `\n\nAvailable workspaces:\n${error.workspaces.map(w => `- ${w.name} (${w.id})`).join('\n')}`;
+  }
+  return message;
+}
+
+// Re-export for convenience
+export { WorkspaceSelectionRequired };

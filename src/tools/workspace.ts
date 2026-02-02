@@ -7,9 +7,8 @@ import {
   listOrgWorkspaces,
   setWorkspaceSelection,
   getWorkspaceSelection,
-  WorkspaceSelectionRequired,
 } from '../helpers/getUser.js';
-import { type OAuthServer, getUserId, toolError, toolSuccess } from './helpers.js';
+import { type OAuthServer, getUserId, toolError, toolSuccess, WorkspaceSelectionRequired, formatWorkspaceSelectionError } from './helpers.js';
 
 /**
  * Register workspace tools with the MCP server
@@ -124,10 +123,7 @@ export function registerWorkspaceTools(server: OAuthServer) {
         return toolSuccess(workspace);
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
-          return toolError(
-            `${error.message}\n\nAvailable organisations:\n${error.orgs.map(o => `- ${o.name} (${o.id})`).join('\n')}` +
-            (error.workspaces ? `\n\nAvailable workspaces:\n${error.workspaces.map(w => `- ${w.name} (${w.id})`).join('\n')}` : '')
-          );
+          return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: 'get_workspace' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
@@ -167,7 +163,7 @@ export function registerWorkspaceTools(server: OAuthServer) {
         return toolSuccess(workspace);
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
-          return toolError(error.message);
+          return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: 'update_workspace' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';

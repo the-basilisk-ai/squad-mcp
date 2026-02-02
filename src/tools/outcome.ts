@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { squadClient } from '../lib/clients/squad.js';
 import { logger } from '../lib/logger.js';
 import { getUserContext } from '../helpers/getUser.js';
-import { type OAuthServer, getUserId, toolError, toolSuccess } from './helpers.js';
+import { type OAuthServer, getUserId, toolError, toolSuccess, WorkspaceSelectionRequired, formatWorkspaceSelectionError } from './helpers.js';
 import { RelationshipAction, type CreateOutcomePayload } from '../lib/openapi/squad/models/index.js';
 
 /**
@@ -49,6 +49,9 @@ export function registerOutcomeTools(server: OAuthServer) {
 
         return toolSuccess(result);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'create_outcome' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to create outcome: ${message}`);
@@ -82,6 +85,9 @@ export function registerOutcomeTools(server: OAuthServer) {
 
         return toolSuccess(outcomes);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'list_outcomes' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to list outcomes: ${message}`);
@@ -120,6 +126,9 @@ export function registerOutcomeTools(server: OAuthServer) {
 
         return toolSuccess(outcome);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'get_outcome' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to get outcome: ${message}`);
@@ -161,6 +170,9 @@ export function registerOutcomeTools(server: OAuthServer) {
 
         return toolSuccess(outcome);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'update_outcome' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to update outcome: ${message}`);
@@ -193,6 +205,9 @@ export function registerOutcomeTools(server: OAuthServer) {
 
         return toolSuccess({ data: { id: params.outcomeId } });
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'delete_outcome' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to delete outcome: ${message}`);
@@ -238,6 +253,9 @@ export function registerOutcomeTools(server: OAuthServer) {
 
         return toolSuccess(updatedOutcome);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'manage_outcome_relationships' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to manage outcome relationships: ${message}`);

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { squadClient } from '../lib/clients/squad.js';
 import { logger } from '../lib/logger.js';
 import { getUserContext } from '../helpers/getUser.js';
-import { type OAuthServer, getUserId, toolError, toolSuccessPretty } from './helpers.js';
+import { type OAuthServer, getUserId, toolError, toolSuccessPretty, WorkspaceSelectionRequired, formatWorkspaceSelectionError } from './helpers.js';
 import { SimilaritySearchRequestFiltersEnum } from '../lib/openapi/squad/models/SimilaritySearchRequest.js';
 
 /**
@@ -55,6 +55,9 @@ export function registerSearchTools(server: OAuthServer) {
 
         return toolSuccessPretty(results);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'similarity_search' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to perform similarity search: ${message}`);

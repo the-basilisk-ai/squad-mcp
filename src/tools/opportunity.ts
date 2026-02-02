@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { squadClient } from '../lib/clients/squad.js';
 import { logger } from '../lib/logger.js';
-import { getUserContext, WorkspaceSelectionRequired } from '../helpers/getUser.js';
-import { type OAuthServer, getUserId, toolError, toolSuccess } from './helpers.js';
+import { getUserContext } from '../helpers/getUser.js';
+import { type OAuthServer, getUserId, toolError, toolSuccess, WorkspaceSelectionRequired, formatWorkspaceSelectionError } from './helpers.js';
 import {
   RelationshipAction,
   UpdateOpportunityPayloadStatusEnum,
@@ -42,6 +42,9 @@ export function registerOpportunityTools(server: OAuthServer) {
 
         return toolSuccess(result);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'create_opportunity' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to create opportunity: ${message}`);
@@ -75,6 +78,9 @@ export function registerOpportunityTools(server: OAuthServer) {
 
         return toolSuccess(opportunities);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'list_opportunities' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to list opportunities: ${message}`);
@@ -113,6 +119,9 @@ export function registerOpportunityTools(server: OAuthServer) {
 
         return toolSuccess(opportunity);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'get_opportunity' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to get opportunity: ${message}`);
@@ -158,6 +167,9 @@ export function registerOpportunityTools(server: OAuthServer) {
 
         return toolSuccess(opportunity);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'update_opportunity' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to update opportunity: ${message}`);
@@ -190,6 +202,9 @@ export function registerOpportunityTools(server: OAuthServer) {
 
         return toolSuccess({ data: { id: params.opportunityId } });
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'delete_opportunity' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to delete opportunity: ${message}`);
@@ -223,6 +238,9 @@ export function registerOpportunityTools(server: OAuthServer) {
 
         return toolSuccess({ data: { id: params.opportunityId } });
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'generate_solutions' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to generate solutions: ${message}`);
@@ -272,6 +290,9 @@ export function registerOpportunityTools(server: OAuthServer) {
 
         return toolSuccess(updatedOpportunity);
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
         logger.debug({ err: error, tool: 'manage_opportunity_relationships' }, 'Tool error');
         const message = error instanceof Error ? error.message : 'Unknown error';
         return toolError(`Unable to manage opportunity relationships: ${message}`);
