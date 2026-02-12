@@ -1,0 +1,17 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "ai.meetsquad/squad",
+  "title": "Squad",
+  "description": "Your AI Product Manager. Surface insights, build roadmaps, and plan strategy with 30+ tools.",
+  "repository": {
+    "url": "https://github.com/the-basilisk-ai/squad-mcp",
+    "source": "github"
+  },
+  "version": "3.0.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.meetsquad.ai/mcp"
+    }
+  ]
+}
