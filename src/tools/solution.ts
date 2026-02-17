@@ -116,13 +116,20 @@ export function registerSolutionTools(server: OAuthServer) {
       title: "List Solutions",
       description:
         "List all solutions in the workspace. Solutions are proposed approaches to address opportunities.",
-      schema: z.object({}),
+      schema: z.object({
+        filter: z
+          .enum(["roadmap", "recommended"])
+          .optional()
+          .describe(
+            "Filter solutions: 'roadmap' returns built solutions (user-created or edited), 'recommended' returns AI-generated suggestions not yet acted on. Omit to return all.",
+          ),
+      }),
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,
       },
     },
-    async (_params, ctx) => {
+    async (params, ctx) => {
       try {
         const userContext = await getUserContext(
           ctx.auth.accessToken,
@@ -130,9 +137,17 @@ export function registerSolutionTools(server: OAuthServer) {
         );
         const { orgId, workspaceId } = userContext;
 
+        const built =
+          params.filter === "roadmap"
+            ? "true"
+            : params.filter === "recommended"
+              ? "false"
+              : undefined;
+
         const solutions = await squadClient(userContext).listSolutions({
           orgId,
           workspaceId,
+          built: built as "true" | "false" | undefined,
         });
 
         if (solutions.data.length === 0) {
