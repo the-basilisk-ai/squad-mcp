@@ -22,7 +22,7 @@
     "start": "node dist/server.js",
     "format": "biome check .",
     "format:fix": "biome check --write .",
-    "openapi:squad": "openapi-generator-cli generate -g typescript-fetch -c ./openapi-generator-config.json -i ./openapi/squad.json -o src/lib/openapi/squad && npx tsx ./scripts/openapi-client-esm-fix.ts"
+    "openapi:squad": "npx tsx ./scripts/openapi-unify-tags.ts && openapi-generator-cli generate -g typescript-fetch -c ./openapi-generator-config.json -i ./openapi/squad.json -o src/lib/openapi/squad && npx tsx ./scripts/openapi-client-esm-fix.ts"
   },
   "files": [
     "dist"
