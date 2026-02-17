@@ -19,6 +19,7 @@
             nodePackages.typescript
             nodePackages.typescript-language-server
             railway
+            jdk
           ];
         };
       }
