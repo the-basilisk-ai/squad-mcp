@@ -4,6 +4,7 @@ import { squadClient } from "../lib/clients/squad.js";
 import { logger } from "../lib/logger.js";
 import {
   CreateSolutionPayloadStatusEnum,
+  PrioritiseSolutionsRequestTriggeredByEnum,
   type RelationshipAction,
 } from "../lib/openapi/squad/models/index.js";
 import {
@@ -420,6 +421,66 @@ export function registerSolutionTools(server: OAuthServer) {
         const message =
           error instanceof Error ? error.message : "Unknown error";
         return toolError(`Unable to manage solution relationships: ${message}`);
+      }
+    },
+  );
+
+  // Prioritise Solutions
+  server.tool(
+    {
+      name: "prioritise_solutions",
+      title: "Prioritise Solutions",
+      description:
+        "Reorder the priority of solutions by moving them before a specified solution. This changes the display order of solutions in the workspace.",
+      schema: z.object({
+        solutionIds: z
+          .array(z.string())
+          .describe("List of solution IDs to move"),
+        beforeId: z
+          .string()
+          .nullable()
+          .describe(
+            "ID of the solution before which to place the solutions, or null to place at the end",
+          ),
+      }),
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+      },
+    },
+    async (params, ctx) => {
+      try {
+        const userContext = await getUserContext(
+          ctx.auth.accessToken,
+          getUserId(ctx.auth),
+        );
+        const { orgId, workspaceId } = userContext;
+
+        await squadClient(userContext).prioritiseSolutions({
+          orgId,
+          workspaceId,
+          prioritiseSolutionsRequest: {
+            solutionIds: params.solutionIds,
+            beforeId: params.beforeId,
+            triggeredBy: PrioritiseSolutionsRequestTriggeredByEnum.Ai,
+          },
+        });
+
+        return toolSuccess({
+          solutionIds: params.solutionIds,
+          message: "Solutions prioritised successfully",
+        });
+      } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
+        logger.debug(
+          { err: error, tool: "prioritise_solutions" },
+          "Tool error",
+        );
+        const message =
+          error instanceof Error ? error.message : "Unknown error";
+        return toolError(`Unable to prioritise solutions: ${message}`);
       }
     },
   );
