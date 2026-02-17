@@ -124,6 +124,12 @@ export function registerSolutionTools(server: OAuthServer) {
           .describe(
             "Filter solutions: 'roadmap' returns built solutions (user-created or edited), 'recommended' returns AI-generated suggestions not yet acted on. Omit to return all.",
           ),
+        horizon: z
+          .enum(["now", "next", "later"])
+          .optional()
+          .describe(
+            "Filter by time horizon: 'now' for current work, 'next' for upcoming, 'later' for future.",
+          ),
       }),
       annotations: {
         readOnlyHint: true,
@@ -149,6 +155,7 @@ export function registerSolutionTools(server: OAuthServer) {
           orgId,
           workspaceId,
           built: built as "true" | "false" | undefined,
+          horizon: params.horizon as "now" | "next" | "later" | undefined,
         });
 
         if (solutions.data.length === 0) {
@@ -158,10 +165,13 @@ export function registerSolutionTools(server: OAuthServer) {
         // Return summaries to reduce token usage - use get_solution for full details
         return toolSuccess({
           count: solutions.data.length,
-          items: solutions.data.map(s => ({
+          items: solutions.data.map((s, i) => ({
             id: s.id,
             title: s.title,
             status: s.status,
+            ...(params.filter === "roadmap"
+              ? { priority: i + 1, horizon: s.horizon }
+              : {}),
           })),
         });
       } catch (error) {
