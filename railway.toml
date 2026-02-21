@@ -3,7 +3,7 @@ builder = "RAILPACK"
 buildCommand = "yarn build"
 
 [deploy]
-startCommand = "node dist/server.js"
+startCommand = "yarn start"
 healthcheckPath = "/health"
 healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"

@@ -27,3 +27,18 @@ export function getSquadApiUrl(): string {
   }
   return "https://api.meetsquad.ai";
 }
+
+/**
+ * Get Squad App URL based on SQUAD_ENV
+ */
+export function getSquadAppUrl(): string {
+  const squadEnv = process.env.SQUAD_ENV || "production";
+
+  if (squadEnv === "dev") {
+    return "https://dev.meetsquad.ai";
+  }
+  if (squadEnv === "staging") {
+    return "https://uat.meetsquad.ai";
+  }
+  return "https://app.meetsquad.ai";
+}

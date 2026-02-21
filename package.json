@@ -1,25 +1,18 @@
 {
   "name": "@squadai/tools",
   "version": "3.0.0",
-  "main": "./dist/server.js",
-  "types": "./dist/server.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "license": "MIT",
   "type": "module",
-  "sideEffects": false,
-  "exports": {
-    ".": {
-      "import": "./dist/server.js",
-      "types": "./dist/server.d.ts"
-    },
-    "./client": {
-      "import": "./dist/client.js",
-      "types": "./dist/client.d.ts"
-    }
-  },
   "scripts": {
-    "build": "swc src -d dist --strip-leading-paths",
-    "dev": "tsx src/server.ts",
-    "start": "node dist/server.js",
+    "postinstall": "echo '// no-op: server uses SWC' > node_modules/typescript/bin/tsc",
+    "build": "swc index.ts src -d dist && mcp-use build",
+    "dev": "mcp-use dev",
+    "start": "mcp-use start",
+    "deploy": "mcp-use deploy",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
     "format": "biome check .",
     "format:fix": "biome check --write .",
     "openapi:squad": "npx tsx ./scripts/openapi-unify-tags.ts && openapi-generator-cli generate -g typescript-fetch -c ./openapi-generator-config.json -i ./openapi/squad.json -o src/lib/openapi/squad && npx tsx ./scripts/openapi-client-esm-fix.ts"
@@ -28,20 +21,32 @@
     "dist"
   ],
   "dependencies": {
+    "@mcp-use/inspector": "^0.22.3",
     "@modelcontextprotocol/sdk": "^1.26.0",
-    "dotenv": "^17.2.4",
-    "mcp-use": "^1.16.4",
-    "zod": "^4.2.0"
+    "clsx": "^2.1.1",
+    "dotenv": "^17.3.1",
+    "mcp-use": "^1.20.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zod": "4.3.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.14",
-    "@openapitools/openapi-generator-cli": "^2.28.2",
+    "@biomejs/biome": "^2.4.4",
+    "@openapitools/openapi-generator-cli": "^2.29.0",
+    "@storybook/react-vite": "^10.2.10",
     "@swc/cli": "^0.8.0",
     "@swc/core": "^1.15.11",
-    "@types/node": "^25.2.2",
-    "glob": "^13.0.1",
+    "@tailwindcss/vite": "^4.2.0",
+    "@types/node": "^25.3.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^4.5.2",
+    "glob": "^13.0.6",
+    "serve": "^14.2.5",
+    "storybook": "^10.2.10",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^6.3.5"
   },
   "resolutions": {
     "@modelcontextprotocol/sdk": "^1.26.0",
@@ -50,7 +55,8 @@
     "lodash": "^4.17.23",
     "diff": "^4.0.4",
     "@isaacs/brace-expansion": "^5.0.1",
-    "axios": "^1.13.5"
+    "axios": "^1.13.5",
+    "hono": "^4.12.0"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

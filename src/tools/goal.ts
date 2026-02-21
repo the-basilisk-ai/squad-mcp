@@ -33,7 +33,9 @@ export function registerGoalTools(server: OAuthServer) {
         priority: z
           .number()
           .optional()
-          .describe("Priority level of the goal (numeric)"),
+          .describe(
+            "Importance level of the goal (1–5, higher = more important)",
+          ),
         trend: z
           .number()
           .optional()
@@ -70,7 +72,7 @@ export function registerGoalTools(server: OAuthServer) {
           ownerId: params.ownerId,
         };
 
-        const result = await squadClient(userContext).createOutcome({
+        const result = await squadClient(userContext).createGoal({
           orgId,
           workspaceId,
           createOutcomePayload: outcomePayload,
@@ -114,7 +116,7 @@ export function registerGoalTools(server: OAuthServer) {
         );
         const { orgId, workspaceId } = userContext;
 
-        const outcomes = await squadClient(userContext).listOutcomes({
+        const outcomes = await squadClient(userContext).listGoals({
           orgId,
           workspaceId,
         });
@@ -129,7 +131,7 @@ export function registerGoalTools(server: OAuthServer) {
           items: outcomes.data.map(o => ({
             id: o.id,
             title: o.title,
-            priority: o.priority,
+            importance: o.priority,
           })),
         });
       } catch (error) {
@@ -174,7 +176,7 @@ export function registerGoalTools(server: OAuthServer) {
         );
         const { orgId, workspaceId } = userContext;
 
-        const outcome = await squadClient(userContext).getOutcome({
+        const outcome = await squadClient(userContext).getGoal({
           orgId,
           workspaceId,
           outcomeId: params.goalId,
@@ -182,8 +184,10 @@ export function registerGoalTools(server: OAuthServer) {
         });
 
         // Return summaries for relationships to reduce token usage
+        const { priority, ...rest } = outcome;
         return toolSuccess({
-          ...outcome,
+          ...rest,
+          importance: priority,
           opportunities: outcome.opportunities?.map(
             (o: { id: string; title: string; status: string }) => ({
               id: o.id,
@@ -228,7 +232,10 @@ export function registerGoalTools(server: OAuthServer) {
         goalId: z.string().describe("The ID of the goal to update"),
         title: z.string().optional().describe("Updated title"),
         description: z.string().optional().describe("Updated description"),
-        priority: z.number().optional().describe("Updated priority level"),
+        priority: z
+          .number()
+          .optional()
+          .describe("Updated importance level (1–5, higher = more important)"),
         trend: z.number().optional().describe("Updated trend indicator"),
         analyticEvents: z
           .array(z.string())
@@ -254,7 +261,7 @@ export function registerGoalTools(server: OAuthServer) {
         const { orgId, workspaceId } = userContext;
         const { goalId, ...updatePayload } = params;
 
-        const outcome = await squadClient(userContext).updateOutcome({
+        const outcome = await squadClient(userContext).updateGoal({
           orgId,
           workspaceId,
           outcomeId: goalId,
@@ -300,7 +307,7 @@ export function registerGoalTools(server: OAuthServer) {
         );
         const { orgId, workspaceId } = userContext;
 
-        await squadClient(userContext).deleteOutcome({
+        await squadClient(userContext).deleteGoal({
           orgId,
           workspaceId,
           outcomeId: params.goalId,
@@ -351,7 +358,7 @@ export function registerGoalTools(server: OAuthServer) {
         );
         const { orgId, workspaceId } = userContext;
 
-        await squadClient(userContext).manageOutcomeRelationships({
+        await squadClient(userContext).manageGoalRelationships({
           orgId,
           workspaceId,
           outcomeId: params.goalId,

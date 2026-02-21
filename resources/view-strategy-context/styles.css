@@ -1,0 +1,84 @@
+@import "tailwindcss";
+@source "./**/*.{ts,tsx}";
+
+@theme {
+  /* Design tokens — from squad-ui globals.css */
+  --color-core-purple: #614ade;
+  --color-content-purple: #7e22ce;
+  --color-content-purple-dark: #c084fc;
+  --color-background-purple: #f3e8ff;
+  --color-background-purple-dark: #581c87;
+  --color-border-purple: #a855f7;
+
+  --color-content-warning: #b45309;
+  --color-content-warning-dark: #fbbf24;
+  --color-background-warning: #fef3c7;
+  --color-background-warning-dark: #451a03;
+  --color-border-warning: #f59e0b;
+
+  --color-content-info: #1d4ed8;
+  --color-content-info-dark: #60a5fa;
+  --color-background-info: #dbeafe;
+  --color-background-info-dark: #172554;
+  --color-border-info: #3b82f6;
+
+  --color-content-success: #15803d;
+  --color-content-success-dark: #4ade80;
+  --color-background-success: #dcfce7;
+  --color-background-success-dark: #052e16;
+  --color-border-success: #22c55e;
+
+  --color-content-error: #b91c1c;
+  --color-content-error-dark: #f87171;
+  --color-background-error: #fee2e2;
+  --color-background-error-dark: #450a0a;
+  --color-border-error: #ef4444;
+
+  --color-content-cyan: #0e7490;
+  --color-content-cyan-dark: #22d3ee;
+  --color-background-cyan: #cffafe;
+  --color-background-cyan-dark: #083344;
+  --color-border-cyan: #06b6d4;
+
+  --animate-shimmer: shimmer 1.5s infinite linear;
+  --animate-fade-in: fadeIn 0.2s ease-out both;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  background: transparent;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .shimmer {
+    background: linear-gradient(90deg, #27272a 25%, #3f3f46 50%, #27272a 75%);
+    background-size: 800px 100%;
+  }
+}
