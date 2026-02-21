@@ -1,0 +1,8 @@
+[build]
+builder = "RAILPACK"
+buildCommand = "yarn build-storybook"
+
+[deploy]
+startCommand = "serve storybook-static -l tcp://0.0.0.0:$PORT"
+healthcheckPath = "/"
+healthcheckTimeout = 30
