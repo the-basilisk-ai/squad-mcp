@@ -1,6 +1,6 @@
 [build]
 builder = "RAILPACK"
-buildCommand = "yarn build"
+buildCommand = "MCP_URL= yarn build"
 
 [deploy]
 startCommand = "yarn start"

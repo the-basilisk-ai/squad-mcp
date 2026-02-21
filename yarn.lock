@@ -1053,6 +1053,29 @@
     ws "^8.19.0"
     zod "4.3.5"
 
+"@mcp-use/cli@2.15.4":
+  version "2.15.4"
+  resolved "https://registry.yarnpkg.com/@mcp-use/cli/-/cli-2.15.4.tgz#1e6b70df07ae682b8e383a8539273b50b533f0d7"
+  integrity sha512-WTN+yt3OK5Mdf3Myf1WsToG2WXPBaDDIdQsPeexhXSDGkDEHch9K4NKdR2GGZNcotSAbVURN/k9YPS59SRW+lA==
+  dependencies:
+    "@mcp-use/inspector" "0.23.0"
+    "@tailwindcss/vite" "^4.2.0"
+    "@vitejs/plugin-react" "^5.1.4"
+    chalk "^5.6.2"
+    chokidar "^5.0.0"
+    commander "^14.0.2"
+    dotenv "^17.3.1"
+    esbuild "0.27.1"
+    globby "^16.1.1"
+    mcp-use "1.20.4"
+    open "^11.0.0"
+    tar "^7.5.9"
+    tsx "^4.21.0"
+    vite "^7.3.1"
+    vite-plugin-singlefile "^2.0.3"
+    ws "^8.19.0"
+    zod "4.3.5"
+
 "@mcp-use/inspector@0.22.3", "@mcp-use/inspector@^0.22.3":
   version "0.22.3"
   resolved "https://registry.yarnpkg.com/@mcp-use/inspector/-/inspector-0.22.3.tgz#515bbd1b7f3dbdc722ca14a5e47ceb0b9882ecd6"
@@ -1087,6 +1110,51 @@
     lucide-react "^0.562.0"
     markdown-to-jsx "^9.7.4"
     mcp-use "1.20.3"
+    motion "^12.34.2"
+    next-themes "^0.4.6"
+    open "^11.0.0"
+    posthog-node "^5.24.17"
+    react-resizable-panels "^4.6.4"
+    react-syntax-highlighter "^16.1.0"
+    sonner "^2.0.7"
+    tailwind-merge "^3.5.0"
+    vite-express "^0.22.0"
+    zod "4.3.5"
+
+"@mcp-use/inspector@0.23.0":
+  version "0.23.0"
+  resolved "https://registry.yarnpkg.com/@mcp-use/inspector/-/inspector-0.23.0.tgz#e12cbd7abbe89f7b33a660aa4140caeab42c53c5"
+  integrity sha512-gGjUNWcCP4+hZ62cFPBLxat39Je0HVf3QQfUlf+FaBU4lSAehkVqmI6UQTl8fDlNwIGw0jbJ4xQq7EKnC4z54g==
+  dependencies:
+    "@hono/node-server" "^1.19.9"
+    "@langchain/anthropic" "^1.3.18"
+    "@langchain/core" "^1.1.26"
+    "@langchain/google-genai" "^2.1.19"
+    "@langchain/openai" "^1.2.8"
+    "@mcp-ui/client" "^6.1.0"
+    "@modelcontextprotocol/ext-apps" "^1.0.1"
+    "@modelcontextprotocol/sdk" "^1.26.0"
+    "@radix-ui/react-alert-dialog" "^1.1.15"
+    "@radix-ui/react-checkbox" "^1.3.3"
+    "@radix-ui/react-dialog" "^1.1.15"
+    "@radix-ui/react-dropdown-menu" "^2.1.16"
+    "@radix-ui/react-label" "^2.1.8"
+    "@radix-ui/react-popover" "^1.1.15"
+    "@radix-ui/react-select" "^2.2.6"
+    "@radix-ui/react-switch" "^1.2.6"
+    "@radix-ui/react-tooltip" "^1.2.8"
+    "@scarf/scarf" "^1.4.0"
+    "@tailwindcss/cli" "^4.2.0"
+    "@tailwindcss/vite" "^4.2.0"
+    "@types/react-syntax-highlighter" "^15.5.13"
+    class-variance-authority "^0.7.1"
+    clsx "^2.1.1"
+    cmdk "^1.1.1"
+    hono "^4.11.10"
+    langchain "^1.2.25"
+    lucide-react "^0.562.0"
+    markdown-to-jsx "^9.7.4"
+    mcp-use "1.20.4"
     motion "^12.34.2"
     next-themes "^0.4.6"
     open "^11.0.0"
@@ -5243,7 +5311,7 @@ math-intrinsics@^1.1.0:
   resolved "https://registry.npmjs.org/math-intrinsics/-/math-intrinsics-1.1.0.tgz"
   integrity sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==
 
-mcp-use@1.20.3, mcp-use@^1.20.3:
+mcp-use@1.20.3:
   version "1.20.3"
   resolved "https://registry.yarnpkg.com/mcp-use/-/mcp-use-1.20.3.tgz#cb880b78cf481a790c086e0c4dab63cc04e6d8ec"
   integrity sha512-EoBTzIOvX+fSkkIJVwARTVx/wIfEJxoxiSMfGjrBcqMKVF9rt4qAZOa6KmhaGAU5DTn22UKCU5Qmh11Qo/n+Vg==
@@ -5252,6 +5320,30 @@ mcp-use@1.20.3, mcp-use@^1.20.3:
     "@mcp-ui/server" "^6.1.0"
     "@mcp-use/cli" "2.15.3"
     "@mcp-use/inspector" "0.22.3"
+    "@modelcontextprotocol/ext-apps" "^1.0.1"
+    "@modelcontextprotocol/sdk" "^1.26.0"
+    express "^5.2.1"
+    hono "^4.11.10"
+    jose "^6.1.3"
+    node-mocks-http "^1.17.2"
+    posthog-js "^1.351.3"
+    posthog-node "^5.24.17"
+    ws "^8.19.0"
+    zod "4.3.5"
+  optionalDependencies:
+    chalk "^5.6.2"
+    cli-highlight "^2.1.11"
+    redis "^5.10.0"
+
+mcp-use@1.20.4, mcp-use@^1.20.4:
+  version "1.20.4"
+  resolved "https://registry.yarnpkg.com/mcp-use/-/mcp-use-1.20.4.tgz#dc0fe037f0ffabfb4415ed44e2dcf9bc542217cd"
+  integrity sha512-woNxU1jfTSuCycv0ZU0qgjx4+Ud/TD/1IqaOeQLCBLoeEk9Fb8xI+1VseZEABejzsszWTXlWnwKmlewy1dCzrw==
+  dependencies:
+    "@hono/node-server" "^1.19.9"
+    "@mcp-ui/server" "^6.1.0"
+    "@mcp-use/cli" "2.15.4"
+    "@mcp-use/inspector" "0.23.0"
     "@modelcontextprotocol/ext-apps" "^1.0.1"
     "@modelcontextprotocol/sdk" "^1.26.0"
     express "^5.2.1"
