@@ -4,6 +4,7 @@ import { getSquadAppUrl } from "../helpers/config.js";
 import { getUserContext } from "../helpers/getUser.js";
 import { squadClient } from "../lib/clients/squad.js";
 import { logger } from "../lib/logger.js";
+import { CreateSolutionPayloadStatusEnum } from "../lib/openapi/squad/models/index.js";
 import {
   formatWorkspaceSelectionError,
   getUserId,
@@ -532,7 +533,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 /**
- * Format entity context data as human-readable text for non-UI MCP clients.
+ * Format strategy context data as human-readable text for non-UI MCP clients.
  */
 function formatHierarchyText(data: EntityContextData): string {
   const lines: string[] = [];
@@ -588,6 +589,178 @@ function formatHierarchyText(data: EntityContextData): string {
   return lines.join("\n");
 }
 
+/* ─── Roadmap data types ─────────────────────────────────────────────── */
+
+type RoadmapGoalSummary = {
+  id: string;
+  title: string;
+  priority: number;
+  colorIndex: number;
+};
+
+type RoadmapSolution = {
+  id: string;
+  title: string;
+  status: string;
+  horizon?: string;
+  goalId?: string;
+};
+
+type RoadmapHorizonColumn = {
+  horizon: "now" | "next" | "later";
+  solutions: Array<{ id: string; title: string; status: string; goalId?: string }>;
+};
+
+type RoadmapData = {
+  goals: RoadmapGoalSummary[];
+  columns: RoadmapHorizonColumn[];
+  totalSolutions: number;
+  appBaseUrl?: string;
+};
+
+const RESOLVED_STATUSES = new Set(["Complete", "Cancelled"]);
+const HORIZON_ORDER = ["now", "next", "later"] as const;
+
+/**
+ * Fetch goals + roadmap solutions and assemble the roadmap view data.
+ */
+async function buildRoadmapData(
+  client: ReturnType<typeof squadClient>,
+  orgId: string,
+  workspaceId: string,
+  opts: {
+    goalId?: string;
+    statusFilter?: string[];
+    showResolved?: boolean;
+  },
+): Promise<RoadmapData> {
+  const [goalsResp, solutionsResp] = await Promise.all([
+    client.listGoals({ orgId, workspaceId }),
+    client.listSolutions({
+      orgId,
+      workspaceId,
+      built: "true" as const,
+      relationships: "outcomes",
+    }),
+  ]);
+
+  // Build goal lookup
+  const goalLookup = new Map<
+    string,
+    { id: string; title: string; priority: number }
+  >();
+  for (const g of goalsResp.data) {
+    goalLookup.set(g.id, { id: g.id, title: g.title, priority: g.priority ?? 0 });
+  }
+
+  // Map solutions with goalId from outcomes
+  let solutions: RoadmapSolution[] = solutionsResp.data.map(
+    (s: {
+      id: string;
+      title: string;
+      status: string;
+      horizon?: string;
+      outcomes?: Array<{ id: string }>;
+    }) => ({
+      id: s.id,
+      title: s.title,
+      status: s.status,
+      horizon: s.horizon,
+      goalId: s.outcomes?.[0]?.id,
+    }),
+  );
+
+  // Apply filters
+  if (opts.goalId) {
+    solutions = solutions.filter((s) => s.goalId === opts.goalId);
+  }
+  if (opts.statusFilter && opts.statusFilter.length > 0) {
+    const allowed = new Set(opts.statusFilter);
+    solutions = solutions.filter((s) => allowed.has(s.status));
+  }
+  if (!opts.showResolved) {
+    solutions = solutions.filter((s) => !RESOLVED_STATUSES.has(s.status));
+  }
+
+  // Group by horizon, omit empty
+  const groups = new Map<string, RoadmapSolution[]>();
+  for (const s of solutions) {
+    const h = s.horizon || "later";
+    if (!groups.has(h)) groups.set(h, []);
+    groups.get(h)!.push(s);
+  }
+
+  const columns: RoadmapHorizonColumn[] = HORIZON_ORDER.filter((h) =>
+    groups.has(h),
+  ).map((h) => ({
+    horizon: h,
+    solutions: groups.get(h)!.map((s) => ({
+      id: s.id,
+      title: s.title,
+      status: s.status,
+      goalId: s.goalId,
+    })),
+  }));
+
+  // Collect referenced goals, sorted by priority desc
+  const referencedGoalIds = new Set(
+    solutions.map((s) => s.goalId).filter(Boolean) as string[],
+  );
+  const goals: RoadmapGoalSummary[] = [...referencedGoalIds]
+    .map((gid) => goalLookup.get(gid))
+    .filter(Boolean)
+    .sort((a, b) => (b!.priority ?? 0) - (a!.priority ?? 0))
+    .map((g, i) => ({ ...g!, colorIndex: i }));
+
+  return { goals, columns, totalSolutions: solutions.length };
+}
+
+/**
+ * Format roadmap data as human-readable text for non-UI MCP clients.
+ */
+function formatRoadmapText(data: RoadmapData): string {
+  const lines: string[] = [];
+  lines.push(`Roadmap (${data.totalSolutions} solutions)`);
+
+  if (data.goals.length > 0) {
+    const goalParts = data.goals.map((g) => {
+      const stars = Array.from({ length: 5 }, (_, i) =>
+        i < g.priority ? "\u2605" : "\u2606",
+      ).join("");
+      return `${g.title} (${stars})`;
+    });
+    lines.push(`Goals: ${goalParts.join(", ")}`);
+  }
+
+  for (const col of data.columns) {
+    lines.push("");
+    lines.push(
+      `${col.horizon.charAt(0).toUpperCase() + col.horizon.slice(1)} (${col.solutions.length}):`,
+    );
+    for (const s of col.solutions) {
+      const status = STATUS_LABELS[s.status] || s.status;
+      const goal = data.goals.find((g) => g.id === s.goalId);
+      const goalSuffix = goal ? ` \u2192 ${goal.title}` : "";
+      lines.push(`  \u2022 ${s.title} [${status}]${goalSuffix}`);
+    }
+  }
+
+  if (data.appBaseUrl) {
+    lines.push(`\nView in Squad: ${data.appBaseUrl}/strategy?view=roadmap`);
+  }
+
+  return lines.join("\n");
+}
+
+const solutionStatusEnum = z.enum([
+  CreateSolutionPayloadStatusEnum.New,
+  CreateSolutionPayloadStatusEnum.InDevelopment,
+  CreateSolutionPayloadStatusEnum.Planned,
+  CreateSolutionPayloadStatusEnum.Complete,
+  CreateSolutionPayloadStatusEnum.Cancelled,
+  CreateSolutionPayloadStatusEnum.Backlog,
+]);
+
 /**
  * Register view tools with the MCP server
  */
@@ -626,8 +799,8 @@ export function registerViewTools(server: OAuthServer) {
       },
       widget: {
         name: "view-strategy-context",
-        invoking: "Loading entity context...",
-        invoked: "Entity context ready",
+        invoking: "Loading strategy context...",
+        invoked: "Strategy context ready",
       },
     },
     async (params, ctx) => {
@@ -729,6 +902,72 @@ export function registerViewTools(server: OAuthServer) {
         const message =
           error instanceof Error ? error.message : "Unknown error";
         return toolError(`Unable to view entity in context: ${message}`);
+      }
+    },
+  );
+
+  server.tool(
+    {
+      name: "view_roadmap",
+      title: "View Roadmap",
+      description:
+        "Show the product roadmap — solutions organized by time horizon (Now/Next/Later) with goal context. " +
+        "Use this when the user asks about the roadmap, what's planned, what's coming next, priorities, " +
+        "or wants to see an overview of solutions being built.",
+      schema: z.object({
+        goalId: z
+          .string()
+          .optional()
+          .describe("Filter to solutions linked to this goal"),
+        statusFilter: z
+          .array(solutionStatusEnum)
+          .optional()
+          .describe("Filter by solution statuses"),
+        showResolved: z
+          .boolean()
+          .optional()
+          .default(false)
+          .describe("Include completed/cancelled solutions"),
+      }),
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+      },
+      widget: {
+        name: "view-roadmap",
+        invoking: "Loading roadmap...",
+        invoked: "Roadmap ready",
+      },
+    },
+    async (params, ctx) => {
+      try {
+        const userContext = await getUserContext(
+          ctx.auth.accessToken,
+          getUserId(ctx.auth),
+        );
+        const { orgId, workspaceId } = userContext;
+        const client = squadClient(userContext);
+
+        const data = await buildRoadmapData(client, orgId, workspaceId, {
+          goalId: params.goalId,
+          statusFilter: params.statusFilter,
+          showResolved: params.showResolved,
+        });
+
+        data.appBaseUrl = `${getSquadAppUrl()}/${orgId}/${workspaceId}`;
+
+        return widget({
+          props: data as unknown as Record<string, unknown>,
+          output: text(formatRoadmapText(data)),
+        });
+      } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
+        logger.debug({ err: error, tool: "view_roadmap" }, "Tool error");
+        const message =
+          error instanceof Error ? error.message : "Unknown error";
+        return toolError(`Unable to view roadmap: ${message}`);
       }
     },
   );

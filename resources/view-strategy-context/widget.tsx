@@ -10,8 +10,8 @@ export const widgetMetadata: WidgetMetadata = {
   exposeAsTool: false,
   metadata: {
     prefersBorder: false,
-    invoking: "Loading entity context...",
-    invoked: "Entity context ready",
+    invoking: "Loading strategy context...",
+    invoked: "Strategy context ready",
     csp: {
       resourceDomains: ["https://assets.meetsquad.ai"],
     },

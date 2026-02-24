@@ -1,5 +1,6 @@
 import type { Preview } from "@storybook/react-vite";
 import "../resources/view-strategy-context/styles.css";
+import "../resources/view-roadmap/styles.css";
 
 const preview: Preview = {
   parameters: {
