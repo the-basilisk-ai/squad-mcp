@@ -11,6 +11,9 @@ export const widgetMetadata: WidgetMetadata = {
   exposeAsTool: false,
   metadata: {
     prefersBorder: false,
+    domain: "https://mcp.meetsquad.ai",
+    widgetDescription:
+      "Shows solutions organized by time horizon (Now/Next/Later) with goal context and priority indicators.",
     invoking: "Loading roadmap...",
     invoked: "Roadmap ready",
   },

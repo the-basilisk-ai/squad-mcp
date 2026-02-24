@@ -796,6 +796,7 @@ export function registerViewTools(server: OAuthServer) {
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,
+        openWorldHint: false,
       },
       widget: {
         name: "view-strategy-context",
@@ -932,6 +933,7 @@ export function registerViewTools(server: OAuthServer) {
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,
+        openWorldHint: false,
       },
       widget: {
         name: "view-roadmap",
