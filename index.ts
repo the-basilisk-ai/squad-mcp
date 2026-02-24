@@ -152,58 +152,37 @@ const server = new MCPServer({
   }),
 });
 
-// OAuth discovery proxies – registered before listen() to take precedence over mcp-use's built-in handlers.
-// PropelAuth only serves metadata at /.well-known/oauth-authorization-server/oauth/2.1 (returns 404
-// at the standard path), so we proxy it and rewrite endpoints to point through our server.
-const SERVER_BASE = process.env.MCP_URL || BASE_URI;
+// Health check (used by Railway for deployment readiness)
+server.app.get("/health", c => c.json({ status: "ok", version: "3.0.0" }));
 
+// PropelAuth serves OAuth metadata at a non-standard path (/oauth/2.1 suffix).
+// Proxy it at the standard path so MCP clients can discover registration_endpoint.
+const mcpUrl = process.env.MCP_URL || BASE_URI;
 server.app.get("/.well-known/oauth-authorization-server", async c => {
-  try {
-    const response = await fetch(
-      `${AUTH_URL}/.well-known/oauth-authorization-server/oauth/2.1`,
-    );
-    if (!response.ok) {
-      return c.json({ error: "Failed to fetch OAuth metadata" }, 502);
-    }
-    const metadata = await response.json();
-    // Rewrite issuer to our server so clients discover our proxied endpoints
-    metadata.issuer = SERVER_BASE;
-    metadata.authorization_endpoint = `${SERVER_BASE}/authorize`;
-    metadata.token_endpoint = `${SERVER_BASE}/token`;
-    return c.json(metadata);
-  } catch {
-    return c.json({ error: "Service unavailable" }, 503);
+  const response = await fetch(
+    `${AUTH_URL}/.well-known/oauth-authorization-server/oauth/2.1`,
+  );
+  if (!response.ok) {
+    return c.json({ error: "Failed to fetch auth server metadata" }, 502);
   }
+  return c.json(await response.json());
 });
 
-// Protected resource metadata – point authorization_servers to our server (not PropelAuth directly)
-// so clients discover our /.well-known/oauth-authorization-server proxy
+// Protected resource metadata must point authorization_servers to our server
+// so clients discover our proxied /.well-known/oauth-authorization-server.
 for (const path of [
   "/.well-known/oauth-protected-resource",
   "/.well-known/oauth-protected-resource/mcp",
+  "/mcp/.well-known/oauth-protected-resource",
 ]) {
   server.app.get(path, c =>
     c.json({
-      resource: path.endsWith("/mcp") ? `${SERVER_BASE}/mcp` : SERVER_BASE,
-      authorization_servers: [SERVER_BASE],
-      bearer_methods_supported: ["header"],
+      resource: `${mcpUrl}/mcp`,
+      authorization_servers: [mcpUrl],
       scopes_supported: SCOPES,
     }),
   );
 }
-
-// Authorize proxy – mcp-use's built-in /authorize doesn't forward the `resource` parameter
-// that PropelAuth requires (RFC 8707). Pass all query params through.
-server.app.get("/authorize", c => {
-  const authUrl = new URL(`${AUTH_URL}/oauth/2.1/authorize`);
-  for (const [key, value] of Object.entries(c.req.query())) {
-    authUrl.searchParams.set(key, value);
-  }
-  return c.redirect(authUrl.toString(), 302);
-});
-
-// Health check (used by Railway for deployment readiness)
-server.app.get("/health", c => c.json({ status: "ok", version: "3.0.0" }));
 
 // Register tools
 registerWorkspaceTools(server);
