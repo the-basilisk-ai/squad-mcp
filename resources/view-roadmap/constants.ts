@@ -46,6 +46,11 @@ export const STATUS_BADGE_CLASSES: Record<string, string> = {
   Live: "bg-background-error text-content-error dark:bg-background-error-dark dark:text-content-error-dark",
 };
 
+export function goalUrl(id: string, appBaseUrl?: string): string {
+  if (!appBaseUrl || !id) return "";
+  return `${appBaseUrl}/strategy?p=goal&i=${encodeURIComponent(id)}`;
+}
+
 export function roadmapUrl(appBaseUrl?: string): string {
   if (!appBaseUrl) return "";
   return `${appBaseUrl}/roadmap`;
