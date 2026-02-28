@@ -36,7 +36,18 @@ export const RoadmapView: React.FC<RoadmapProps> = ({
               clipRule="evenodd"
             />
           </svg>
-          Roadmap
+          {url ? (
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-inherit no-underline hover:underline"
+            >
+              Roadmap
+            </a>
+          ) : (
+            "Roadmap"
+          )}
         </h2>
         <span className="text-[11px] text-gray-400 dark:text-zinc-500">
           {totalSolutions} {totalSolutions === 1 ? "solution" : "solutions"}
@@ -62,19 +73,6 @@ export const RoadmapView: React.FC<RoadmapProps> = ({
         ))
       )}
 
-      {/* Deep link */}
-      {url && (
-        <div className="mt-3 pt-2 border-t border-gray-100 dark:border-zinc-800">
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline"
-          >
-            View in Squad
-          </a>
-        </div>
-      )}
     </div>
   );
 };
