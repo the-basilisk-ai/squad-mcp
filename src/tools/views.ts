@@ -507,86 +507,25 @@ async function buildFeedbackContext(
   return { ancestors, focused };
 }
 
-const TYPE_PLURALS: Record<string, string> = {
-  goal: "Goals",
-  opportunity: "Opportunities",
-  solution: "Solutions",
-  insight: "Insights",
-  feedback: "Feedback",
-};
+/** Short summary for the model when a widget is rendered. */
+function summarizeContext(data: EntityContextData): string {
+  const chain = [...data.ancestors, data.focused]
+    .map((n) => `${n.type}: ${n.title}`)
+    .join(" → ");
+  const parts = [chain];
+  if (data.focused.status) parts.push(`Status: ${data.focused.status}`);
+  if (data.children)
+    parts.push(`${data.children.count} ${data.children.type}(s)`);
+  return parts.join(". ");
+}
 
-const STATUS_LABELS: Record<string, string> = {
-  New: "New",
-  InProgress: "In Progress",
-  InDevelopment: "In Development",
-  Planned: "Planned",
-  Complete: "Complete",
-  Solved: "Solved",
-  Live: "Live",
-  Done: "Done",
-  Parked: "Parked",
-  Cancelled: "Cancelled",
-  Backlog: "Backlog",
-  FeatureRequest: "Feature Request",
-  Bug: "Bug",
-  Feedback: "Feedback",
-};
-
-/**
- * Format strategy context data as human-readable text for non-UI MCP clients.
- */
-function formatHierarchyText(data: EntityContextData): string {
-  const lines: string[] = [];
-  const indent = "  ";
-
-  for (const ancestor of data.ancestors) {
-    const label =
-      ancestor.type.charAt(0).toUpperCase() + ancestor.type.slice(1);
-    const parts: string[] = [];
-    if (ancestor.status)
-      parts.push(STATUS_LABELS[ancestor.status] || ancestor.status);
-    if (ancestor.type === "goal" && ancestor.priority)
-      parts.push(`Importance: ${ancestor.priority}/5`);
-    const suffix = parts.length > 0 ? ` (${parts.join(", ")})` : "";
-    lines.push(`${label}: ${ancestor.title}${suffix}`);
-  }
-
-  const focusedLabel =
-    data.focused.type.charAt(0).toUpperCase() + data.focused.type.slice(1);
-  const focusedParts: string[] = [];
-  if (data.focused.status)
-    focusedParts.push(
-      STATUS_LABELS[data.focused.status] || data.focused.status,
-    );
-  if (data.focused.type === "goal" && data.focused.priority)
-    focusedParts.push(`Importance: ${data.focused.priority}/5`);
-  const focusedSuffix =
-    focusedParts.length > 0 ? ` (${focusedParts.join(", ")})` : "";
-  lines.push(`→ ${focusedLabel}: ${data.focused.title}${focusedSuffix}`);
-
-  if (data.focused.description) {
-    lines.push(`${indent}${data.focused.description}`);
-  }
-
-  if (data.children) {
-    const label =
-      data.children.count !== 1
-        ? (TYPE_PLURALS[data.children.type] ?? `${data.children.type}s`)
-        : data.children.type.charAt(0).toUpperCase() +
-          data.children.type.slice(1);
-    lines.push(`${indent}${data.children.count} ${label}`);
-  }
-
-  if (data.appBaseUrl && data.focused.type !== "workspace") {
-    const section =
-      data.focused.type === "insight" || data.focused.type === "feedback"
-        ? "insights"
-        : "strategy";
-    const url = `${data.appBaseUrl}/${section}?p=${data.focused.type}&i=${data.focused.id}`;
-    lines.push(`\nView in Squad: ${url}`);
-  }
-
-  return lines.join("\n");
+/** Short summary for the model when a widget is rendered. */
+function summarizeRoadmap(data: RoadmapData): string {
+  const horizons = data.columns
+    .map((c) => `${c.horizon}: ${c.solutions.length}`)
+    .join(", ");
+  const goals = data.goals.map((g) => g.title).join(", ");
+  return `Roadmap: ${data.totalSolutions} solutions (${horizons}). Goals: ${goals}`;
 }
 
 /* ─── Roadmap data types ─────────────────────────────────────────────── */
@@ -708,42 +647,6 @@ async function buildRoadmapData(
   return { goals, columns, totalSolutions: solutions.length };
 }
 
-/**
- * Format roadmap data as human-readable text for non-UI MCP clients.
- */
-function formatRoadmapText(data: RoadmapData): string {
-  const lines: string[] = [];
-  lines.push(`Roadmap (${data.totalSolutions} solutions)`);
-
-  if (data.goals.length > 0) {
-    const goalParts = data.goals.map((g) => {
-      const stars = Array.from({ length: 5 }, (_, i) =>
-        i < g.priority ? "\u2605" : "\u2606",
-      ).join("");
-      return `${g.title} (${stars})`;
-    });
-    lines.push(`Goals: ${goalParts.join(", ")}`);
-  }
-
-  for (const col of data.columns) {
-    lines.push("");
-    lines.push(
-      `${col.horizon.charAt(0).toUpperCase() + col.horizon.slice(1)} (${col.solutions.length}):`,
-    );
-    for (const s of col.solutions) {
-      const status = STATUS_LABELS[s.status] || s.status;
-      const goal = data.goals.find((g) => g.id === s.goalId);
-      const goalSuffix = goal ? ` \u2192 ${goal.title}` : "";
-      lines.push(`  \u2022 ${s.title} [${status}]${goalSuffix}`);
-    }
-  }
-
-  if (data.appBaseUrl) {
-    lines.push(`\nView in Squad: ${data.appBaseUrl}/strategy?view=roadmap`);
-  }
-
-  return lines.join("\n");
-}
 
 const solutionStatusEnum = z.enum([
   CreateSolutionPayloadStatusEnum.New,
@@ -883,7 +786,7 @@ export function registerViewTools(server: OAuthServer) {
         // - structuredContent for ChatGPT (window.openai.toolOutput)
         return widget({
           props: data as unknown as Record<string, unknown>,
-          output: text(formatHierarchyText(data)),
+          output: text(summarizeContext(data)),
         });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
@@ -953,7 +856,7 @@ export function registerViewTools(server: OAuthServer) {
 
         return widget({
           props: data as unknown as Record<string, unknown>,
-          output: text(formatRoadmapText(data)),
+          output: text(summarizeRoadmap(data)),
         });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
