@@ -701,15 +701,9 @@ async function buildRoadmapData(
     })),
   }));
 
-  // Collect referenced goals, sorted by priority desc
-  const referencedGoalIds = new Set(
-    solutions.map((s) => s.goalId).filter(Boolean) as string[],
-  );
-  const goals: RoadmapGoalSummary[] = [...referencedGoalIds]
-    .map((gid) => goalLookup.get(gid))
-    .filter(Boolean)
-    .sort((a, b) => (b!.priority ?? 0) - (a!.priority ?? 0))
-    .map((g) => ({ id: g!.id, title: g!.title, priority: g!.priority ?? 0 }));
+  // All goals sorted by priority desc
+  const goals: RoadmapGoalSummary[] = [...goalLookup.values()]
+    .sort((a, b) => b.priority - a.priority);
 
   return { goals, columns, totalSolutions: solutions.length };
 }
