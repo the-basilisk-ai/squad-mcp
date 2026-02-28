@@ -10,7 +10,6 @@ export const widgetMetadata: WidgetMetadata = {
   exposeAsTool: false,
   metadata: {
     prefersBorder: false,
-    domain: "https://mcp.meetsquad.ai",
     widgetDescription:
       "Shows an entity in its product strategy tree — workspace, goals, opportunities, solutions, and insights.",
     invoking: "Loading strategy context...",
