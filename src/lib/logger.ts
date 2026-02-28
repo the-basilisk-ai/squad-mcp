@@ -7,7 +7,10 @@ const levels: Record<LogLevel, number> = {
   error: 3,
   fatal: 4,
 };
-const currentLevel = (process.env.LOG_LEVEL || "info") as LogLevel;
+const VALID_LEVELS: readonly LogLevel[] = ["debug", "info", "warn", "error", "fatal"];
+const currentLevel: LogLevel = VALID_LEVELS.includes(process.env.LOG_LEVEL as LogLevel)
+  ? (process.env.LOG_LEVEL as LogLevel)
+  : "info";
 
 const shouldLog = (level: LogLevel): boolean =>
   levels[level] >= (levels[currentLevel] ?? levels.info);

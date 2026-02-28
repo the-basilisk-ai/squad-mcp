@@ -5,7 +5,6 @@ import { logger } from "../lib/logger.js";
 import {
   CreateSolutionPayloadStatusEnum,
   PrioritiseSolutionsRequestTriggeredByEnum,
-  type RelationshipAction,
 } from "../lib/openapi/squad/models/index.js";
 import {
   formatWorkspaceSelectionError,
@@ -156,8 +155,8 @@ export function registerSolutionTools(server: OAuthServer) {
         const solutions = await squadClient(userContext).listSolutions({
           orgId,
           workspaceId,
-          built: built as "true" | "false" | undefined,
-          horizon: params.horizon as "now" | "next" | "later" | undefined,
+          built,
+          horizon: params.horizon,
         });
 
         if (solutions.data.length === 0) {
@@ -228,27 +227,21 @@ export function registerSolutionTools(server: OAuthServer) {
         // Return summaries for relationships to reduce token usage
         return toolSuccess({
           ...solution,
-          opportunities: solution.opportunities?.map(
-            (o: { id: string; title: string; status: string }) => ({
-              id: o.id,
-              title: o.title,
-              status: o.status,
-            }),
-          ),
-          outcomes: solution.outcomes?.map(
-            (o: { id: string; title: string; priority: number }) => ({
-              id: o.id,
-              title: o.title,
-              priority: o.priority,
-            }),
-          ),
-          insights: solution.insights?.map(
-            (i: { id: string; title: string; type: string }) => ({
-              id: i.id,
-              title: i.title,
-              type: i.type,
-            }),
-          ),
+          opportunities: solution.opportunities?.map((o) => ({
+            id: o.id,
+            title: o.title,
+            status: o.status,
+          })),
+          outcomes: solution.outcomes?.map((o) => ({
+            id: o.id,
+            title: o.title,
+            priority: o.priority,
+          })),
+          insights: solution.insights?.map((i) => ({
+            id: i.id,
+            title: i.title,
+            type: i.type,
+          })),
         });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
@@ -416,7 +409,7 @@ export function registerSolutionTools(server: OAuthServer) {
           orgId,
           workspaceId,
           solutionId: params.solutionId,
-          action: params.action as RelationshipAction,
+          action: params.action,
           solutionRelationshipsPayload: {
             opportunityIds: params.opportunityIds || [],
           },

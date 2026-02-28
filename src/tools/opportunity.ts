@@ -3,7 +3,6 @@ import { getUserContext } from "../helpers/getUser.js";
 import { squadClient } from "../lib/clients/squad.js";
 import { logger } from "../lib/logger.js";
 import {
-  type RelationshipAction,
   UpdateOpportunityPayloadStatusEnum,
 } from "../lib/openapi/squad/models/index.js";
 import {
@@ -170,27 +169,21 @@ export function registerOpportunityTools(server: OAuthServer) {
         // Return summaries for relationships to reduce token usage
         return toolSuccess({
           ...opportunity,
-          outcomes: opportunity.outcomes?.map(
-            (o: { id: string; title: string; priority: number }) => ({
-              id: o.id,
-              title: o.title,
-              priority: o.priority,
-            }),
-          ),
-          solutions: opportunity.solutions?.map(
-            (s: { id: string; title: string; status: string }) => ({
-              id: s.id,
-              title: s.title,
-              status: s.status,
-            }),
-          ),
-          insights: opportunity.insights?.map(
-            (i: { id: string; title: string; type: string }) => ({
-              id: i.id,
-              title: i.title,
-              type: i.type,
-            }),
-          ),
+          outcomes: opportunity.outcomes?.map((o) => ({
+            id: o.id,
+            title: o.title,
+            priority: o.priority,
+          })),
+          solutions: opportunity.solutions?.map((s) => ({
+            id: s.id,
+            title: s.title,
+            status: s.status,
+          })),
+          insights: opportunity.insights?.map((i) => ({
+            id: i.id,
+            title: i.title,
+            type: i.type,
+          })),
         });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
@@ -407,7 +400,7 @@ export function registerOpportunityTools(server: OAuthServer) {
           orgId,
           workspaceId,
           opportunityId: params.opportunityId,
-          action: params.action as RelationshipAction,
+          action: params.action,
           opportunityRelationshipsPayload: {
             solutionIds: params.solutionIds || [],
             outcomeIds: params.outcomeIds || [],

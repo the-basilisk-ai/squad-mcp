@@ -2,10 +2,7 @@ import { z } from "zod";
 import { getUserContext } from "../helpers/getUser.js";
 import { squadClient } from "../lib/clients/squad.js";
 import { logger } from "../lib/logger.js";
-import type {
-  CreateOutcomePayload,
-  RelationshipAction,
-} from "../lib/openapi/squad/models/index.js";
+import type { CreateOutcomePayload } from "../lib/openapi/squad/models/index.js";
 import {
   formatWorkspaceSelectionError,
   getUserId,
@@ -191,27 +188,21 @@ export function registerGoalTools(server: OAuthServer) {
         return toolSuccess({
           ...rest,
           importance: priority,
-          opportunities: outcome.opportunities?.map(
-            (o: { id: string; title: string; status: string }) => ({
-              id: o.id,
-              title: o.title,
-              status: o.status,
-            }),
-          ),
-          solutions: outcome.solutions?.map(
-            (s: { id: string; title: string; status: string }) => ({
-              id: s.id,
-              title: s.title,
-              status: s.status,
-            }),
-          ),
-          insights: outcome.insights?.map(
-            (i: { id: string; title: string; type: string }) => ({
-              id: i.id,
-              title: i.title,
-              type: i.type,
-            }),
-          ),
+          opportunities: outcome.opportunities?.map((o) => ({
+            id: o.id,
+            title: o.title,
+            status: o.status,
+          })),
+          solutions: outcome.solutions?.map((s) => ({
+            id: s.id,
+            title: s.title,
+            status: s.status,
+          })),
+          insights: outcome.insights?.map((i) => ({
+            id: i.id,
+            title: i.title,
+            type: i.type,
+          })),
         });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {
@@ -368,7 +359,7 @@ export function registerGoalTools(server: OAuthServer) {
           orgId,
           workspaceId,
           outcomeId: params.goalId,
-          action: params.action as RelationshipAction,
+          action: params.action,
           outcomeRelationshipsPayload: {
             opportunityIds: params.opportunityIds || [],
           },

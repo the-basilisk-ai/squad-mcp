@@ -245,13 +245,11 @@ async function buildOpportunityContext(
       ? {
           type: "solution",
           count: solutions.length,
-          items: solutions
-            .slice(0, 4)
-            .map((s: { id: string; title: string; status: string }) => ({
-              id: s.id,
-              title: s.title,
-              status: s.status,
-            })),
+          items: solutions.slice(0, 4).map((s) => ({
+            id: s.id,
+            title: s.title,
+            status: s.status,
+          })),
         }
       : undefined;
 
@@ -296,13 +294,11 @@ async function buildGoalContext(
       ? {
           type: "opportunity",
           count: opportunities.length,
-          items: opportunities
-            .slice(0, 4)
-            .map((o: { id: string; title: string; status: string }) => ({
-              id: o.id,
-              title: o.title,
-              status: o.status,
-            })),
+          items: opportunities.slice(0, 4).map((o) => ({
+            id: o.id,
+            title: o.title,
+            status: o.status,
+          })),
         }
       : undefined;
 
@@ -337,7 +333,7 @@ async function buildWorkspaceContext(
       ? {
           type: "goal",
           count: goals.length,
-          items: goals.slice(0, 4).map((g: { id: string; title: string }) => ({
+          items: goals.slice(0, 4).map((g) => ({
             id: g.id,
             title: g.title,
           })),
@@ -577,7 +573,7 @@ async function buildRoadmapData(
     client.listSolutions({
       orgId,
       workspaceId,
-      built: "true" as const,
+      built: "true",
       relationships: "outcomes",
     }),
   ]);
@@ -624,15 +620,19 @@ async function buildRoadmapData(
   const groups = new Map<string, RoadmapSolution[]>();
   for (const s of solutions) {
     const h = s.horizon || "later";
-    if (!groups.has(h)) groups.set(h, []);
-    groups.get(h)!.push(s);
+    let bucket = groups.get(h);
+    if (!bucket) {
+      bucket = [];
+      groups.set(h, bucket);
+    }
+    bucket.push(s);
   }
 
   const columns: RoadmapHorizonColumn[] = HORIZON_ORDER.filter((h) =>
     groups.has(h),
   ).map((h) => ({
     horizon: h,
-    solutions: groups.get(h)!.map((s) => ({
+    solutions: (groups.get(h) ?? []).map((s) => ({
       id: s.id,
       title: s.title,
       status: s.status,
@@ -785,7 +785,7 @@ export function registerViewTools(server: OAuthServer) {
         // - Dual-protocol _meta (MCP Apps + ChatGPT Apps SDK)
         // - structuredContent for ChatGPT (window.openai.toolOutput)
         return widget({
-          props: data as unknown as Record<string, unknown>,
+          props: data,
           output: text(summarizeContext(data)),
         });
       } catch (error) {
@@ -855,7 +855,7 @@ export function registerViewTools(server: OAuthServer) {
         data.appBaseUrl = `${getSquadAppUrl()}/${orgId}/${workspaceId}`;
 
         return widget({
-          props: data as unknown as Record<string, unknown>,
+          props: data,
           output: text(summarizeRoadmap(data)),
         });
       } catch (error) {

@@ -180,26 +180,21 @@ export function registerInsightTools(server: OAuthServer) {
         // Return summaries for relationships to reduce token usage
         return toolSuccess({
           ...insight,
-          opportunities: insight.opportunities?.map(
-            (o: { id: string; title: string; status: string }) => ({
-              id: o.id,
-              title: o.title,
-              status: o.status,
-            }),
-          ),
-          solutions: insight.solutions?.map(
-            (s: { id: string; title: string; status: string }) => ({
-              id: s.id,
-              title: s.title,
-              status: s.status,
-            }),
-          ),
-          outcomes: insight.outcomes?.map(
-            (o: { id: string; title: string; priority: number }) => ({
-              id: o.id,
-              title: o.title,
-              priority: o.priority,
-            }),
+          opportunities: insight.opportunities?.map((o) => ({
+            id: o.id,
+            title: o.title,
+            status: o.status,
+          })),
+          solutions: insight.solutions?.map((s) => ({
+            id: s.id,
+            title: s.title,
+            status: s.status,
+          })),
+          outcomes: insight.outcomes?.map((o) => ({
+            id: o.id,
+            title: o.title,
+            priority: o.priority,
+          }),
           ),
         });
       } catch (error) {
