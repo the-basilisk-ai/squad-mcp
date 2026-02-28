@@ -12,9 +12,15 @@ export const GOAL_COLOR = {
 } as const;
 
 export const HORIZON_HEADER_STYLES: Record<string, string> = {
-  now: "border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300",
-  next: "border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300",
-  later: "border-gray-300 dark:border-zinc-600 text-gray-500 dark:text-zinc-400",
+  now: "border-gray-300 dark:border-zinc-600 text-gray-600 dark:text-zinc-300",
+  next: "border-gray-300 dark:border-zinc-600 text-gray-600 dark:text-zinc-300",
+  later: "border-gray-300 dark:border-zinc-600 text-gray-600 dark:text-zinc-300",
+};
+
+export const HORIZON_BADGE_CLASSES: Record<string, string> = {
+  now: "bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-zinc-300",
+  next: "bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-zinc-300",
+  later: "bg-gray-100 text-gray-500 dark:bg-zinc-800 dark:text-zinc-400",
 };
 
 /** Status display labels — matches strategy-context STATUS_DISPLAY */

@@ -2,6 +2,8 @@ import clsx from "clsx";
 import type React from "react";
 import {
   GOAL_COLOR,
+  HORIZON_BADGE_CLASSES,
+  HORIZON_LABELS,
   STATUS_BADGE_CLASSES,
   STATUS_DISPLAY,
   goalUrl,
@@ -28,9 +30,10 @@ const StatusBadge: React.FC<{ value: string }> = ({ value }) => {
 
 export const SolutionCard: React.FC<{
   solution: RoadmapSolution;
+  horizon: string;
   goalMap: Map<string, GoalSummary>;
   appBaseUrl?: string;
-}> = ({ solution, goalMap, appBaseUrl }) => {
+}> = ({ solution, horizon, goalMap, appBaseUrl }) => {
   const goal = solution.goalId ? goalMap.get(solution.goalId) : undefined;
 
   const url = appBaseUrl
@@ -53,10 +56,7 @@ export const SolutionCard: React.FC<{
   const goalTag = goal ? (() => {
     const gUrl = goalUrl(goal.id, appBaseUrl);
     const inner = (
-      <>
-        <span className={clsx("size-1.5 rounded-full", GOAL_COLOR.dot)} />
-        <span className="truncate max-w-[200px]">{goal.title}</span>
-      </>
+      <span className="truncate max-w-[200px]">{goal.title}</span>
     );
     const cls = clsx(
       "inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-md",
@@ -95,7 +95,19 @@ export const SolutionCard: React.FC<{
       </div>
       <div className="flex items-center gap-1.5 mt-1 flex-wrap justify-between">
         {goalTag ?? <span />}
-        <StatusBadge value={solution.status} />
+        <span className="inline-flex items-center gap-1.5">
+          <StatusBadge value={solution.status} />
+          <span
+            className={clsx(
+              "inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-md capitalize",
+              HORIZON_BADGE_CLASSES[horizon] ||
+                "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-zinc-300",
+            )}
+            title="Roadmap Horizon"
+          >
+            {HORIZON_LABELS[horizon] || horizon}
+          </span>
+        </span>
       </div>
     </div>
   );

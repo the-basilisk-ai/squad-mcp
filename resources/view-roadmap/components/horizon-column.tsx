@@ -31,6 +31,7 @@ export const HorizonColumn: React.FC<{
         <SolutionCard
           key={solution.id}
           solution={solution}
+          horizon={column.horizon}
           goalMap={goalMap}
           appBaseUrl={appBaseUrl}
         />
