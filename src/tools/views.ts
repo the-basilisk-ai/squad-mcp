@@ -595,7 +595,6 @@ type RoadmapGoalSummary = {
   id: string;
   title: string;
   priority: number;
-  colorIndex: number;
 };
 
 type RoadmapSolution = {
@@ -710,7 +709,7 @@ async function buildRoadmapData(
     .map((gid) => goalLookup.get(gid))
     .filter(Boolean)
     .sort((a, b) => (b!.priority ?? 0) - (a!.priority ?? 0))
-    .map((g, i) => ({ ...g!, colorIndex: i }));
+    .map((g) => ({ id: g!.id, title: g!.title, priority: g!.priority ?? 0 }));
 
   return { goals, columns, totalSolutions: solutions.length };
 }

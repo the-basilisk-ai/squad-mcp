@@ -21,8 +21,7 @@ export const FullRoadmap: Story = {
         id: "g-1",
         title: "Accelerate Market Penetration",
         priority: 5,
-        colorIndex: 0,
-      },
+        },
       {
         id: "g-2",
         title: "AI Innovation",
@@ -84,8 +83,7 @@ export const SingleGoalFiltered: Story = {
         id: "g-1",
         title: "Accelerate Market Penetration",
         priority: 5,
-        colorIndex: 0,
-      },
+        },
     ],
     columns: [
       {
@@ -132,16 +130,14 @@ export const ManyGoals: Story = {
         id: "g-1",
         title: "Accelerate Market Penetration",
         priority: 5,
-        colorIndex: 0,
-      },
-      { id: "g-2", title: "AI Innovation", priority: 3, colorIndex: 1 },
-      { id: "g-3", title: "Customer Retention", priority: 4, colorIndex: 2 },
-      { id: "g-4", title: "Platform Reliability", priority: 2, colorIndex: 3 },
+        },
+      { id: "g-2", title: "AI Innovation", priority: 3, },
+      { id: "g-3", title: "Customer Retention", priority: 4, },
+      { id: "g-4", title: "Platform Reliability", priority: 2, },
       {
         id: "g-5",
         title: "Developer Experience",
         priority: 1,
-        colorIndex: 4,
       },
     ],
     columns: [

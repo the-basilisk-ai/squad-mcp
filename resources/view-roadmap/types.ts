@@ -4,7 +4,6 @@ const goalSummarySchema = z.object({
   id: z.string(),
   title: z.string(),
   priority: z.number(),
-  colorIndex: z.number(),
 });
 
 const roadmapSolutionSchema = z.object({

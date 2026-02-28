@@ -1,10 +1,6 @@
 import clsx from "clsx";
 import type React from "react";
-import {
-  GOAL_COLORS,
-  STATUS_BADGE_CLASSES,
-  STATUS_DISPLAY,
-} from "../constants";
+import { GOAL_COLOR, STATUS_BADGE_CLASSES, STATUS_DISPLAY } from "../constants";
 import type { GoalSummary, RoadmapSolution } from "../types";
 
 const StatusBadge: React.FC<{ value: string }> = ({ value }) => {
@@ -31,9 +27,6 @@ export const SolutionCard: React.FC<{
   appBaseUrl?: string;
 }> = ({ solution, goalMap, appBaseUrl }) => {
   const goal = solution.goalId ? goalMap.get(solution.goalId) : undefined;
-  const goalColor = goal
-    ? GOAL_COLORS[goal.colorIndex % GOAL_COLORS.length]
-    : undefined;
 
   const url = appBaseUrl
     ? `${appBaseUrl}/strategy?p=solution&i=${encodeURIComponent(solution.id)}`
@@ -59,16 +52,16 @@ export const SolutionCard: React.FC<{
       </div>
       <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
         <StatusBadge value={solution.status} />
-        {goalColor && goal && (
+        {goal && (
           <span
             className={clsx(
               "inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-md",
-              goalColor.bg,
-              goalColor.text,
+              GOAL_COLOR.bg,
+              GOAL_COLOR.text,
             )}
           >
             <span
-              className={clsx("size-1.5 rounded-full", goalColor.dot)}
+              className={clsx("size-1.5 rounded-full", GOAL_COLOR.dot)}
             />
             <span className="truncate max-w-[100px]">{goal.title}</span>
           </span>
