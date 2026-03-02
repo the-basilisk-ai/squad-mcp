@@ -15,7 +15,7 @@ const preview: Preview = {
   },
   decorators: [
     Story => (
-      <div style={{ maxWidth: 420, width: "100%" }}>
+      <div style={{ maxWidth: 420, minWidth: 320, width: "100%" }}>
         <Story />
       </div>
     ),
