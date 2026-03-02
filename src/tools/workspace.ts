@@ -77,6 +77,11 @@ export function registerWorkspaceTools(server: OAuthServer) {
         orgId: z.string().describe("The ID of the organisation to select"),
         workspaceId: z.string().describe("The ID of the workspace to select"),
       }),
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        openWorldHint: false,
+      },
     },
     async (params, ctx) => {
       try {
