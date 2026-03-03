@@ -25,14 +25,16 @@ export function registerOpportunityTools(server: OAuthServer) {
       title: "Create Opportunity",
       description:
         "Create a new opportunity. An opportunity is a detailed problem statement identified for the organisation. It doesn't have any solutionising and simply captures an opportunity for the organisation.",
-      schema: z.object({
-        title: z.string().describe("A short title"),
-        description: z
-          .string()
-          .describe(
-            "A short description of the opportunity, detailing the problem statement and opportunity for the business",
-          ),
-      }),
+      schema: z
+        .object({
+          title: z.string().describe("A short title"),
+          description: z
+            .string()
+            .describe(
+              "A short description of the opportunity, detailing the problem statement and opportunity for the business",
+            ),
+        })
+        .strict(),
       annotations: {
         readOnlyHint: false,
         destructiveHint: true,

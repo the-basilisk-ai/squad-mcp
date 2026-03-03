@@ -23,19 +23,23 @@ export function registerInsightTools(server: OAuthServer) {
       title: "Create Insight",
       description:
         "Create a new insight entry. An insight is customer-generated feedback about your product, often from reviews, surveys, or questionnaires.",
-      schema: z.object({
-        type: z
-          .enum([
-            CreateInsightRequestTypeEnum.Feedback,
-            CreateInsightRequestTypeEnum.Bug,
-            CreateInsightRequestTypeEnum.FeatureRequest,
-          ])
-          .describe(
-            "The type of insight: 'Feedback' for customer feedback, 'Bug' for bug reports, or 'FeatureRequest' for feature requests.",
-          ),
-        title: z.string().describe("A brief title summarizing the insight"),
-        description: z.string().describe("A short description of the insight"),
-      }),
+      schema: z
+        .object({
+          type: z
+            .enum([
+              CreateInsightRequestTypeEnum.Feedback,
+              CreateInsightRequestTypeEnum.Bug,
+              CreateInsightRequestTypeEnum.FeatureRequest,
+            ])
+            .describe(
+              "The type of insight: 'Feedback' for customer feedback, 'Bug' for bug reports, or 'FeatureRequest' for feature requests.",
+            ),
+          title: z.string().describe("A brief title summarizing the insight"),
+          description: z
+            .string()
+            .describe("A short description of the insight"),
+        })
+        .strict(),
       annotations: {
         readOnlyHint: false,
         destructiveHint: true,

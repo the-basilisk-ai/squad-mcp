@@ -40,30 +40,32 @@ export function registerSolutionTools(server: OAuthServer) {
       title: "Create Solution",
       description:
         "Create a new solution. A solution is a proposed approach to address an opportunity. The 'prd' field should contain the complete detailed specification, while 'description' should be a brief summary for AI context.",
-      schema: z.object({
-        title: z.string().describe("A short title for the solution"),
-        description: z
-          .string()
-          .describe(
-            "A brief AI-friendly summary of the solution for context and search purposes. Keep this concise.",
-          ),
-        prd: z
-          .string()
-          .describe(
-            "The complete Product Requirements Document (PRD) containing the full detailed specification, implementation plan, and requirements for this solution. This is the primary content field.",
-          ),
-        pros: z
-          .array(z.string())
-          .describe(
-            "List of pros/benefits of this solution. This is a sentence or two max.",
-          ),
-        cons: z
-          .array(z.string())
-          .describe(
-            "List of cons/drawbacks of this solution. This is a sentence or two max.",
-          ),
-        status: statusEnum,
-      }),
+      schema: z
+        .object({
+          title: z.string().describe("A short title for the solution"),
+          description: z
+            .string()
+            .describe(
+              "A brief AI-friendly summary of the solution for context and search purposes. Keep this concise.",
+            ),
+          prd: z
+            .string()
+            .describe(
+              "The complete Product Requirements Document (PRD) containing the full detailed specification, implementation plan, and requirements for this solution. This is the primary content field.",
+            ),
+          pros: z
+            .array(z.string())
+            .describe(
+              "List of pros/benefits of this solution. This is a sentence or two max.",
+            ),
+          cons: z
+            .array(z.string())
+            .describe(
+              "List of cons/drawbacks of this solution. This is a sentence or two max.",
+            ),
+          status: statusEnum,
+        })
+        .strict(),
       annotations: {
         readOnlyHint: false,
         destructiveHint: true,

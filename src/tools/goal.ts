@@ -24,29 +24,33 @@ export function registerGoalTools(server: OAuthServer) {
       title: "Create Goal",
       description:
         "Create a new goal. A goal is a business objective that the organization aims to achieve.",
-      schema: z.object({
-        title: z.string().describe("A short title for the goal"),
-        description: z.string().describe("A detailed description of the goal"),
-        priority: z
-          .number()
-          .optional()
-          .describe(
-            "Importance level of the goal (1–5, higher = more important)",
-          ),
-        trend: z
-          .number()
-          .optional()
-          .describe("Trend indicator for the goal (numeric)"),
-        analyticEvents: z
-          .array(z.string())
-          .optional()
-          .describe("List of analytic events associated with the goal"),
-        hideContent: z
-          .boolean()
-          .optional()
-          .describe("Whether the goal content should be hidden"),
-        ownerId: z.string().optional().describe("ID of the goal owner"),
-      }),
+      schema: z
+        .object({
+          title: z.string().describe("A short title for the goal"),
+          description: z
+            .string()
+            .describe("A detailed description of the goal"),
+          priority: z
+            .number()
+            .optional()
+            .describe(
+              "Importance level of the goal (1–5, higher = more important)",
+            ),
+          trend: z
+            .number()
+            .optional()
+            .describe("Trend indicator for the goal (numeric)"),
+          analyticEvents: z
+            .array(z.string())
+            .optional()
+            .describe("List of analytic events associated with the goal"),
+          hideContent: z
+            .boolean()
+            .optional()
+            .describe("Whether the goal content should be hidden"),
+          ownerId: z.string().optional().describe("ID of the goal owner"),
+        })
+        .strict(),
       annotations: {
         readOnlyHint: false,
         destructiveHint: true,

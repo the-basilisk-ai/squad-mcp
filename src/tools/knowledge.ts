@@ -22,13 +22,15 @@ export function registerKnowledgeTools(server: OAuthServer) {
       title: "Create Knowledge Document",
       description:
         "Create a new knowledge entry. Knowledge entries are text documents that can be used as references or information sources.",
-      schema: z.object({
-        title: z.string().describe("A short title for the knowledge"),
-        description: z
-          .string()
-          .describe("A short summary of the knowledge content"),
-        content: z.string().describe("The full content of the knowledge"),
-      }),
+      schema: z
+        .object({
+          title: z.string().describe("A short title for the knowledge"),
+          description: z
+            .string()
+            .describe("A short summary of the knowledge content"),
+          content: z.string().describe("The full content of the knowledge"),
+        })
+        .strict(),
       annotations: {
         readOnlyHint: false,
         destructiveHint: true,

@@ -23,38 +23,40 @@ export function registerFeedbackTools(server: OAuthServer) {
       title: "Create Feedback",
       description:
         "Create a new feedback entry. Feedback represents raw, unprocessed feedback from users that can later be analyzed and converted into insights.",
-      schema: z.object({
-        content: z
-          .string()
-          .describe("The original raw feedback content from the user"),
-        source: z
-          .string()
-          .describe(
-            "The source of the feedback (e.g., 'Typeform', 'Slack', 'Manual', 'Email', etc.)",
-          ),
-        sentimentScore: z
-          .number()
-          .min(-1)
-          .max(1)
-          .optional()
-          .describe("Sentiment score from -1 (negative) to 1 (positive)"),
-        sentimentCategory: z
-          .enum([
-            CreateFeedbackRequestSentimentCategoryEnum.Positive,
-            CreateFeedbackRequestSentimentCategoryEnum.Neutral,
-            CreateFeedbackRequestSentimentCategoryEnum.Negative,
-          ])
-          .optional()
-          .describe(
-            "Sentiment classification category: 'Positive', 'Neutral', or 'Negative'",
-          ),
-        sentimentConfidence: z
-          .number()
-          .min(0)
-          .max(1)
-          .optional()
-          .describe("Confidence in sentiment analysis (0-1)"),
-      }),
+      schema: z
+        .object({
+          content: z
+            .string()
+            .describe("The original raw feedback content from the user"),
+          source: z
+            .string()
+            .describe(
+              "The source of the feedback (e.g., 'Typeform', 'Slack', 'Manual', 'Email', etc.)",
+            ),
+          sentimentScore: z
+            .number()
+            .min(-1)
+            .max(1)
+            .optional()
+            .describe("Sentiment score from -1 (negative) to 1 (positive)"),
+          sentimentCategory: z
+            .enum([
+              CreateFeedbackRequestSentimentCategoryEnum.Positive,
+              CreateFeedbackRequestSentimentCategoryEnum.Neutral,
+              CreateFeedbackRequestSentimentCategoryEnum.Negative,
+            ])
+            .optional()
+            .describe(
+              "Sentiment classification category: 'Positive', 'Neutral', or 'Negative'",
+            ),
+          sentimentConfidence: z
+            .number()
+            .min(0)
+            .max(1)
+            .optional()
+            .describe("Confidence in sentiment analysis (0-1)"),
+        })
+        .strict(),
       annotations: {
         readOnlyHint: false,
         destructiveHint: true,
