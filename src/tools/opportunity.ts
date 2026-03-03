@@ -204,24 +204,26 @@ export function registerOpportunityTools(server: OAuthServer) {
       title: "Update Opportunity",
       description:
         "Update an existing opportunity's details such as title, description, or status.",
-      schema: z.object({
-        opportunityId: z
-          .string()
-          .describe("The ID of the opportunity to update"),
-        title: z.string().optional().describe("Updated title"),
-        description: z.string().optional().describe("Updated description"),
-        status: z
-          .enum([
-            UpdateOpportunityPayloadStatusEnum.New,
-            UpdateOpportunityPayloadStatusEnum.Solved,
-            UpdateOpportunityPayloadStatusEnum.Planned,
-            UpdateOpportunityPayloadStatusEnum.InProgress,
-          ])
-          .optional()
-          .describe(
-            `Updated status: ${UpdateOpportunityPayloadStatusEnum.New} hasn't been developed, ${UpdateOpportunityPayloadStatusEnum.InProgress} means we're currently building out solutions and implementing them. ${UpdateOpportunityPayloadStatusEnum.Planned} means we've finished developing the solutions and are ready to implement them. ${UpdateOpportunityPayloadStatusEnum.Solved} means we've completed the implementation and the opportunity is considered addressed.`,
-          ),
-      }),
+      schema: z
+        .object({
+          opportunityId: z
+            .string()
+            .describe("The ID of the opportunity to update"),
+          title: z.string().optional().describe("Updated title"),
+          description: z.string().optional().describe("Updated description"),
+          status: z
+            .enum([
+              UpdateOpportunityPayloadStatusEnum.New,
+              UpdateOpportunityPayloadStatusEnum.Solved,
+              UpdateOpportunityPayloadStatusEnum.Planned,
+              UpdateOpportunityPayloadStatusEnum.InProgress,
+            ])
+            .optional()
+            .describe(
+              `Updated status: ${UpdateOpportunityPayloadStatusEnum.New} hasn't been developed, ${UpdateOpportunityPayloadStatusEnum.InProgress} means we're currently building out solutions and implementing them. ${UpdateOpportunityPayloadStatusEnum.Planned} means we've finished developing the solutions and are ready to implement them. ${UpdateOpportunityPayloadStatusEnum.Solved} means we've completed the implementation and the opportunity is considered addressed.`,
+            ),
+        })
+        .strict(),
       annotations: {
         readOnlyHint: false,
         destructiveHint: true,

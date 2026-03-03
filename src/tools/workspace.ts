@@ -168,25 +168,30 @@ export function registerWorkspaceTools(server: OAuthServer) {
       title: "Update Workspace",
       description:
         "Update the current workspace's details such as name, description, mission statement.",
-      schema: z.object({
-        name: z.string().optional().describe("Updated name for the workspace"),
-        homepageUrl: z
-          .string()
-          .optional()
-          .describe("Updated URL to the workspace's homepage"),
-        logoUrl: z
-          .string()
-          .optional()
-          .describe("Updated URL to the workspace's logo"),
-        missionStatement: z
-          .string()
-          .optional()
-          .describe("Updated mission statement for the workspace"),
-        description: z
-          .string()
-          .optional()
-          .describe("Updated detailed description of the workspace"),
-      }),
+      schema: z
+        .object({
+          name: z
+            .string()
+            .optional()
+            .describe("Updated name for the workspace"),
+          homepageUrl: z
+            .string()
+            .optional()
+            .describe("Updated URL to the workspace's homepage"),
+          logoUrl: z
+            .string()
+            .optional()
+            .describe("Updated URL to the workspace's logo"),
+          missionStatement: z
+            .string()
+            .optional()
+            .describe("Updated mission statement for the workspace"),
+          description: z
+            .string()
+            .optional()
+            .describe("Updated detailed description of the workspace"),
+        })
+        .strict(),
       annotations: {
         readOnlyHint: false,
         destructiveHint: true,

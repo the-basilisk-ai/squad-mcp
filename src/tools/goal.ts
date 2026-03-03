@@ -222,25 +222,32 @@ export function registerGoalTools(server: OAuthServer) {
       name: "update_goal",
       title: "Update Goal",
       description: "Update an existing goal's details.",
-      schema: z.object({
-        goalId: z.string().describe("The ID of the goal to update"),
-        title: z.string().optional().describe("Updated title"),
-        description: z.string().optional().describe("Updated description"),
-        priority: z
-          .number()
-          .optional()
-          .describe("Updated importance level (1–5, higher = more important)"),
-        trend: z.number().optional().describe("Updated trend indicator"),
-        analyticEvents: z
-          .array(z.string())
-          .optional()
-          .describe("Updated list of analytic events"),
-        hideContent: z
-          .boolean()
-          .optional()
-          .describe("Whether the goal content should be hidden"),
-        ownerId: z.string().optional().describe("Updated ID of the goal owner"),
-      }),
+      schema: z
+        .object({
+          goalId: z.string().describe("The ID of the goal to update"),
+          title: z.string().optional().describe("Updated title"),
+          description: z.string().optional().describe("Updated description"),
+          priority: z
+            .number()
+            .optional()
+            .describe(
+              "Updated importance level (1–5, higher = more important)",
+            ),
+          trend: z.number().optional().describe("Updated trend indicator"),
+          analyticEvents: z
+            .array(z.string())
+            .optional()
+            .describe("Updated list of analytic events"),
+          hideContent: z
+            .boolean()
+            .optional()
+            .describe("Whether the goal content should be hidden"),
+          ownerId: z
+            .string()
+            .optional()
+            .describe("Updated ID of the goal owner"),
+        })
+        .strict(),
       annotations: {
         readOnlyHint: false,
         destructiveHint: true,
