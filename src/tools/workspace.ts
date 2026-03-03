@@ -10,6 +10,7 @@ import { getServiceToken } from "../helpers/mintToken.js";
 import { squadClient } from "../lib/clients/squad.js";
 import { logger } from "../lib/logger.js";
 import {
+  formatApiError,
   formatWorkspaceSelectionError,
   getUserId,
   type OAuthServer,
@@ -60,8 +61,7 @@ export function registerWorkspaceTools(server: OAuthServer) {
         });
       } catch (error) {
         logger.debug({ err: error, tool: "list_workspaces" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to list workspaces: ${message}`);
       }
     },
@@ -117,8 +117,7 @@ export function registerWorkspaceTools(server: OAuthServer) {
         });
       } catch (error) {
         logger.debug({ err: error, tool: "select_workspace" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to select workspace: ${message}`);
       }
     },
@@ -155,8 +154,7 @@ export function registerWorkspaceTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "get_workspace" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to retrieve workspace: ${message}`);
       }
     },
@@ -217,8 +215,7 @@ export function registerWorkspaceTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "update_workspace" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to update workspace: ${message}`);
       }
     },

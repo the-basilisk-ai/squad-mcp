@@ -3,6 +3,7 @@ import { getUserContext } from "../helpers/getUser.js";
 import { squadClient } from "../lib/clients/squad.js";
 import { logger } from "../lib/logger.js";
 import {
+  formatApiError,
   formatWorkspaceSelectionError,
   getUserId,
   type OAuthServer,
@@ -68,8 +69,7 @@ export function registerKnowledgeTools(server: OAuthServer) {
           { err: error, tool: "create_knowledge_document" },
           "Tool error",
         );
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to create knowledge: ${message}`);
       }
     },
@@ -123,8 +123,7 @@ export function registerKnowledgeTools(server: OAuthServer) {
           { err: error, tool: "list_knowledge_documents" },
           "Tool error",
         );
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to list knowledge: ${message}`);
       }
     },
@@ -171,8 +170,7 @@ export function registerKnowledgeTools(server: OAuthServer) {
           { err: error, tool: "get_knowledge_document" },
           "Tool error",
         );
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to get knowledge: ${message}`);
       }
     },
@@ -218,8 +216,7 @@ export function registerKnowledgeTools(server: OAuthServer) {
           { err: error, tool: "delete_knowledge_document" },
           "Tool error",
         );
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to delete knowledge: ${message}`);
       }
     },

@@ -4,6 +4,7 @@ import { squadClient } from "../lib/clients/squad.js";
 import { logger } from "../lib/logger.js";
 import { CreateInsightRequestTypeEnum } from "../lib/openapi/squad/models/CreateInsightRequest.js";
 import {
+  formatApiError,
   formatWorkspaceSelectionError,
   getUserId,
   type OAuthServer,
@@ -77,8 +78,7 @@ export function registerInsightTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "create_insight" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to create insight: ${message}`);
       }
     },
@@ -129,8 +129,7 @@ export function registerInsightTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "list_insights" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to list insights: ${message}`);
       }
     },
@@ -205,8 +204,7 @@ export function registerInsightTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "get_insight" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to get insight: ${message}`);
       }
     },
@@ -247,8 +245,7 @@ export function registerInsightTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "delete_insight" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to delete insight: ${message}`);
       }
     },

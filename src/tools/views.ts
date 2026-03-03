@@ -6,6 +6,7 @@ import { squadClient } from "../lib/clients/squad.js";
 import { logger } from "../lib/logger.js";
 import { CreateSolutionPayloadStatusEnum } from "../lib/openapi/squad/models/index.js";
 import {
+  formatApiError,
   formatWorkspaceSelectionError,
   getUserId,
   type OAuthServer,
@@ -805,8 +806,7 @@ export function registerViewTools(server: OAuthServer) {
           { err: error, tool: "view_strategy_context" },
           "Tool error",
         );
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to view entity in context: ${message}`);
       }
     },
@@ -872,8 +872,7 @@ export function registerViewTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "view_roadmap" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to view roadmap: ${message}`);
       }
     },

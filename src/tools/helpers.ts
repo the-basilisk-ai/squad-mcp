@@ -1,5 +1,6 @@
 import type { McpServerInstance } from "mcp-use/server";
 import { WorkspaceSelectionRequired } from "../helpers/getUser.js";
+import { ResponseError } from "../lib/openapi/squad/runtime.js";
 
 /**
  * Type alias for the server with OAuth enabled
@@ -58,6 +59,48 @@ export function toolSuccessPretty(data: unknown): {
   return {
     content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
   };
+}
+
+/**
+ * Extract a human-readable error message from an API error.
+ *
+ * Handles ResponseError from the generated OpenAPI client by checking
+ * the HTTP status code and attempting to parse the response body.
+ */
+export async function formatApiError(error: unknown): Promise<string> {
+  if (!(error instanceof ResponseError)) {
+    return error instanceof Error ? error.message : "Unknown error";
+  }
+
+  const { status } = error.response;
+
+  if (status === 402) {
+    return "Your workspace has run out of AI credits. Please upgrade your plan or contact support.";
+  }
+
+  if (status === 401 || status === 403) {
+    return "Authentication failed. Please try reconnecting.";
+  }
+
+  // Try to extract the error description from the response body
+  try {
+    const body: unknown = await error.response.json();
+    if (
+      typeof body === "object" &&
+      body !== null &&
+      "error" in body &&
+      typeof (body as Record<string, unknown>).error === "object"
+    ) {
+      const apiError = (body as { error: Record<string, unknown> }).error;
+      if (typeof apiError.description === "string") {
+        return `${apiError.description} (HTTP ${status})`;
+      }
+    }
+  } catch {
+    // Body wasn't JSON or already consumed — fall through
+  }
+
+  return `API request failed (HTTP ${status})`;
 }
 
 /**

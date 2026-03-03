@@ -4,6 +4,7 @@ import { squadClient } from "../lib/clients/squad.js";
 import { logger } from "../lib/logger.js";
 import { CreateFeedbackRequestSentimentCategoryEnum } from "../lib/openapi/squad/models/CreateFeedbackRequest.js";
 import {
+  formatApiError,
   formatWorkspaceSelectionError,
   getUserId,
   type OAuthServer,
@@ -93,8 +94,7 @@ export function registerFeedbackTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "create_feedback" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to create feedback: ${message}`);
       }
     },
@@ -146,8 +146,7 @@ export function registerFeedbackTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "list_feedback" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to list feedback: ${message}`);
       }
     },
@@ -196,8 +195,7 @@ export function registerFeedbackTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "get_feedback" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to get feedback: ${message}`);
       }
     },
@@ -240,8 +238,7 @@ export function registerFeedbackTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "delete_feedback" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to delete feedback: ${message}`);
       }
     },

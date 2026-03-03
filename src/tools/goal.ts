@@ -4,6 +4,7 @@ import { squadClient } from "../lib/clients/squad.js";
 import { logger } from "../lib/logger.js";
 import type { CreateOutcomePayload } from "../lib/openapi/squad/models/index.js";
 import {
+  formatApiError,
   formatWorkspaceSelectionError,
   getUserId,
   type OAuthServer,
@@ -90,8 +91,7 @@ export function registerGoalTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "create_goal" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to create goal: ${message}`);
       }
     },
@@ -142,8 +142,7 @@ export function registerGoalTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "list_goals" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to list goals: ${message}`);
       }
     },
@@ -213,8 +212,7 @@ export function registerGoalTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "get_goal" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to get goal: ${message}`);
       }
     },
@@ -284,8 +282,7 @@ export function registerGoalTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "update_goal" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to update goal: ${message}`);
       }
     },
@@ -326,8 +323,7 @@ export function registerGoalTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "delete_goal" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to delete goal: ${message}`);
       }
     },
@@ -388,8 +384,7 @@ export function registerGoalTools(server: OAuthServer) {
           { err: error, tool: "manage_goal_relationships" },
           "Tool error",
         );
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to manage goal relationships: ${message}`);
       }
     },

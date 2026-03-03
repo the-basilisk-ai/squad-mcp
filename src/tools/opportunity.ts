@@ -4,6 +4,7 @@ import { squadClient } from "../lib/clients/squad.js";
 import { logger } from "../lib/logger.js";
 import { UpdateOpportunityPayloadStatusEnum } from "../lib/openapi/squad/models/index.js";
 import {
+  formatApiError,
   formatWorkspaceSelectionError,
   getUserId,
   type OAuthServer,
@@ -67,8 +68,7 @@ export function registerOpportunityTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "create_opportunity" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to create opportunity: ${message}`);
       }
     },
@@ -119,8 +119,7 @@ export function registerOpportunityTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "list_opportunities" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to list opportunities: ${message}`);
       }
     },
@@ -190,8 +189,7 @@ export function registerOpportunityTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "get_opportunity" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to get opportunity: ${message}`);
       }
     },
@@ -257,8 +255,7 @@ export function registerOpportunityTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "update_opportunity" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to update opportunity: ${message}`);
       }
     },
@@ -301,8 +298,7 @@ export function registerOpportunityTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "delete_opportunity" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to delete opportunity: ${message}`);
       }
     },
@@ -350,8 +346,7 @@ export function registerOpportunityTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "generate_solutions" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to generate solutions: ${message}`);
       }
     },
@@ -422,8 +417,7 @@ export function registerOpportunityTools(server: OAuthServer) {
           { err: error, tool: "manage_opportunity_relationships" },
           "Tool error",
         );
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(
           `Unable to manage opportunity relationships: ${message}`,
         );

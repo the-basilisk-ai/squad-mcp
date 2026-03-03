@@ -7,6 +7,7 @@ import {
   PrioritiseSolutionsRequestTriggeredByEnum,
 } from "../lib/openapi/squad/models/index.js";
 import {
+  formatApiError,
   formatWorkspaceSelectionError,
   getUserId,
   type OAuthServer,
@@ -105,8 +106,7 @@ export function registerSolutionTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "create_solution" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to create solution: ${message}`);
       }
     },
@@ -182,8 +182,7 @@ export function registerSolutionTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "list_solutions" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to list solutions: ${message}`);
       }
     },
@@ -250,8 +249,7 @@ export function registerSolutionTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "get_solution" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to get solution: ${message}`);
       }
     },
@@ -327,8 +325,7 @@ export function registerSolutionTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "update_solution" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to update solution: ${message}`);
       }
     },
@@ -369,8 +366,7 @@ export function registerSolutionTools(server: OAuthServer) {
           return toolError(formatWorkspaceSelectionError(error));
         }
         logger.debug({ err: error, tool: "delete_solution" }, "Tool error");
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to delete solution: ${message}`);
       }
     },
@@ -431,8 +427,7 @@ export function registerSolutionTools(server: OAuthServer) {
           { err: error, tool: "manage_solution_relationships" },
           "Tool error",
         );
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to manage solution relationships: ${message}`);
       }
     },
@@ -492,8 +487,7 @@ export function registerSolutionTools(server: OAuthServer) {
           { err: error, tool: "prioritise_solutions" },
           "Tool error",
         );
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
+        const message = await formatApiError(error);
         return toolError(`Unable to prioritise solutions: ${message}`);
       }
     },
