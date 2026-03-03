@@ -261,32 +261,34 @@ export function registerSolutionTools(server: OAuthServer) {
       name: "update_solution",
       title: "Update Solution",
       description:
-        "Update an existing solution's details such as title, description, pros, cons, or status.",
-      schema: z.object({
-        solutionId: z.string().describe("The ID of the solution to update"),
-        title: z.string().optional().describe("Updated title"),
-        description: z
-          .string()
-          .optional()
-          .describe(
-            "Updated brief AI-friendly summary for context and search purposes",
-          ),
-        prd: z
-          .string()
-          .optional()
-          .describe(
-            "Updated complete Product Requirements Document (PRD) containing the full detailed specification and implementation plan",
-          ),
-        pros: z
-          .array(z.string())
-          .optional()
-          .describe("Updated list of pros/benefits"),
-        cons: z
-          .array(z.string())
-          .optional()
-          .describe("Updated list of cons/drawbacks"),
-        status: statusEnum,
-      }),
+        "Update an existing solution's details such as title, description, pros, cons, or status. Does NOT support changing priority — use prioritise_solutions to reorder.",
+      schema: z
+        .object({
+          solutionId: z.string().describe("The ID of the solution to update"),
+          title: z.string().optional().describe("Updated title"),
+          description: z
+            .string()
+            .optional()
+            .describe(
+              "Updated brief AI-friendly summary for context and search purposes",
+            ),
+          prd: z
+            .string()
+            .optional()
+            .describe(
+              "Updated complete Product Requirements Document (PRD) containing the full detailed specification and implementation plan",
+            ),
+          pros: z
+            .array(z.string())
+            .optional()
+            .describe("Updated list of pros/benefits"),
+          cons: z
+            .array(z.string())
+            .optional()
+            .describe("Updated list of cons/drawbacks"),
+          status: statusEnum,
+        })
+        .strict(),
       annotations: {
         readOnlyHint: false,
         destructiveHint: true,
@@ -440,7 +442,7 @@ export function registerSolutionTools(server: OAuthServer) {
       name: "prioritise_solutions",
       title: "Prioritise Solutions",
       description:
-        "Reorder the priority of solutions by moving them before a specified solution. This changes the display order of solutions in the workspace.",
+        "Reorder the priority of solutions by moving them before a specified solution. This is the only way to change solution priority/ordering in the workspace.",
       schema: z.object({
         solutionIds: z
           .array(z.string())
