@@ -6,16 +6,16 @@ vi.mock("@propelauth/node", () => ({
   initBaseAuth: () => ({ createAccessToken: mockCreateAccessToken }),
 }));
 
-vi.mock("../src/helpers/config.js", () => ({
+vi.mock("./config.js", () => ({
   getPropelAuthUrl: () => "https://test.propelauthtest.com",
 }));
 
-vi.mock("../src/lib/logger.js", () => ({
+vi.mock("../lib/logger.js", () => ({
   logger: { debug: vi.fn() },
 }));
 
 // Must import after mocks are set up
-const { getServiceToken } = await import("../src/helpers/mintToken.js");
+const { getServiceToken } = await import("./mintToken.js");
 
 beforeEach(() => {
   vi.stubEnv("PROPELAUTH_API_KEY", "test-key");
