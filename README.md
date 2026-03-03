@@ -80,12 +80,13 @@ All tools include:
 │  Squad MCP Server                            │
 │  ┌────────────────────────────────────────┐  │
 │  │  OAuth Middleware → Validate Token     │  │
+│  │  JWT Minting → Service Credentials    │  │
 │  │  Session Store → Manage State          │  │
 │  │  MCP Handler → Execute Tools           │  │
 │  └────────────────────────────────────────┘  │
 └──────────────────────────────────────────────┘
        │
-       │ Squad API Calls
+       │ Squad API Calls (minted JWT)
        ▼
 ┌──────────────┐
 │  Squad API   │
@@ -121,8 +122,9 @@ This repository contains the source code for the Squad MCP remote server.
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 22.22+
 - Yarn
+- Nix (optional, for reproducible dev environment via `flake.nix`)
 - PropelAuth account (for OAuth2)
 - Squad API credentials
 
@@ -152,6 +154,9 @@ yarn dev
 yarn build              # Compile TypeScript
 yarn dev                # Start dev server with hot reload
 yarn start              # Start production server
+yarn test               # Run unit tests (vitest)
+yarn format             # Lint with biome
+yarn format:fix         # Auto-fix lint issues
 yarn openapi:squad      # Regenerate API client from OpenAPI spec
 yarn storybook          # Run Storybook for widget development
 ```
@@ -180,7 +185,8 @@ squad-mcp/
 │   ├── client.ts               # MCP client export
 │   ├── helpers/
 │   │   ├── config.ts           # Environment configuration
-│   │   └── getUser.ts          # OAuth context + workspace selection
+│   │   ├── getUser.ts          # OAuth context + workspace selection
+│   │   └── mintToken.ts        # JWT minting + per-user cache
 │   ├── lib/
 │   │   ├── logger.ts           # Structured logging
 │   │   └── clients/
@@ -228,12 +234,12 @@ Need help with the Squad MCP server?
 
 ## 🤝 Contributing
 
-Contributions welcome! Please ensure:
+Contributions welcome! Pre-commit hooks run biome lint and vitest automatically. Please ensure:
 
-- TypeScript builds without errors (`yarn build`)
+- `yarn format` passes (biome lint)
+- `yarn build` compiles without errors
+- `yarn test` passes
 - All tools include safety annotations
-- OAuth context properly propagated
-- Server starts and responds to health checks
 
 ## 📄 License
 
