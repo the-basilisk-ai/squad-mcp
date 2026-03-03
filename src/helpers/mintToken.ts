@@ -4,13 +4,15 @@ import { logger } from "../lib/logger.js";
 
 const JWT_DURATION_MINUTES = 60;
 const CACHE_TTL_MS = 55 * 60 * 1000; // 55 min (5 min buffer before JWT expiry)
-const CACHE_MAX_SIZE = 10_000;
+const CACHE_MAX_SIZE = 10_000; // max concurrent users before eviction
+const EVICTION_RATIO = 0.1;
 
 type CachedToken = {
   jwt: string;
   createdAt: number;
 };
 
+// In-memory only — lost on restart, which just means a few extra createAccessToken calls to warm up.
 const tokenCache = new Map<string, CachedToken>();
 
 // Lazy singleton — initialized on first use
@@ -34,7 +36,7 @@ function evictOldest(): void {
   if (tokenCache.size < CACHE_MAX_SIZE) return;
   const entries = Array.from(tokenCache.entries());
   entries.sort((a, b) => a[1].createdAt - b[1].createdAt);
-  const evictCount = Math.ceil(CACHE_MAX_SIZE * 0.1);
+  const evictCount = Math.ceil(CACHE_MAX_SIZE * EVICTION_RATIO);
   for (let i = 0; i < evictCount && i < entries.length; i++) {
     tokenCache.delete(entries[i][0]);
   }
