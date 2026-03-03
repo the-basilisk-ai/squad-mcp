@@ -1,8 +1,0 @@
-pre-commit:
-  parallel: true
-  commands:
-    lint:
-      glob: "*.{ts,tsx,js,jsx,json,css}"
-      run: node_modules/.bin/biome check --staged --no-errors-on-unmatched {staged_files}
-    test:
-      run: node_modules/.bin/vitest run

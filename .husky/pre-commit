@@ -1,0 +1,2 @@
+node_modules/.bin/biome check --staged --no-errors-on-unmatched
+node_modules/.bin/vitest run

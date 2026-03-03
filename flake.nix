@@ -20,12 +20,7 @@
             nodePackages.typescript-language-server
             railway
             jdk
-            lefthook
           ];
-
-          shellHook = ''
-            lefthook install
-          '';
         };
       }
     );

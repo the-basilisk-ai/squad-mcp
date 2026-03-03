@@ -14,6 +14,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test": "vitest run",
+    "prepare": "husky",
     "format": "biome check .",
     "format:fix": "biome check --write .",
     "openapi:squad": "npx tsx ./scripts/openapi-unify-tags.ts && openapi-generator-cli generate -g typescript-fetch -c ./openapi-generator-config.json -i ./openapi/squad.json -o src/lib/openapi/squad && npx tsx ./scripts/openapi-client-esm-fix.ts"
@@ -44,6 +45,7 @@
     "@types/react-dom": "^19.1.0",
     "@vitejs/plugin-react": "^4.5.2",
     "glob": "^13.0.6",
+    "husky": "^9.1.7",
     "serve": "^14.2.5",
     "storybook": "^10.2.10",
     "tsx": "^4.21.0",
