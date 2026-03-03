@@ -18,4 +18,5 @@ jobs:
 
       - run: yarn install --frozen-lockfile --ignore-engines
 
+      - run: yarn format
       - run: yarn test
