@@ -6,6 +6,7 @@ import {
   listUserOrganisations,
   setWorkspaceSelection,
 } from "../helpers/getUser.js";
+import { getServiceToken } from "../helpers/mintToken.js";
 import { squadClient } from "../lib/clients/squad.js";
 import { logger } from "../lib/logger.js";
 import {
@@ -38,7 +39,7 @@ export function registerWorkspaceTools(server: OAuthServer) {
     async (_params, ctx) => {
       try {
         const userId = getUserId(ctx.auth);
-        const token = ctx.auth.accessToken;
+        const token = await getServiceToken(userId);
 
         const orgs = await listUserOrganisations(token);
         const result: Array<{
@@ -86,7 +87,7 @@ export function registerWorkspaceTools(server: OAuthServer) {
     async (params, ctx) => {
       try {
         const userId = getUserId(ctx.auth);
-        const token = ctx.auth.accessToken;
+        const token = await getServiceToken(userId);
         const { orgId, workspaceId } = params;
 
         // Verify the user has access to this org/workspace

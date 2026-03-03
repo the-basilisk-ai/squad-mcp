@@ -182,9 +182,9 @@ registerInsightTools(server);
 registerSearchTools(server);
 registerViewTools(server);
 
-if (!CLIENT_ID || !CLIENT_SECRET) {
+if (!CLIENT_ID || !CLIENT_SECRET || !process.env.PROPELAUTH_API_KEY) {
   logger.fatal(
-    "Missing required environment variables: PROPELAUTH_CLIENT_ID and PROPELAUTH_CLIENT_SECRET",
+    "Missing required environment variables: PROPELAUTH_CLIENT_ID, PROPELAUTH_CLIENT_SECRET, and PROPELAUTH_API_KEY",
   );
   process.exit(1);
 }

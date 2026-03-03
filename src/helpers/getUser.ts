@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { squadClient } from "../lib/clients/squad.js";
 import { logger } from "../lib/logger.js";
+import { getServiceToken } from "./mintToken.js";
 
 export type UserContext = {
   orgId: string;
@@ -183,21 +184,23 @@ export async function listOrgWorkspaces(
  * @returns User context with orgId, workspaceId, and token
  */
 export const getUserContext = async (
-  accessToken: string,
+  _accessToken: string,
   userId: string,
 ): Promise<UserContext> => {
+  const token = await getServiceToken(userId);
+
   // Check if user has a stored workspace selection
   const storedSelection = getWorkspaceSelection(userId);
   if (storedSelection) {
     return {
       orgId: storedSelection.orgId,
       workspaceId: storedSelection.workspaceId,
-      token: accessToken,
+      token,
     };
   }
 
   // No stored selection - try to auto-select if user has only one org/workspace
-  const orgs = await listUserOrganisations(accessToken);
+  const orgs = await listUserOrganisations(token);
 
   if (orgs.length === 0) {
     throw new Error(
@@ -214,7 +217,7 @@ export const getUserContext = async (
 
   // Single org - check workspaces
   const orgId = orgs[0].id;
-  const workspaces = await listOrgWorkspaces(accessToken, orgId);
+  const workspaces = await listOrgWorkspaces(token, orgId);
 
   if (workspaces.length === 0) {
     throw new Error(
@@ -234,7 +237,7 @@ export const getUserContext = async (
   const workspaceId = workspaces[0].id;
   setWorkspaceSelection(userId, orgId, workspaceId);
 
-  return { orgId, workspaceId, token: accessToken };
+  return { orgId, workspaceId, token };
 };
 
 /**
