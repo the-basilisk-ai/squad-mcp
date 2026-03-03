@@ -14,6 +14,8 @@ type CachedToken = {
 
 // In-memory only — lost on restart, which just means a few extra createAccessToken calls to warm up.
 const tokenCache = new Map<string, CachedToken>();
+let cacheHits = 0;
+let cacheMisses = 0;
 
 // Lazy singleton — initialized on first use
 let authInstance: ReturnType<typeof initBaseAuth> | null = null;
@@ -51,8 +53,27 @@ function removeExpired(): void {
   }
 }
 
-// Hourly cleanup (mirrors workspace cache pattern in getUser.ts)
-setInterval(removeExpired, 60 * 60 * 1000);
+// Periodic cleanup and stats logging
+setInterval(
+  () => {
+    removeExpired();
+    const total = cacheHits + cacheMisses;
+    if (total > 0) {
+      logger.info(
+        {
+          cacheHits,
+          cacheMisses,
+          cacheSize: tokenCache.size,
+          hitRate: `${Math.round((cacheHits / total) * 100)}%`,
+        },
+        "JWT token cache stats",
+      );
+      cacheHits = 0;
+      cacheMisses = 0;
+    }
+  },
+  60 * 60 * 1000,
+);
 
 /**
  * Get a short-lived JWT for calling the Squad API on behalf of a user.
@@ -61,8 +82,10 @@ setInterval(removeExpired, 60 * 60 * 1000);
 export async function getServiceToken(userId: string): Promise<string> {
   const cached = tokenCache.get(userId);
   if (cached && Date.now() - cached.createdAt < CACHE_TTL_MS) {
+    cacheHits++;
     return cached.jwt;
   }
+  cacheMisses++;
 
   const auth = getAuth();
   const result = await auth.createAccessToken({
