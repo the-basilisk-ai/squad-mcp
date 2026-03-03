@@ -2,9 +2,7 @@ import { z } from "zod";
 import { getUserContext } from "../helpers/getUser.js";
 import { squadClient } from "../lib/clients/squad.js";
 import { logger } from "../lib/logger.js";
-import {
-  UpdateOpportunityPayloadStatusEnum,
-} from "../lib/openapi/squad/models/index.js";
+import { UpdateOpportunityPayloadStatusEnum } from "../lib/openapi/squad/models/index.js";
 import {
   formatWorkspaceSelectionError,
   getUserId,
@@ -171,17 +169,17 @@ export function registerOpportunityTools(server: OAuthServer) {
         // Return summaries for relationships to reduce token usage
         return toolSuccess({
           ...opportunity,
-          outcomes: opportunity.outcomes?.map((o) => ({
+          outcomes: opportunity.outcomes?.map(o => ({
             id: o.id,
             title: o.title,
             priority: o.priority,
           })),
-          solutions: opportunity.solutions?.map((s) => ({
+          solutions: opportunity.solutions?.map(s => ({
             id: s.id,
             title: s.title,
             status: s.status,
           })),
-          insights: opportunity.insights?.map((i) => ({
+          insights: opportunity.insights?.map(i => ({
             id: i.id,
             title: i.title,
             type: i.type,

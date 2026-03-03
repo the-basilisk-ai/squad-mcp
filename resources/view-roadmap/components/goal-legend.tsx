@@ -11,13 +11,13 @@ export const GoalLegend: React.FC<{
 
   return (
     <div className="flex flex-wrap gap-1.5 mb-3">
-      {goals.map((goal) => {
+      {goals.map(goal => {
         const url = goalUrl(goal.id, appBaseUrl);
         const content = (
           <>
             <span className="truncate max-w-[200px]">{goal.title}</span>
             <span className="inline-flex gap-0.5 items-center ml-0.5">
-              {[1, 2, 3, 4, 5].map((i) => (
+              {[1, 2, 3, 4, 5].map(i => (
                 <span
                   key={i}
                   className={clsx(

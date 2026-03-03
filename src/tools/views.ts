@@ -245,7 +245,7 @@ async function buildOpportunityContext(
       ? {
           type: "solution",
           count: solutions.length,
-          items: solutions.slice(0, 4).map((s) => ({
+          items: solutions.slice(0, 4).map(s => ({
             id: s.id,
             title: s.title,
             status: s.status,
@@ -294,7 +294,7 @@ async function buildGoalContext(
       ? {
           type: "opportunity",
           count: opportunities.length,
-          items: opportunities.slice(0, 4).map((o) => ({
+          items: opportunities.slice(0, 4).map(o => ({
             id: o.id,
             title: o.title,
             status: o.status,
@@ -333,7 +333,7 @@ async function buildWorkspaceContext(
       ? {
           type: "goal",
           count: goals.length,
-          items: goals.slice(0, 4).map((g) => ({
+          items: goals.slice(0, 4).map(g => ({
             id: g.id,
             title: g.title,
           })),
@@ -506,7 +506,7 @@ async function buildFeedbackContext(
 /** Short summary for the model when a widget is rendered. */
 function summarizeContext(data: EntityContextData): string {
   const chain = [...data.ancestors, data.focused]
-    .map((n) => `${n.type}: ${n.title}`)
+    .map(n => `${n.type}: ${n.title}`)
     .join(" → ");
   const parts = [chain];
   if (data.focused.status) parts.push(`Status: ${data.focused.status}`);
@@ -518,9 +518,9 @@ function summarizeContext(data: EntityContextData): string {
 /** Short summary for the model when a widget is rendered. */
 function summarizeRoadmap(data: RoadmapData): string {
   const horizons = data.columns
-    .map((c) => `${c.horizon}: ${c.solutions.length}`)
+    .map(c => `${c.horizon}: ${c.solutions.length}`)
     .join(", ");
-  const goals = data.goals.map((g) => g.title).join(", ");
+  const goals = data.goals.map(g => g.title).join(", ");
   return `Roadmap: ${data.totalSolutions} solutions (${horizons}). Goals: ${goals}`;
 }
 
@@ -542,7 +542,12 @@ type RoadmapSolution = {
 
 type RoadmapHorizonColumn = {
   horizon: "now" | "next" | "later";
-  solutions: Array<{ id: string; title: string; status: string; goalId?: string }>;
+  solutions: Array<{
+    id: string;
+    title: string;
+    status: string;
+    goalId?: string;
+  }>;
 };
 
 type RoadmapData = {
@@ -584,7 +589,11 @@ async function buildRoadmapData(
     { id: string; title: string; priority: number }
   >();
   for (const g of goalsResp.data) {
-    goalLookup.set(g.id, { id: g.id, title: g.title, priority: g.priority ?? 0 });
+    goalLookup.set(g.id, {
+      id: g.id,
+      title: g.title,
+      priority: g.priority ?? 0,
+    });
   }
 
   // Map solutions with goalId from outcomes
@@ -606,14 +615,14 @@ async function buildRoadmapData(
 
   // Apply filters
   if (opts.goalId) {
-    solutions = solutions.filter((s) => s.goalId === opts.goalId);
+    solutions = solutions.filter(s => s.goalId === opts.goalId);
   }
   if (opts.statusFilter && opts.statusFilter.length > 0) {
     const allowed = new Set(opts.statusFilter);
-    solutions = solutions.filter((s) => allowed.has(s.status));
+    solutions = solutions.filter(s => allowed.has(s.status));
   }
   if (!opts.showResolved) {
-    solutions = solutions.filter((s) => !RESOLVED_STATUSES.has(s.status));
+    solutions = solutions.filter(s => !RESOLVED_STATUSES.has(s.status));
   }
 
   // Group by horizon, omit empty
@@ -628,11 +637,11 @@ async function buildRoadmapData(
     bucket.push(s);
   }
 
-  const columns: RoadmapHorizonColumn[] = HORIZON_ORDER.filter((h) =>
+  const columns: RoadmapHorizonColumn[] = HORIZON_ORDER.filter(h =>
     groups.has(h),
-  ).map((h) => ({
+  ).map(h => ({
     horizon: h,
-    solutions: (groups.get(h) ?? []).map((s) => ({
+    solutions: (groups.get(h) ?? []).map(s => ({
       id: s.id,
       title: s.title,
       status: s.status,
@@ -641,12 +650,12 @@ async function buildRoadmapData(
   }));
 
   // All goals sorted by priority desc
-  const goals: RoadmapGoalSummary[] = [...goalLookup.values()]
-    .sort((a, b) => b.priority - a.priority);
+  const goals: RoadmapGoalSummary[] = [...goalLookup.values()].sort(
+    (a, b) => b.priority - a.priority,
+  );
 
   return { goals, columns, totalSolutions: solutions.length };
 }
-
 
 const solutionStatusEnum = z.enum([
   CreateSolutionPayloadStatusEnum.New,

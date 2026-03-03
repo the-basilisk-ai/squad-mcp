@@ -21,7 +21,7 @@ export const FullRoadmap: Story = {
         id: "g-1",
         title: "Accelerate Market Penetration",
         priority: 5,
-        },
+      },
       {
         id: "g-2",
         title: "AI Innovation",
@@ -83,7 +83,7 @@ export const SingleGoalFiltered: Story = {
         id: "g-1",
         title: "Accelerate Market Penetration",
         priority: 5,
-        },
+      },
     ],
     columns: [
       {
@@ -130,10 +130,10 @@ export const ManyGoals: Story = {
         id: "g-1",
         title: "Accelerate Market Penetration",
         priority: 5,
-        },
-      { id: "g-2", title: "AI Innovation", priority: 3, },
-      { id: "g-3", title: "Customer Retention", priority: 4, },
-      { id: "g-4", title: "Platform Reliability", priority: 2, },
+      },
+      { id: "g-2", title: "AI Innovation", priority: 3 },
+      { id: "g-3", title: "Customer Retention", priority: 4 },
+      { id: "g-4", title: "Platform Reliability", priority: 2 },
       {
         id: "g-5",
         title: "Developer Experience",
@@ -201,15 +201,35 @@ export const AllStatuses: Story = {
         horizon: "now",
         solutions: [
           { id: "s-1", title: "New Feature", status: "New", goalId: "g-1" },
-          { id: "s-2", title: "In Progress Task", status: "InProgress", goalId: "g-1" },
-          { id: "s-3", title: "Dev Build", status: "InDevelopment", goalId: "g-1" },
+          {
+            id: "s-2",
+            title: "In Progress Task",
+            status: "InProgress",
+            goalId: "g-1",
+          },
+          {
+            id: "s-3",
+            title: "Dev Build",
+            status: "InDevelopment",
+            goalId: "g-1",
+          },
         ],
       },
       {
         horizon: "next",
         solutions: [
-          { id: "s-4", title: "Planned Work", status: "Planned", goalId: "g-1" },
-          { id: "s-5", title: "Completed Item", status: "Complete", goalId: "g-1" },
+          {
+            id: "s-4",
+            title: "Planned Work",
+            status: "Planned",
+            goalId: "g-1",
+          },
+          {
+            id: "s-5",
+            title: "Completed Item",
+            status: "Complete",
+            goalId: "g-1",
+          },
           { id: "s-6", title: "Solved Issue", status: "Solved", goalId: "g-1" },
         ],
       },
@@ -217,8 +237,18 @@ export const AllStatuses: Story = {
         horizon: "later",
         solutions: [
           { id: "s-7", title: "Live Service", status: "Live", goalId: "g-1" },
-          { id: "s-8", title: "Cancelled Project", status: "Cancelled", goalId: "g-1" },
-          { id: "s-9", title: "Backlog Item", status: "Backlog", goalId: "g-1" },
+          {
+            id: "s-8",
+            title: "Cancelled Project",
+            status: "Cancelled",
+            goalId: "g-1",
+          },
+          {
+            id: "s-9",
+            title: "Backlog Item",
+            status: "Backlog",
+            goalId: "g-1",
+          },
         ],
       },
     ],
@@ -240,9 +270,7 @@ export const SolutionsWithoutGoals: Story = {
       },
       {
         horizon: "next",
-        solutions: [
-          { id: "s-3", title: "Orphan Task C", status: "Planned" },
-        ],
+        solutions: [{ id: "s-3", title: "Orphan Task C", status: "Planned" }],
       },
     ],
     totalSolutions: 3,
@@ -271,12 +299,14 @@ export const LongTitles: Story = {
     goals: [
       {
         id: "g-1",
-        title: "Improve Cross-Functional Alignment Across All Product Teams and Stakeholders",
+        title:
+          "Improve Cross-Functional Alignment Across All Product Teams and Stakeholders",
         priority: 5,
       },
       {
         id: "g-2",
-        title: "Achieve Enterprise-Grade Security Compliance for SOC2 and ISO 27001 Certification",
+        title:
+          "Achieve Enterprise-Grade Security Compliance for SOC2 and ISO 27001 Certification",
         priority: 4,
       },
     ],

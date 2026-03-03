@@ -184,22 +184,21 @@ export function registerInsightTools(server: OAuthServer) {
         // Return summaries for relationships to reduce token usage
         return toolSuccess({
           ...insight,
-          opportunities: insight.opportunities?.map((o) => ({
+          opportunities: insight.opportunities?.map(o => ({
             id: o.id,
             title: o.title,
             status: o.status,
           })),
-          solutions: insight.solutions?.map((s) => ({
+          solutions: insight.solutions?.map(s => ({
             id: s.id,
             title: s.title,
             status: s.status,
           })),
-          outcomes: insight.outcomes?.map((o) => ({
+          outcomes: insight.outcomes?.map(o => ({
             id: o.id,
             title: o.title,
             priority: o.priority,
-          }),
-          ),
+          })),
         });
       } catch (error) {
         if (error instanceof WorkspaceSelectionRequired) {

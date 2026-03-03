@@ -1,7 +1,7 @@
 import { McpUseProvider, useWidget, type WidgetMetadata } from "mcp-use/react";
 import type React from "react";
 import { RoadmapView } from "./roadmap-view";
-import { type RoadmapProps, propSchema } from "./types";
+import { propSchema, type RoadmapProps } from "./types";
 import "./styles.css";
 
 export const widgetMetadata: WidgetMetadata = {
@@ -35,7 +35,7 @@ const RoadmapWidget: React.FC = () => {
           <div className="shimmer h-6 w-28 rounded-md" />
         </div>
         {/* Column skeletons */}
-        {[1, 2].map((i) => (
+        {[1, 2].map(i => (
           <div key={i} className="mb-4">
             <div className="shimmer h-3 w-12 rounded mb-2" />
             <div className="shimmer h-14 rounded-lg mb-2" />

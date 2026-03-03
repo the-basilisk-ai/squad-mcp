@@ -229,17 +229,17 @@ export function registerSolutionTools(server: OAuthServer) {
         // Return summaries for relationships to reduce token usage
         return toolSuccess({
           ...solution,
-          opportunities: solution.opportunities?.map((o) => ({
+          opportunities: solution.opportunities?.map(o => ({
             id: o.id,
             title: o.title,
             status: o.status,
           })),
-          outcomes: solution.outcomes?.map((o) => ({
+          outcomes: solution.outcomes?.map(o => ({
             id: o.id,
             title: o.title,
             priority: o.priority,
           })),
-          insights: solution.insights?.map((i) => ({
+          insights: solution.insights?.map(i => ({
             id: i.id,
             title: i.title,
             type: i.type,

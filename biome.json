@@ -33,11 +33,14 @@
   },
   "overrides": [
     {
-      "includes": ["src/lib/openapi/**", "scripts/**", "dist/**"],
+      "includes": ["src/lib/openapi/**", "openapi/**", "scripts/**", "dist/**"],
       "linter": {
         "enabled": false
       },
       "formatter": {
+        "enabled": false
+      },
+      "assist": {
         "enabled": false
       }
     }

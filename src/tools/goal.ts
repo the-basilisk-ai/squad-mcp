@@ -192,17 +192,17 @@ export function registerGoalTools(server: OAuthServer) {
         return toolSuccess({
           ...rest,
           importance: priority,
-          opportunities: outcome.opportunities?.map((o) => ({
+          opportunities: outcome.opportunities?.map(o => ({
             id: o.id,
             title: o.title,
             status: o.status,
           })),
-          solutions: outcome.solutions?.map((s) => ({
+          solutions: outcome.solutions?.map(s => ({
             id: s.id,
             title: s.title,
             status: s.status,
           })),
-          insights: outcome.insights?.map((i) => ({
+          insights: outcome.insights?.map(i => ({
             id: i.id,
             title: i.title,
             type: i.type,

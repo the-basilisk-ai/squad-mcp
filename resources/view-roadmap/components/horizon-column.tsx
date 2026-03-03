@@ -1,10 +1,7 @@
 import clsx from "clsx";
 import type React from "react";
 import { HORIZON_HEADER_STYLES, HORIZON_LABELS } from "../constants";
-import type {
-  GoalSummary,
-  HorizonColumn as HorizonColumnType,
-} from "../types";
+import type { GoalSummary, HorizonColumn as HorizonColumnType } from "../types";
 import { SolutionCard } from "./solution-card";
 
 export const HorizonColumn: React.FC<{
@@ -27,7 +24,7 @@ export const HorizonColumn: React.FC<{
       </span>
     </div>
     <div className="flex flex-col gap-2">
-      {column.solutions.map((solution) => (
+      {column.solutions.map(solution => (
         <SolutionCard
           key={solution.id}
           solution={solution}

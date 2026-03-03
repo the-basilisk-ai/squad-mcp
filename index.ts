@@ -1,4 +1,3 @@
-import { createClient } from "redis";
 import { config } from "dotenv";
 import {
   MCPServer,
@@ -6,6 +5,7 @@ import {
   RedisSessionStore,
   RedisStreamManager,
 } from "mcp-use/server";
+import { createClient } from "redis";
 import { getPropelAuthUrl } from "./src/helpers/config.js";
 import { logger } from "./src/lib/logger.js";
 import { registerFeedbackTools } from "./src/tools/feedback.js";

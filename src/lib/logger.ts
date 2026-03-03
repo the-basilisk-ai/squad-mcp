@@ -7,8 +7,16 @@ const levels: Record<LogLevel, number> = {
   error: 3,
   fatal: 4,
 };
-const VALID_LEVELS: readonly LogLevel[] = ["debug", "info", "warn", "error", "fatal"];
-const currentLevel: LogLevel = VALID_LEVELS.includes(process.env.LOG_LEVEL as LogLevel)
+const VALID_LEVELS: readonly LogLevel[] = [
+  "debug",
+  "info",
+  "warn",
+  "error",
+  "fatal",
+];
+const currentLevel: LogLevel = VALID_LEVELS.includes(
+  process.env.LOG_LEVEL as LogLevel,
+)
   ? (process.env.LOG_LEVEL as LogLevel)
   : "info";
 

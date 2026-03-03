@@ -12,7 +12,7 @@ export const RoadmapView: React.FC<RoadmapProps> = ({
   appBaseUrl,
 }) => {
   const goalMap = useMemo(
-    () => new Map<string, GoalSummary>(goals.map((g) => [g.id, g])),
+    () => new Map<string, GoalSummary>(goals.map(g => [g.id, g])),
     [goals],
   );
 
@@ -63,7 +63,7 @@ export const RoadmapView: React.FC<RoadmapProps> = ({
           No solutions on the roadmap yet.
         </div>
       ) : (
-        columns.map((column) => (
+        columns.map(column => (
           <HorizonColumn
             key={column.horizon}
             column={column}
@@ -72,7 +72,6 @@ export const RoadmapView: React.FC<RoadmapProps> = ({
           />
         ))
       )}
-
     </div>
   );
 };

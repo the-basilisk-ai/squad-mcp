@@ -1,6 +1,6 @@
 import { initBaseAuth } from "@propelauth/node";
-import { getPropelAuthUrl } from "./config.js";
 import { logger } from "../lib/logger.js";
+import { getPropelAuthUrl } from "./config.js";
 
 const JWT_DURATION_MINUTES = 60;
 const CACHE_TTL_MS = 55 * 60 * 1000; // 55 min (5 min buffer before JWT expiry)

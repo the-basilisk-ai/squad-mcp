@@ -14,7 +14,8 @@ export const GOAL_COLOR = {
 export const HORIZON_HEADER_STYLES: Record<string, string> = {
   now: "border-gray-300 dark:border-zinc-600 text-gray-600 dark:text-zinc-300",
   next: "border-gray-300 dark:border-zinc-600 text-gray-600 dark:text-zinc-300",
-  later: "border-gray-300 dark:border-zinc-600 text-gray-600 dark:text-zinc-300",
+  later:
+    "border-gray-300 dark:border-zinc-600 text-gray-600 dark:text-zinc-300",
 };
 
 export const HORIZON_BADGE_CLASSES: Record<string, string> = {
