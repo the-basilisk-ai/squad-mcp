@@ -75,7 +75,7 @@ export async function formatApiError(error: unknown): Promise<string> {
   const { status } = error.response;
 
   if (status === 402) {
-    return "Your workspace has run out of AI credits. Please upgrade your plan or contact support.";
+    return "Your workspace has run out of AI credits. Please purchase flex credits or upgrade your plan.";
   }
 
   if (status === 401 || status === 403) {
