@@ -144,12 +144,12 @@ const server = new MCPServer({
 // Health check (used by Railway for deployment readiness)
 server.app.get("/health", c => c.json({ status: "ok", version: "3.0.0" }));
 
-// PropelAuth doesn't support the RFC 8707 `resource` parameter that MCP clients
-// send. Proxy the authorize endpoint, strip `resource`, and redirect.
+// Proxy the authorize endpoint to PropelAuth, forwarding all parameters including
+// the RFC 8707 `resource` parameter that PropelAuth requires.
 server.app.get("/oauth/authorize", c => {
   const url = new URL(`${AUTH_URL}/oauth/2.1/authorize`);
   for (const [key, value] of Object.entries(c.req.query())) {
-    if (key !== "resource" && value !== undefined) {
+    if (value !== undefined) {
       url.searchParams.set(key, value);
     }
   }
