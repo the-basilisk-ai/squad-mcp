@@ -15,8 +15,8 @@ export const ExternalLink: React.FC<
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       if (href && openExternal) {
         e.preventDefault();
-        openExternal(href).catch(() => {
-          // Fallback: let the browser try natively
+        openExternal(href).catch(err => {
+          console.error("[ExternalLink] openExternal failed:", err);
           window.open(href, "_blank", "noopener,noreferrer");
         });
       }
