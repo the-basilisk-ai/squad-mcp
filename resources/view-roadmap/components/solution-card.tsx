@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import type React from "react";
+import { ExternalLink } from "../../shared/external-link";
 import {
   GOAL_COLOR,
   goalUrl,
@@ -41,14 +42,12 @@ export const SolutionCard: React.FC<{
     : "";
 
   const titleEl = url ? (
-    <a
+    <ExternalLink
       href={url}
-      target="_blank"
-      rel="noopener noreferrer"
       className="text-inherit no-underline hover:underline"
     >
       {solution.title}
-    </a>
+    </ExternalLink>
   ) : (
     solution.title
   );
@@ -65,15 +64,13 @@ export const SolutionCard: React.FC<{
           GOAL_COLOR.text,
         );
         return gUrl ? (
-          <a
+          <ExternalLink
             href={gUrl}
-            target="_blank"
-            rel="noopener noreferrer"
             title={goal.title}
             className={clsx(cls, "no-underline hover:underline")}
           >
             {inner}
-          </a>
+          </ExternalLink>
         ) : (
           <span className={cls} title={goal.title}>
             {inner}

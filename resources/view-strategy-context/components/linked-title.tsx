@@ -1,4 +1,5 @@
 import type React from "react";
+import { ExternalLink } from "../../shared/external-link";
 import { entityUrl } from "../constants";
 
 export const LinkedTitle: React.FC<{
@@ -10,13 +11,11 @@ export const LinkedTitle: React.FC<{
   const url = entityUrl(type, id, appBaseUrl);
   if (!url) return <>{title}</>;
   return (
-    <a
+    <ExternalLink
       href={url}
-      target="_blank"
-      rel="noopener noreferrer"
       className="text-inherit no-underline hover:underline"
     >
       {title}
-    </a>
+    </ExternalLink>
   );
 };

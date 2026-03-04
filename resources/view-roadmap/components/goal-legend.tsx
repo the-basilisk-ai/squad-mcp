@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import type React from "react";
+import { ExternalLink } from "../../shared/external-link";
 import { GOAL_COLOR, goalUrl } from "../constants";
 import type { GoalSummary } from "../types";
 
@@ -38,16 +39,14 @@ export const GoalLegend: React.FC<{
         );
 
         return url ? (
-          <a
+          <ExternalLink
             key={goal.id}
             href={url}
-            target="_blank"
-            rel="noopener noreferrer"
             title={goal.title}
             className={clsx(className, "no-underline hover:underline")}
           >
             {content}
-          </a>
+          </ExternalLink>
         ) : (
           <div key={goal.id} title={goal.title} className={className}>
             {content}

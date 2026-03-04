@@ -110,7 +110,9 @@ const server = new MCPServer({
   oauth: oauthCustomProvider({
     issuer: AUTH_URL,
     jwksUrl: `${AUTH_URL}/.well-known/jwks.json`,
-    authEndpoint: `${AUTH_URL}/oauth/2.1/authorize`,
+    // Proxy authorize through our server to strip the RFC 8707 `resource`
+    // parameter that PropelAuth doesn't support.
+    authEndpoint: `${process.env.MCP_URL || BASE_URI}/oauth/authorize`,
     tokenEndpoint: `${AUTH_URL}/oauth/2.1/token`,
     scopesSupported: SCOPES,
     grantTypesSupported: ["authorization_code", "refresh_token"],
@@ -142,6 +144,18 @@ const server = new MCPServer({
 // Health check (used by Railway for deployment readiness)
 server.app.get("/health", c => c.json({ status: "ok", version: "3.0.0" }));
 
+// PropelAuth doesn't support the RFC 8707 `resource` parameter that MCP clients
+// send. Proxy the authorize endpoint, strip `resource`, and redirect.
+server.app.get("/oauth/authorize", c => {
+  const url = new URL(`${AUTH_URL}/oauth/2.1/authorize`);
+  for (const [key, value] of Object.entries(c.req.query())) {
+    if (key !== "resource" && value !== undefined) {
+      url.searchParams.set(key, value);
+    }
+  }
+  return c.redirect(url.toString(), 302);
+});
+
 // PropelAuth serves OAuth metadata at a non-standard path (/oauth/2.1 suffix).
 // Proxy it at the standard path so MCP clients can discover registration_endpoint.
 const mcpUrl = process.env.MCP_URL || BASE_URI;
@@ -152,7 +166,11 @@ server.app.get("/.well-known/oauth-authorization-server", async c => {
   if (!response.ok) {
     return c.json({ error: "Failed to fetch auth server metadata" }, 502);
   }
-  return c.json(await response.json());
+  const metadata = await response.json();
+  // Rewrite authorization_endpoint so clients that discover via metadata
+  // also go through our proxy (which strips the `resource` param).
+  metadata.authorization_endpoint = `${mcpUrl}/oauth/authorize`;
+  return c.json(metadata);
 });
 
 // Protected resource metadata must point authorization_servers to our server

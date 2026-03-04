@@ -1,5 +1,6 @@
 import type React from "react";
 import { useMemo } from "react";
+import { ExternalLink } from "../shared/external-link";
 import { GoalLegend } from "./components/goal-legend";
 import { HorizonColumn } from "./components/horizon-column";
 import { roadmapUrl } from "./constants";
@@ -37,14 +38,12 @@ export const RoadmapView: React.FC<RoadmapProps> = ({
             />
           </svg>
           {url ? (
-            <a
+            <ExternalLink
               href={url}
-              target="_blank"
-              rel="noopener noreferrer"
               className="text-inherit no-underline hover:underline"
             >
               Roadmap
-            </a>
+            </ExternalLink>
           ) : (
             "Roadmap"
           )}
