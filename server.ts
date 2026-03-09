@@ -2,8 +2,8 @@ import { config } from "dotenv";
 import {
   MCPServer,
   oauthCustomProvider,
-  RedisSessionStore,
-  RedisStreamManager,
+  type RedisSessionStore,
+  type RedisStreamManager,
 } from "mcp-use/server";
 import { getPropelAuthUrl } from "./src/helpers/config.js";
 import { introspectToken } from "./src/helpers/oauth.js";
