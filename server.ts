@@ -5,8 +5,9 @@ import {
   RedisSessionStore,
   RedisStreamManager,
 } from "mcp-use/server";
-import { createClient } from "redis";
 import { getPropelAuthUrl } from "./src/helpers/config.js";
+import { introspectToken } from "./src/helpers/oauth.js";
+import { connectRedis } from "./src/helpers/redis.js";
 import { logger } from "./src/lib/logger.js";
 import { registerFeedbackTools } from "./src/tools/feedback.js";
 import { registerGoalTools } from "./src/tools/goal.js";
@@ -22,79 +23,14 @@ config();
 
 const PORT = parseInt(process.env.PORT || "3232", 10);
 const BASE_URI = process.env.BASE_URI || `http://localhost:${PORT}`;
-const CLIENT_ID = process.env.PROPELAUTH_CLIENT_ID ?? "";
-const CLIENT_SECRET = process.env.PROPELAUTH_CLIENT_SECRET ?? "";
 const AUTH_URL = getPropelAuthUrl();
 const SCOPES = ["read:workspace", "write:workspace"];
 
-const introspectionCredentials = Buffer.from(
-  `${CLIENT_ID}:${CLIENT_SECRET}`,
-).toString("base64");
-
-type IntrospectionResult = {
-  active: boolean;
-  sub?: string;
-  email?: string;
-  exp?: number;
-  iat?: number;
-  scope?: string;
-  client_id?: string;
-  token_type?: string;
-};
-
-function isValidIntrospectionResult(
-  data: unknown,
-): data is IntrospectionResult {
-  if (typeof data !== "object" || data === null) return false;
-  return typeof (data as Record<string, unknown>).active === "boolean";
-}
-
-async function introspectToken(token: string): Promise<IntrospectionResult> {
-  const response = await fetch(`${AUTH_URL}/oauth/2.1/introspect`, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${introspectionCredentials}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({ token }),
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `Introspection failed: ${response.status} ${response.statusText}`,
-    );
-  }
-
-  const data: unknown = await response.json();
-
-  if (!isValidIntrospectionResult(data)) {
-    throw new Error(
-      'Invalid introspection response: missing or invalid "active" field',
-    );
-  }
-
-  return data;
-}
-
-const redisUrl = process.env.REDIS_URL;
-
+// Connect Redis if available (skipped during build when REDIS_URL is unset)
 let sessionStore: RedisSessionStore | undefined;
 let streamManager: RedisStreamManager | undefined;
-
-if (redisUrl) {
-  const redis = createClient({ url: redisUrl });
-  const pubSubRedis = redis.duplicate();
-
-  await redis.connect();
-  await pubSubRedis.connect();
-
-  sessionStore = new RedisSessionStore({ client: redis, defaultTTL: 3600 });
-  streamManager = new RedisStreamManager({
-    client: redis,
-    pubSubClient: pubSubRedis,
-  });
-
-  logger.info("Redis session store connected");
+if (process.env.REDIS_URL) {
+  ({ sessionStore, streamManager } = await connectRedis());
 } else {
   logger.warn("REDIS_URL not set, using in-memory sessions (not deploy-safe)");
 }
@@ -110,8 +46,6 @@ const server = new MCPServer({
   oauth: oauthCustomProvider({
     issuer: AUTH_URL,
     jwksUrl: `${AUTH_URL}/.well-known/jwks.json`,
-    // Proxy authorize through our server to strip the RFC 8707 `resource`
-    // parameter that PropelAuth doesn't support.
     authEndpoint: `${process.env.MCP_URL || BASE_URI}/oauth/authorize`,
     tokenEndpoint: `${AUTH_URL}/oauth/2.1/token`,
     scopesSupported: SCOPES,
@@ -167,8 +101,6 @@ server.app.get("/.well-known/oauth-authorization-server", async c => {
     return c.json({ error: "Failed to fetch auth server metadata" }, 502);
   }
   const metadata = await response.json();
-  // Rewrite authorization_endpoint so clients that discover via metadata
-  // also go through our proxy (which strips the `resource` param).
   metadata.authorization_endpoint = `${mcpUrl}/oauth/authorize`;
   return c.json(metadata);
 });
@@ -200,11 +132,26 @@ registerInsightTools(server);
 registerSearchTools(server);
 registerViewTools(server);
 
-if (!CLIENT_ID || !CLIENT_SECRET || !process.env.PROPELAUTH_API_KEY) {
-  logger.fatal(
-    "Missing required environment variables: PROPELAUTH_CLIENT_ID, PROPELAUTH_CLIENT_SECRET, and PROPELAUTH_API_KEY",
-  );
-  process.exit(1);
+// mcp-use build imports this file for type generation — skip env validation during build
+if (!(globalThis as Record<string, unknown>).__mcpUseHmrMode) {
+  const required = [
+    "PROPELAUTH_CLIENT_ID",
+    "PROPELAUTH_CLIENT_SECRET",
+    "PROPELAUTH_API_KEY",
+  ];
+  const missing = required.filter(v => !process.env[v]);
+  if (missing.length > 0) {
+    logger.fatal(
+      `Missing required environment variables: ${missing.join(", ")}`,
+    );
+    process.exit(1);
+  }
 }
 
-server.listen(PORT);
+await server.listen(PORT);
+
+// mcp-use build imports this file for type generation but never calls process.exit().
+// __mcpUseHmrMode is set during both build and dev, so check argv to only exit during build.
+if (process.argv.includes("build")) {
+  process.exit(0);
+}

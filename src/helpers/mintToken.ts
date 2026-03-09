@@ -53,7 +53,7 @@ function removeExpired(): void {
   }
 }
 
-// Periodic cleanup and stats logging
+// Periodic cleanup and stats logging (unref so it doesn't prevent process exit)
 setInterval(
   () => {
     removeExpired();
@@ -73,7 +73,7 @@ setInterval(
     }
   },
   60 * 60 * 1000,
-);
+).unref();
 
 /**
  * Get a short-lived JWT for calling the Squad API on behalf of a user.
