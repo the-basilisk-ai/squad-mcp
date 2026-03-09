@@ -142,7 +142,7 @@ registerSearchTools(server);
 registerViewTools(server);
 
 // mcp-use build imports this file for type generation — skip env validation during build
-if (!(globalThis as Record<string, unknown>).__mcpUseHmrMode) {
+if (!process.argv.includes("build")) {
   const required = [
     "PROPELAUTH_CLIENT_ID",
     "PROPELAUTH_CLIENT_SECRET",
