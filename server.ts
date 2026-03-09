@@ -4,6 +4,7 @@ import {
   oauthCustomProvider,
   type RedisSessionStore,
   type RedisStreamManager,
+  runWithContext,
 } from "mcp-use/server";
 import { getPropelAuthUrl } from "./src/helpers/config.js";
 import { introspectToken } from "./src/helpers/oauth.js";
@@ -73,6 +74,13 @@ const server = new MCPServer({
       };
     },
   }),
+});
+
+// Populate AsyncLocalStorage so tool callbacks can access the Hono context (including auth).
+// mountMcp() doesn't wrap transport.handleRequest() in runWithContext(), so without this
+// middleware getRequestContext() returns undefined inside tool handlers.
+server.app.use("/mcp/*", async (c, next) => {
+  return runWithContext(c, () => next());
 });
 
 // Health check (used by Railway for deployment readiness)
