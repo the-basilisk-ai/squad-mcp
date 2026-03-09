@@ -79,6 +79,7 @@ const server = new MCPServer({
 // Populate AsyncLocalStorage so tool callbacks can access the Hono context (including auth).
 // mountMcp() doesn't wrap transport.handleRequest() in runWithContext(), so without this
 // middleware getRequestContext() returns undefined inside tool handlers.
+// https://github.com/mcp-use/mcp-use/issues/1183
 server.app.use("/mcp/*", async (c, next) => {
   return runWithContext(c, () => next());
 });
@@ -160,6 +161,7 @@ await server.listen(PORT);
 
 // mcp-use build imports this file for type generation but never calls process.exit().
 // __mcpUseHmrMode is set during both build and dev, so check argv to only exit during build.
+// https://github.com/mcp-use/mcp-use/issues/1181
 if (process.argv.includes("build")) {
   process.exit(0);
 }
