@@ -27,12 +27,12 @@ const BASE_URI = process.env.BASE_URI || `http://localhost:${PORT}`;
 const AUTH_URL = getPropelAuthUrl();
 const SCOPES = ["read:workspace", "write:workspace"];
 
-// Connect Redis if available (skipped during build when REDIS_URL is unset)
+// Connect Redis if available (skipped during build — Railway internal DNS isn't reachable)
 let sessionStore: RedisSessionStore | undefined;
 let streamManager: RedisStreamManager | undefined;
-if (process.env.REDIS_URL) {
+if (process.env.REDIS_URL && !process.argv.includes("build")) {
   ({ sessionStore, streamManager } = await connectRedis());
-} else {
+} else if (!process.env.REDIS_URL) {
   logger.warn("REDIS_URL not set, using in-memory sessions (not deploy-safe)");
 }
 
@@ -158,10 +158,3 @@ if (!process.argv.includes("build")) {
 }
 
 await server.listen(PORT);
-
-// mcp-use build imports this file for type generation but never calls process.exit().
-// __mcpUseHmrMode is set during both build and dev, so check argv to only exit during build.
-// https://github.com/mcp-use/mcp-use/issues/1181
-if (process.argv.includes("build")) {
-  process.exit(0);
-}
