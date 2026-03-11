@@ -255,13 +255,71 @@ export function registerSolutionTools(server: OAuthServer) {
     },
   );
 
+  // Edit Solution PRD
+  server.tool(
+    {
+      name: "edit_solution_prd",
+      title: "Edit Solution PRD",
+      description:
+        "Edit the PRD (Product Requirements Document) of a solution. Use this to write or rewrite the detailed specification, implementation plan, and requirements for a solution.",
+      schema: z
+        .object({
+          solutionId: z.string().describe("The ID of the solution to edit"),
+          prd: z
+            .string()
+            .describe(
+              "The complete updated PRD content. This replaces the existing PRD entirely.",
+            ),
+        })
+        .strict(),
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        openWorldHint: false,
+      },
+    },
+    async (params, ctx) => {
+      try {
+        const userContext = await getUserContext(
+          ctx.auth.accessToken,
+          getUserId(ctx.auth),
+        );
+        const { orgId, workspaceId } = userContext;
+
+        const solution = await squadClient(userContext).updateSolution({
+          orgId,
+          workspaceId,
+          solutionId: params.solutionId,
+          updateSolutionPayload: {
+            prd: params.prd,
+            updateTriggeredBy: "AI",
+          },
+        });
+
+        return toolSuccess({
+          id: solution.id,
+          title: solution.title,
+          status: solution.status,
+          message: "Solution PRD updated successfully",
+        });
+      } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          return toolError(formatWorkspaceSelectionError(error));
+        }
+        logger.debug({ err: error, tool: "edit_solution_prd" }, "Tool error");
+        const message = await formatApiError(error);
+        return toolError(`Unable to update solution PRD: ${message}`);
+      }
+    },
+  );
+
   // Update Solution
   server.tool(
     {
       name: "update_solution",
       title: "Update Solution",
       description:
-        "Update an existing solution's details such as title, description, pros, cons, or status. Does NOT support changing priority — use prioritise_solutions to reorder.",
+        "Update a solution's metadata (title, description, pros, cons, status). To edit the PRD content, use edit_solution_prd. To change priority, use prioritise_solutions.",
       schema: z
         .object({
           solutionId: z.string().describe("The ID of the solution to update"),
