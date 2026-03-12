@@ -114,6 +114,11 @@ server.app.get("/.well-known/oauth-authorization-server", async c => {
   return c.json(metadata);
 });
 
+// OpenAI Apps Challenge verification
+server.app.get("/.well-known/openai-apps-challenge", c =>
+  c.text("ywfOLPwG3Z3bK1EX5FLG2ho27wlOPA9bUkpewskLD90"),
+);
+
 // Protected resource metadata must point authorization_servers to our server
 // so clients discover our proxied /.well-known/oauth-authorization-server.
 for (const path of [
