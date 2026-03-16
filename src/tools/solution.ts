@@ -319,7 +319,7 @@ export function registerSolutionTools(server: OAuthServer) {
       name: "update_solution",
       title: "Update Solution",
       description:
-        "Update a solution's metadata (title, description, pros, cons, status). To edit the PRD content, use edit_solution_prd. To change priority, use prioritise_solutions.",
+        "Update a solution's metadata (title, description, pros, cons, status, horizon). To edit the PRD content, use edit_solution_prd. To change priority, use prioritise_solutions. To move a solution between roadmap horizons, set the horizon field.",
       schema: z
         .object({
           solutionId: z.string().describe("The ID of the solution to update"),
@@ -345,6 +345,12 @@ export function registerSolutionTools(server: OAuthServer) {
             .optional()
             .describe("Updated list of cons/drawbacks"),
           status: statusEnum,
+          horizon: z
+            .enum(["now", "next", "later"])
+            .optional()
+            .describe(
+              "Roadmap time horizon: 'now' for current work, 'next' for upcoming, 'later' for future.",
+            ),
         })
         .strict(),
       annotations: {
@@ -376,6 +382,7 @@ export function registerSolutionTools(server: OAuthServer) {
           id: solution.id,
           title: solution.title,
           status: solution.status,
+          horizon: solution.horizon,
           message: "Solution updated successfully",
         });
       } catch (error) {
