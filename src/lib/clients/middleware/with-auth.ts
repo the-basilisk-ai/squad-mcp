@@ -1,8 +1,4 @@
-import type {
-  FetchParams,
-  Middleware,
-  RequestContext,
-} from "../../openapi/squad/index.js";
+import type { Middleware } from "../../openapi/squad/index.js";
 
 /**
  * Create authentication middleware for Squad API
@@ -10,7 +6,7 @@ import type {
  */
 export function withAuth(token: string): Middleware {
   return {
-    pre: async (ctx: RequestContext): Promise<FetchParams | undefined> => {
+    pre: async ctx => {
       if (!ctx.init.headers) ctx.init.headers = {};
 
       ctx.init.headers = {
