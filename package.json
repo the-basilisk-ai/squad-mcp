@@ -6,8 +6,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "postinstall": "echo '// no-op: server uses SWC' > node_modules/typescript/bin/tsc",
-    "build": "swc server.ts src -d dist && mcp-use build",
+    "build": "mcp-use build",
     "dev": "mcp-use dev",
     "start": "mcp-use start",
     "deploy": "mcp-use deploy",
@@ -28,7 +27,7 @@
     "@propelauth/node": "^2.1.34",
     "clsx": "^2.1.1",
     "dotenv": "^17.3.1",
-    "mcp-use": "^1.21.4",
+    "mcp-use": "^1.21.5",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "zod": "4.3.6"
@@ -37,8 +36,6 @@
     "@biomejs/biome": "^2.4.6",
     "@openapitools/openapi-generator-cli": "^2.30.2",
     "@storybook/react-vite": "^10.2.17",
-    "@swc/cli": "^0.8.0",
-    "@swc/core": "^1.15.18",
     "@tailwindcss/vite": "^4.2.1",
     "@types/node": "^25.4.0",
     "@types/react": "^19.1.0",

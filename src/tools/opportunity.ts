@@ -158,7 +158,9 @@ export function registerOpportunityTools(server: OAuthServer) {
         );
         const { orgId, workspaceId } = userContext;
 
-        const opportunity = await squadClient(userContext).getOpportunity({
+        const { data: opportunity } = await squadClient(
+          userContext,
+        ).getOpportunity({
           orgId,
           workspaceId,
           opportunityId: params.opportunityId,

@@ -10,7 +10,7 @@ import type {
  */
 export function withAuth(token: string): Middleware {
   return {
-    pre: async (ctx: RequestContext): Promise<undefined | FetchParams> => {
+    pre: async (ctx: RequestContext): Promise<FetchParams | undefined> => {
       if (!ctx.init.headers) ctx.init.headers = {};
 
       ctx.init.headers = {

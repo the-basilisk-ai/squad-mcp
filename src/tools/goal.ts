@@ -179,7 +179,7 @@ export function registerGoalTools(server: OAuthServer) {
         );
         const { orgId, workspaceId } = userContext;
 
-        const outcome = await squadClient(userContext).getGoal({
+        const { data: outcome } = await squadClient(userContext).getGoal({
           orgId,
           workspaceId,
           outcomeId: params.goalId,

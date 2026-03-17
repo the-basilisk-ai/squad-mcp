@@ -26,7 +26,6 @@ export const FullRoadmap: Story = {
         id: "g-2",
         title: "AI Innovation",
         priority: 3,
-        colorIndex: 1,
       },
     ],
     columns: [

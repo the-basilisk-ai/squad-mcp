@@ -166,7 +166,7 @@ export function registerInsightTools(server: OAuthServer) {
         const { orgId, workspaceId } = userContext;
 
         // Build params conditionally
-        const insight =
+        const { data: insight } =
           params.relationships && params.relationships.length > 0
             ? await squadClient(userContext).getInsight({
                 orgId,

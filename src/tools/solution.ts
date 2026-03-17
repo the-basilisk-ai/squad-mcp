@@ -218,7 +218,7 @@ export function registerSolutionTools(server: OAuthServer) {
         );
         const { orgId, workspaceId } = userContext;
 
-        const solution = await squadClient(userContext).getSolution({
+        const { data: solution } = await squadClient(userContext).getSolution({
           orgId,
           workspaceId,
           solutionId: params.solutionId,

@@ -60,13 +60,7 @@ setInterval(
     const total = cacheHits + cacheMisses;
     if (total > 0) {
       logger.info(
-        {
-          cacheHits,
-          cacheMisses,
-          cacheSize: tokenCache.size,
-          hitRate: `${Math.round((cacheHits / total) * 100)}%`,
-        },
-        "JWT token cache stats",
+        `JWT token cache stats: hits=${cacheHits} misses=${cacheMisses} size=${tokenCache.size} hitRate=${Math.round((cacheHits / total) * 100)}%`,
       );
       cacheHits = 0;
       cacheMisses = 0;
