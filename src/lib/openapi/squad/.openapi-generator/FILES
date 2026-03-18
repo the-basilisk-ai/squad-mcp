@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/SquadApi.ts
 apis/index.ts
 index.ts
@@ -72,11 +71,8 @@ models/FeedbackArrayResponse.ts
 models/FeedbackMetadataItem.ts
 models/FeedbackMetadataItemValue.ts
 models/FeedbackWithRelationships.ts
-models/GenerateMockInsights200Response.ts
 models/GetOrganisation404Response.ts
 models/GetOrganisation404ResponseError.ts
-models/GetOrganisationStatus200Response.ts
-models/GetOrganisationStatus200ResponseData.ts
 models/GongDbConfig.ts
 models/GongIntegration.ts
 models/GoogleReviewsIntegration.ts
@@ -87,17 +83,6 @@ models/InsightResponse.ts
 models/InsightSourceEnum.ts
 models/InsightWithRelationships.ts
 models/Integration.ts
-models/InvokeAgent200Response.ts
-models/InvokeAgentRequest.ts
-models/InvokeAgentRequestOneOf.ts
-models/InvokeAgentRequestOneOf1.ts
-models/InvokeAgentRequestOneOf2.ts
-models/InvokeAgentRequestOneOf3.ts
-models/InvokeAgentRequestOneOf4.ts
-models/InvokeAgentRequestOneOf5.ts
-models/InvokeAgentRequestOneOf6.ts
-models/InvokeAgentRequestOneOf7.ts
-models/InvokeAgentRequestOneOf8.ts
 models/Knowledge.ts
 models/KnowledgeArrayResponse.ts
 models/ListGoals200Response.ts
@@ -141,10 +126,6 @@ models/OutcomeWithRelationships.ts
 models/PlayStoreIntegration.ts
 models/PlayStoreResponseConfig.ts
 models/PrioritiseSolutionsRequest.ts
-models/ProcessTextProxy200Response.ts
-models/ProcessTextProxy200ResponseData.ts
-models/ProcessTextProxyRequest.ts
-models/ProcessTextProxyRequestOptions.ts
 models/SimilaritySearch200Response.ts
 models/SimilaritySearchRequest.ts
 models/SimilaritySearchResponse.ts
@@ -166,9 +147,9 @@ models/SolutionWithRelationships.ts
 models/SubmitFeedback201Response.ts
 models/SyncIntegration202Response.ts
 models/SyncIntegration202ResponseData.ts
+models/TokenExchangeResponse.ts
 models/Topic.ts
 models/TopicWithRelationships.ts
-models/TrackTokenUsageRequest.ts
 models/TrustpilotIntegration.ts
 models/TrustpilotResponseConfig.ts
 models/TypeformIntegration.ts
@@ -176,6 +157,7 @@ models/TypeformResponseConfig.ts
 models/UpdateIntegrationPayload.ts
 models/UpdateKnowledgePayload.ts
 models/UpdateMetricPayload.ts
+models/UpdateNotificationPreferencesPayload.ts
 models/UpdateOpportunityPayload.ts
 models/UpdateOrganisationPayload.ts
 models/UpdateOutcomePayload.ts

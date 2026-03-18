@@ -2,12 +2,12 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Squad API",
-    "version": "4.8.0",
-    "description": "API for managing Squad resources",
+    "version": "4.15.0",
+    "description": "Squad is an AI product management platform that analyses customer feedback, surfaces insights, and builds prioritised roadmaps. Use this API to manage goals, opportunities, solutions, feedback, and more.",
     "contact": {
       "name": "Squad Support",
       "url": "https://www.meetsquad.ai/support",
-      "email": "help@meetsquad.ai"
+      "email": "hello@meetsquad.ai"
     }
   },
   "servers": [
@@ -25,6 +25,9 @@
     }
   ],
   "tags": [
+    {
+      "name": "Authentication"
+    },
     {
       "name": "Organisations"
     },
@@ -65,10 +68,57 @@
       "name": "AI & Search"
     },
     {
+      "name": "Notifications"
+    },
+    {
       "name": "Onboarding"
     }
   ],
   "paths": {
+    "/v1/auth/token": {
+      "post": {
+        "operationId": "exchangeToken",
+        "summary": "Exchange an OAuth opaque token for a JWT",
+        "description": "Accepts a PropelAuth opaque access token (from an OAuth2 PKCE flow) and returns a short-lived JWT suitable for authenticating with the Squad API. Intended for CLI and other native application integrations.",
+        "tags": [
+          "Squad"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer <opaque-token>"
+            },
+            "description": "PropelAuth opaque access token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully exchanged token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenExchangeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Token is invalid, expired, or missing"
+          },
+          "405": {
+            "description": "Method not allowed"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/organisations": {
       "post": {
         "operationId": "createOrganisation",
@@ -1439,289 +1489,6 @@
           },
           "500": {
             "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "description": "Internal Server Error - An unexpected error occurred on the server",
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "description": "Error code identifier",
-                          "example": "INTERNAL_SERVER_ERROR",
-                          "type": "string"
-                        },
-                        "description": {
-                          "description": "Human-readable error description",
-                          "example": "An unexpected error occurred on the server",
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "code",
-                        "description"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/organisations/{orgId}/status": {
-      "get": {
-        "operationId": "getOrganisationStatus",
-        "summary": "Get organization status",
-        "description": "Retrieves the current status and subscription information of an organization",
-        "tags": [
-          "Squad"
-        ],
-        "x-hidden": true,
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "orgId",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "Organization ID",
-            "example": "a5f3c6e1-9d20-4f7b-8e31-d09a2b63c184"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Organization status retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "description": "Organization status response",
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "description": "Organization status data",
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                        },
-                        "name": {
-                          "description": "Name of the organisation",
-                          "example": "Acme Corporation",
-                          "type": "string"
-                        },
-                        "stripeCustomerId": {
-                          "description": "Stripe customer ID for billing",
-                          "example": "cus_1234567890",
-                          "type": "string"
-                        },
-                        "homepageUrl": {
-                          "description": "URL to the organisation's homepage",
-                          "example": "https://acme.example.com",
-                          "type": [
-                            "string",
-                            "null"
-                          ]
-                        },
-                        "logoUrl": {
-                          "description": "URL to the organisation's logo",
-                          "example": "https://acme.example.com/logo.png",
-                          "type": [
-                            "string",
-                            "null"
-                          ]
-                        },
-                        "createdAt": {
-                          "description": "Creation timestamp",
-                          "example": "2025-03-26T22:35:46Z",
-                          "type": "string"
-                        },
-                        "accountType": {
-                          "description": "Account type",
-                          "example": "HOBBY",
-                          "$ref": "#/components/schemas/OrganisationAccountTypeEnum"
-                        },
-                        "billingCycleStartDate": {
-                          "description": "The start date of the current billing cycle.",
-                          "example": "2025-03-26T22:35:46Z",
-                          "type": "string"
-                        },
-                        "billingCycleFlexCreditAllowance": {
-                          "description": "Number of flex credits available at the start of the current billing cycle.",
-                          "example": 100000,
-                          "type": "number"
-                        },
-                        "updatedAt": {
-                          "description": "Last update timestamp",
-                          "example": "2025-03-26T22:35:46Z",
-                          "type": "string"
-                        },
-                        "status": {
-                          "description": "Status of the organisation",
-                          "example": "ACTIVE",
-                          "default": "ACTIVE",
-                          "type": "string",
-                          "enum": [
-                            "ACTIVE",
-                            "ARCHIVED"
-                          ]
-                        },
-                        "hasRemainingCredits": {
-                          "description": "Whether the organization has remaining credits",
-                          "example": true,
-                          "type": "boolean"
-                        },
-                        "billingCycleCreditAllowance": {
-                          "description": "The number of credits available for the current billing cycle",
-                          "example": 250,
-                          "type": "number"
-                        },
-                        "billingCycleCreditUsage": {
-                          "description": "The number of credits used in the current billing cycle so far",
-                          "example": 100,
-                          "type": "number"
-                        },
-                        "billingCycleFlexCreditUsage": {
-                          "description": "The number of flex credits used in the current billing cycle so far",
-                          "example": 100,
-                          "type": "number"
-                        },
-                        "currentBillingCycleStartDate": {
-                          "description": "The date the current billing cycle started",
-                          "example": "2025-06-24",
-                          "type": "string"
-                        },
-                        "currentBillingCycleEndDate": {
-                          "description": "The date the current billing cycle will end",
-                          "example": "2025-06-24",
-                          "type": "string"
-                        },
-                        "totalMembers": {
-                          "description": "The total number of members in the organization",
-                          "example": 10,
-                          "type": "number"
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "name",
-                        "createdAt",
-                        "accountType",
-                        "billingCycleStartDate",
-                        "billingCycleFlexCreditAllowance",
-                        "updatedAt",
-                        "status",
-                        "hasRemainingCredits",
-                        "billingCycleCreditAllowance",
-                        "billingCycleCreditUsage",
-                        "billingCycleFlexCreditUsage",
-                        "currentBillingCycleStartDate",
-                        "currentBillingCycleEndDate",
-                        "totalMembers"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - invalid or missing authentication",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "description": "Unauthorized - Missing or invalid authentication token",
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "description": "Error code identifier",
-                          "example": "UNAUTHORISED_ERROR",
-                          "type": "string"
-                        },
-                        "description": {
-                          "description": "Human-readable error description",
-                          "example": "User is unauthenticated",
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "code",
-                        "description"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Organization not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "description": "Not Found - The requested resource does not exist",
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "description": "Error code identifier",
-                          "example": "NOT_FOUND",
-                          "type": "string"
-                        },
-                        "description": {
-                          "description": "Human-readable error description",
-                          "example": "The requested resource was not found",
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "code",
-                        "description"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
             "content": {
               "application/json": {
                 "schema": {
@@ -8422,176 +8189,6 @@
         }
       }
     },
-    "/organisations/{orgId}/workspaces/{workspaceId}/mock-insights": {
-      "post": {
-        "operationId": "generateMockInsights",
-        "tags": [
-          "Squad"
-        ],
-        "x-hidden": true,
-        "summary": "Generate mock insights",
-        "description": "Generates mock insights for testing purposes",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "orgId",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "Organization ID",
-            "example": "a5f3c6e1-9d20-4f7b-8e31-d09a2b63c184"
-          },
-          {
-            "in": "path",
-            "name": "workspaceId",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "Workspace ID",
-            "example": "c0e195d9-b918-4a3a-bd8b-f730361d044f"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Mock insights generated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/MockInsightsResponse"
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - Authentication required",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "description": "Unauthorized - Missing or invalid authentication token",
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "description": "Error code identifier",
-                          "example": "UNAUTHORISED_ERROR",
-                          "type": "string"
-                        },
-                        "description": {
-                          "description": "Human-readable error description",
-                          "example": "User is unauthenticated",
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "code",
-                        "description"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden - Insufficient permissions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "description": "Forbidden - Insufficient permissions to access this resource",
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "description": "Error code identifier",
-                          "example": "UNAUTHORISED_ERROR",
-                          "type": "string"
-                        },
-                        "description": {
-                          "description": "Human-readable error description",
-                          "example": "User is unauthorised",
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "code",
-                        "description"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "description": "Internal Server Error - An unexpected error occurred on the server",
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "description": "Error code identifier",
-                          "example": "INTERNAL_SERVER_ERROR",
-                          "type": "string"
-                        },
-                        "description": {
-                          "description": "Human-readable error description",
-                          "example": "An unexpected error occurred on the server",
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "code",
-                        "description"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/organisations/{orgId}/workspaces/{workspaceId}/knowledge/source/url": {
       "post": {
         "operationId": "createKnowledgeFromUrl",
@@ -13062,623 +12659,6 @@
           }
         }
       }
-    },
-    "/organisations/{orgId}/workspaces/{workspaceId}/invoke_agent/{agentName}": {
-      "post": {
-        "operationId": "invokeAgent",
-        "summary": "Invoke a workflow agent",
-        "description": "Invokes a specific workflow agent with the provided data",
-        "tags": [
-          "Squad"
-        ],
-        "x-hidden": true,
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "orgId",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "Organization ID",
-            "example": "a5f3c6e1-9d20-4f7b-8e31-d09a2b63c184"
-          },
-          {
-            "in": "path",
-            "name": "workspaceId",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "Workspace ID",
-            "example": "c0e195d9-b918-4a3a-bd8b-f730361d044f"
-          },
-          {
-            "in": "path",
-            "name": "agentName",
-            "schema": {
-              "description": "Name of the agent to invoke",
-              "type": "string"
-            },
-            "required": true,
-            "description": "Name of the agent to invoke"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "type": "object",
-                    "properties": {
-                      "agent": {
-                        "type": "string",
-                        "const": "considerSolutionToBuild"
-                      },
-                      "data": {
-                        "$ref": "#/components/schemas/ConsiderSolutionToBuildRequest"
-                      }
-                    },
-                    "required": [
-                      "agent",
-                      "data"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "agent": {
-                        "type": "string",
-                        "const": "considerRecommendedSolutions"
-                      },
-                      "data": {
-                        "$ref": "#/components/schemas/ConsiderRecommendedSolutionsRequest"
-                      }
-                    },
-                    "required": [
-                      "agent",
-                      "data"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "agent": {
-                        "type": "string",
-                        "const": "makeOpportunityFromInsights"
-                      },
-                      "data": {
-                        "$ref": "#/components/schemas/MakeOpportunityFromInsightsRequest"
-                      }
-                    },
-                    "required": [
-                      "agent",
-                      "data"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "agent": {
-                        "type": "string",
-                        "const": "considerInsightsFromFeedback"
-                      },
-                      "data": {
-                        "$ref": "#/components/schemas/ConsiderInsightsFromFeedbackRequest"
-                      }
-                    },
-                    "required": [
-                      "agent",
-                      "data"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "agent": {
-                        "type": "string",
-                        "const": "considerMergingOpportunities"
-                      },
-                      "data": {
-                        "$ref": "#/components/schemas/ConsiderMergingOpportunitiesRequest"
-                      }
-                    },
-                    "required": [
-                      "agent",
-                      "data"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "agent": {
-                        "type": "string",
-                        "const": "considerOpportunitiesToOutcomes"
-                      },
-                      "data": {
-                        "$ref": "#/components/schemas/ConsiderOpportunitiesToOutcomesRequest"
-                      }
-                    },
-                    "required": [
-                      "agent",
-                      "data"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "agent": {
-                        "type": "string",
-                        "const": "considerPRDForSolution"
-                      },
-                      "data": {
-                        "$ref": "#/components/schemas/ConsiderPRDForSolutionRequest"
-                      }
-                    },
-                    "required": [
-                      "agent",
-                      "data"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "agent": {
-                        "type": "string",
-                        "const": "considerSolutionsToRoadmap"
-                      },
-                      "data": {
-                        "$ref": "#/components/schemas/ConsiderSolutionsToRoadmapRequest"
-                      }
-                    },
-                    "required": [
-                      "agent",
-                      "data"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "agent": {
-                        "type": "string",
-                        "const": "considerUpdateOpportunity"
-                      },
-                      "data": {
-                        "$ref": "#/components/schemas/ConsiderUpdateOpportunityRequest"
-                      }
-                    },
-                    "required": [
-                      "agent",
-                      "data"
-                    ]
-                  }
-                ],
-                "type": "object"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Agent invoked successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "result": {},
-                    "error": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "success"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Agent not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/organisations/{orgId}/workspaces/{workspaceId}/test-proxy": {
-      "post": {
-        "operationId": "processTextProxy",
-        "summary": "Process text through AI proxy",
-        "description": "Processes a text prompt through an AI model and returns the result",
-        "tags": [
-          "Squad"
-        ],
-        "x-hidden": true,
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "orgId",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "Organization ID",
-            "example": "a5f3c6e1-9d20-4f7b-8e31-d09a2b63c184"
-          },
-          {
-            "in": "path",
-            "name": "workspaceId",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "Workspace ID",
-            "example": "c0e195d9-b918-4a3a-bd8b-f730361d044f"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "description": "Request body for text proxy processing",
-                "type": "object",
-                "properties": {
-                  "prompt": {
-                    "description": "Text prompt to process",
-                    "example": "Analyze customer insight regarding our mobile app",
-                    "type": "string"
-                  },
-                  "model": {
-                    "description": "AI model to use for processing",
-                    "example": "gpt-4",
-                    "type": "string"
-                  },
-                  "options": {
-                    "type": "object",
-                    "properties": {
-                      "temperature": {
-                        "description": "Temperature parameter for the model",
-                        "example": 0.7,
-                        "type": "number"
-                      },
-                      "maxTokens": {
-                        "description": "Maximum number of tokens in the response",
-                        "example": 500,
-                        "type": "number"
-                      }
-                    }
-                  }
-                },
-                "required": [
-                  "prompt"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successfully processed text",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "description": "Text proxy processing result",
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "result": {
-                          "description": "Processed text result",
-                          "example": "Based on the customer insight analysis...",
-                          "type": "string"
-                        },
-                        "model": {
-                          "description": "AI model used for processing",
-                          "example": "gpt-4",
-                          "type": "string"
-                        },
-                        "processingTime": {
-                          "description": "Time taken to process the request in milliseconds",
-                          "example": 1250,
-                          "type": "number"
-                        }
-                      },
-                      "required": [
-                        "result",
-                        "model",
-                        "processingTime"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request - invalid input parameters"
-          },
-          "401": {
-            "description": "Unauthorized - invalid or missing authentication"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/organisations/{orgId}/workspaces/{workspaceId}/token-usage": {
-      "post": {
-        "operationId": "trackTokenUsage",
-        "summary": "Track token usage",
-        "description": "Tracks token usage for a given request",
-        "tags": [
-          "Squad"
-        ],
-        "x-hidden": true,
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "orgId",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "Organization ID",
-            "example": "a5f3c6e1-9d20-4f7b-8e31-d09a2b63c184"
-          },
-          {
-            "in": "path",
-            "name": "workspaceId",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "Workspace ID",
-            "example": "c0e195d9-b918-4a3a-bd8b-f730361d044f"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "source": {
-                    "description": "Source of the token usage",
-                    "example": "in-app-chat",
-                    "type": "string"
-                  },
-                  "inputTokens": {
-                    "description": "Number of input tokens",
-                    "example": 123,
-                    "type": "number"
-                  },
-                  "outputTokens": {
-                    "description": "Number of output tokens",
-                    "example": 456,
-                    "type": "number"
-                  },
-                  "thinking": {
-                    "description": "Whether the request is using thinking mode",
-                    "example": false,
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "source",
-                  "inputTokens",
-                  "outputTokens",
-                  "thinking"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Token usage tracked successfully"
-          },
-          "400": {
-            "description": "Bad Request - Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized - Authentication required"
-          },
-          "403": {
-            "description": "Forbidden - Insufficient permissions"
-          }
-        }
-      }
-    },
-    "/onboard": {
-      "post": {
-        "operationId": "onboardOrganisation",
-        "summary": "Create a new organization with workspace and outcomes",
-        "tags": [
-          "Squad"
-        ],
-        "x-hidden": true,
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OnboardingPayload"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Organization, workspace, and outcomes created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OnboardingResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request body"
-          },
-          "409": {
-            "description": "Organization name already exists"
-          }
-        }
-      }
-    },
-    "/organisations/{orgId}/onboard": {
-      "put": {
-        "operationId": "updateOnboarding",
-        "summary": "Update an existing organization, recreate workspace and outcomes",
-        "tags": [
-          "Squad"
-        ],
-        "x-hidden": true,
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "orgId",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "Organization ID",
-            "example": "a5f3c6e1-9d20-4f7b-8e31-d09a2b63c184"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OnboardingUpdatePayload"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Organization updated, workspace and outcomes recreated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OnboardingResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request body"
-          },
-          "404": {
-            "description": "Organization not found"
-          }
-        }
-      }
-    },
-    "/organisations/{orgId}/workspaces/{workspaceId}/onboarding": {
-      "post": {
-        "operationId": "onboardWorkspaceV2",
-        "summary": "Process business description and knowledge to create workspace details, outcomes, opportunities, and solutions",
-        "tags": [
-          "Squad"
-        ],
-        "x-hidden": true,
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "orgId",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "Organization ID",
-            "example": "a5f3c6e1-9d20-4f7b-8e31-d09a2b63c184"
-          },
-          {
-            "in": "path",
-            "name": "workspaceId",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "Workspace ID",
-            "example": "b7e2d5a9-3c18-4e6f-9a42-f8d1c7b5e3a2"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OnboardingV2Payload"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Request accepted, processing started"
-          },
-          "400": {
-            "description": "Invalid request body"
-          },
-          "404": {
-            "description": "One or more knowledge entities not found"
-          }
-        }
-      }
     }
   },
   "components": {
@@ -15348,6 +14328,21 @@
           "insightIds"
         ]
       },
+      "UpdateNotificationPreferencesPayload": {
+        "description": "Request schema for updating notification preferences",
+        "type": "object",
+        "properties": {
+          "dailyEnabled": {
+            "type": "boolean"
+          },
+          "weeklyEnabled": {
+            "type": "boolean"
+          },
+          "monthlyEnabled": {
+            "type": "boolean"
+          }
+        }
+      },
       "OnboardingPayload": {
         "description": "Request schema for onboarding",
         "type": "object",
@@ -15408,6 +14403,35 @@
           "text",
           "knowledgeIds"
         ]
+      },
+      "TokenExchangeResponse": {
+        "description": "Token exchange response",
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "description": "JWT access token for authenticating with the Squad API",
+            "type": "string"
+          },
+          "token_type": {
+            "description": "Token type",
+            "example": "Bearer",
+            "type": "string",
+            "const": "Bearer"
+          },
+          "expires_in": {
+            "description": "Token lifetime in seconds",
+            "example": 3600,
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "access_token",
+          "token_type",
+          "expires_in"
+        ],
+        "additionalProperties": false
       },
       "WhoAmIResponse": {
         "description": "User organization and workspace information",
