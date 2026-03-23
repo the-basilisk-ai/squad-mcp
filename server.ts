@@ -33,7 +33,10 @@ let streamManager: RedisStreamManager | undefined;
 if (process.env.REDIS_URL && !process.argv.includes("build")) {
   ({ sessionStore, streamManager } = await connectRedis());
 } else if (!process.env.REDIS_URL) {
-  logger.warn("REDIS_URL not set, using in-memory sessions (not deploy-safe)");
+  logger.warn(
+    {},
+    "REDIS_URL not set, using in-memory sessions (not deploy-safe)",
+  );
 }
 
 const server = new MCPServer({

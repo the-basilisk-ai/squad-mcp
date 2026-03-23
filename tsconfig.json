@@ -16,6 +16,6 @@
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "include": ["src/**/*", "resources/**/*", ".mcp-use/**/*.d.ts"],
+  "include": ["server.ts", "src/**/*", "resources/**/*", ".mcp-use/**/*.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
