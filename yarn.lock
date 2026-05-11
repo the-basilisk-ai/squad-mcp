@@ -775,12 +775,12 @@
     ws "^8.19.0"
     zod "4.3.5"
 
-"@mcp-use/cli@3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@mcp-use/cli/-/cli-3.0.1.tgz#d37de4f7f392267ac1c511c3b78531bd4ce92e67"
-  integrity sha512-Y2fYQ/kZSmS4r2g3cMOZYTDWNZpC1K+4YVPsfbAF0tWOkJolO2cKaur1mxihbMp8AM91xuQmvWIzTxggkncZwA==
+"@mcp-use/cli@3.1.4":
+  version "3.1.4"
+  resolved "https://registry.yarnpkg.com/@mcp-use/cli/-/cli-3.1.4.tgz#c89e2fbb566c79814455ee5a6d768adb73e8275a"
+  integrity sha512-+U/YFQ1x68iek71pvRKJEz4lT6MsijuIBo4hvHa8Fe0ZOqkQodAOTjmcnOcs6hr78u2zFMHYFBYuXHF8u8v37A==
   dependencies:
-    "@mcp-use/inspector" "2.1.0"
+    "@mcp-use/inspector" "5.0.1"
     "@tailwindcss/vite" "^4.2.0"
     "@vitejs/plugin-react" "^6.0.0"
     chalk "^5.6.2"
@@ -789,7 +789,7 @@
     dotenv "^17.3.1"
     esbuild "0.27.1"
     globby "^16.1.1"
-    mcp-use "1.24.1"
+    mcp-use "1.27.1"
     open "^11.0.0"
     tar "^7.5.11"
     tsx "^4.21.0"
@@ -840,20 +840,17 @@
     tailwind-merge "^3.5.0"
     zod "4.3.5"
 
-"@mcp-use/inspector@2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@mcp-use/inspector/-/inspector-2.1.0.tgz#f65c9d2e46b95c42c866401240380cbc483a27fa"
-  integrity sha512-EXgvPtRDgmS5fGELPTsJsxOUwlvgt5ljgVV+bSF4EPsAju+n3kYvZzU5i8wN6ZImEP0oIFzG3ybbYSyzeZPz4A==
+"@mcp-use/inspector@5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@mcp-use/inspector/-/inspector-5.0.1.tgz#9a40b85fc14e1c0bd79ca3ac20c89a822f61728c"
+  integrity sha512-JZnxlcdv1IqenFMzb2GCAyo26umNFhaZu6Q8BDbbG32Qs9/FQHS6ClDt1p2+rqzw4sEOMydmw4IcbyqRS7O+iQ==
   dependencies:
     "@hono/node-server" "^1.19.13"
-    "@langchain/anthropic" "^1.3.18"
-    "@langchain/core" "^1.1.26"
-    "@langchain/google-genai" "^2.1.19"
-    "@langchain/openai" "^1.2.8"
     "@modelcontextprotocol/ext-apps" "^1.0.1"
     "@modelcontextprotocol/sdk" "^1.26.0"
     "@paper-design/shaders-react" "^0.0.72"
     "@radix-ui/react-alert-dialog" "^1.1.15"
+    "@radix-ui/react-avatar" "^1.1.11"
     "@radix-ui/react-checkbox" "^1.3.3"
     "@radix-ui/react-dialog" "^1.1.15"
     "@radix-ui/react-dropdown-menu" "^2.1.16"
@@ -871,7 +868,7 @@
     hono "^4.12.12"
     lucide-react "^0.562.0"
     markdown-to-jsx "^9.7.4"
-    mcp-use "1.24.1"
+    mcp-use "1.27.1"
     motion "^12.34.2"
     next-themes "^0.4.6"
     open "^11.0.0"
@@ -1244,18 +1241,18 @@
   resolved "https://registry.yarnpkg.com/@posthog/types/-/types-1.352.0.tgz#dda7f5550b72bd431a82d7cd7face97732123c56"
   integrity sha512-pp7VBMlkhlLmv2TyOoss028lPPD4ElnZlX5y3hqq6oijK5BMZbjVuTAgvFYNLiKbuze/i5ndFGyXTtfCwlMQeA==
 
-"@propelauth/node-apis@^2.1.34":
-  version "2.1.34"
-  resolved "https://registry.yarnpkg.com/@propelauth/node-apis/-/node-apis-2.1.34.tgz#53c310ca7d329c4030aed48b67fcba0e13bf5fbc"
-  integrity sha512-WaXwpImGq+vKb4OXapdk66RU5zwoldGzU5jYBtbAp0VYs6XCjuaJQJKV+QpbIWNFzT+reiUtHNZyDb4MWPr0EQ==
+"@propelauth/node-apis@^2.1.35":
+  version "2.1.35"
+  resolved "https://registry.yarnpkg.com/@propelauth/node-apis/-/node-apis-2.1.35.tgz#71e928f9c420eb03eeeb6bee686c3d63991c3484"
+  integrity sha512-eXnC+bZwo9CD1xNUT8kAYpOVs/CiDsGgmYemSH1ULWKAQ7Nhck7um7xl6oU0NkCf/REZK01Gt//EN3fc5x0Zmg==
 
-"@propelauth/node@^2.1.34":
-  version "2.1.34"
-  resolved "https://registry.yarnpkg.com/@propelauth/node/-/node-2.1.34.tgz#77329d15eb44865ad8c8da1915a9ca5626793e22"
-  integrity sha512-I2x7MKE6zG4PY0WFspaVRzTwoX325HdLJEYSjgr+H4yzI2xAyJMp714eBYJfcl9eQFUgPx9Tuw8HjtELJDeayg==
+"@propelauth/node@^2.1.35":
+  version "2.1.35"
+  resolved "https://registry.yarnpkg.com/@propelauth/node/-/node-2.1.35.tgz#e39d5bc8c2380de2142ced3f5b9f5742cd7167eb"
+  integrity sha512-D9QbuGirTpK51ljPH3UBGkfuwZkYvddse++gX4o8o90EBWQHbW4o65a4f7Jaw4VEdq44G1ShBz4DMh97Dwe4oQ==
   dependencies:
-    "@propelauth/node-apis" "^2.1.34"
-    jose "^5.2.0"
+    "@propelauth/node-apis" "^2.1.35"
+    jose "^5.10.0"
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
@@ -1339,6 +1336,17 @@
   dependencies:
     "@radix-ui/react-primitive" "2.1.3"
 
+"@radix-ui/react-avatar@^1.1.11":
+  version "1.1.11"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-avatar/-/react-avatar-1.1.11.tgz#3e24b70d636a12e2806abb2b4ce4b15df395f9c9"
+  integrity sha512-0Qk603AHGV28BOBO34p7IgD5m+V5Sg/YovfayABkoDDBM5d3NCx0Mp4gGrjzLGes1jV5eNOE1r3itqOR33VC6Q==
+  dependencies:
+    "@radix-ui/react-context" "1.1.3"
+    "@radix-ui/react-primitive" "2.1.4"
+    "@radix-ui/react-use-callback-ref" "1.1.1"
+    "@radix-ui/react-use-is-hydrated" "0.1.0"
+    "@radix-ui/react-use-layout-effect" "1.1.1"
+
 "@radix-ui/react-checkbox@^1.3.3":
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-checkbox/-/react-checkbox-1.3.3.tgz#db45ca8a6d5c056a92f74edbb564acee05318b79"
@@ -1372,6 +1380,11 @@
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-context/-/react-context-1.1.2.tgz#61628ef269a433382c364f6f1e3788a6dc213a36"
   integrity sha512-jCi/QKUM2r1Ju5a3J64TH2A5SpKAgh0LpknyqdQ4m6DCV0xJ2HG1xARRwNGPQfi1SLdLWZ1OJz6F4OMBBNiGJA==
+
+"@radix-ui/react-context@1.1.3":
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-context/-/react-context-1.1.3.tgz#81286f643b310d040eaac13b18e223130861d839"
+  integrity sha512-ieIFACdMpYfMEjF0rEf5KLvfVyIkOz6PDGyNnP+u+4xQ6jny3VCgA4OgXOwNx2aUkxn8zx9fiVcM8CfFYv9Lxw==
 
 "@radix-ui/react-dialog@1.1.15", "@radix-ui/react-dialog@^1.1.15", "@radix-ui/react-dialog@^1.1.6":
   version "1.1.15"
@@ -1654,6 +1667,13 @@
   integrity sha512-Il0+boE7w/XebUHyBjroE+DbByORGR9KKmITzbR7MyQ4akpORYP/ZmbhAr0DG7RmmBqoOnZdy2QlvajJ2QA59g==
   dependencies:
     "@radix-ui/react-use-callback-ref" "1.1.1"
+
+"@radix-ui/react-use-is-hydrated@0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-use-is-hydrated/-/react-use-is-hydrated-0.1.0.tgz#544da73369517036c77659d7cdd019dc0f5ff9a0"
+  integrity sha512-U+UORVEq+cTnRIaostJv9AGdV3G6Y+zbVd+12e18jQ5A3c0xL03IhnHuiU4UV69wolOQp5GfR58NW/EgdQhwOA==
+  dependencies:
+    use-sync-external-store "^1.5.0"
 
 "@radix-ui/react-use-layout-effect@1.1.1":
   version "1.1.1"
@@ -3623,7 +3643,7 @@ highlightjs-vue@^1.0.0:
   resolved "https://registry.yarnpkg.com/highlightjs-vue/-/highlightjs-vue-1.0.0.tgz#fdfe97fbea6354e70ee44e3a955875e114db086d"
   integrity sha512-PDEfEF102G23vHmPhLyPboFCD+BkMGu+GuJe2d9/eH4FsCwvgBpnc9n0pGE+ffKdph38s6foEZiEjdgHdzp+IA==
 
-hono@^4.11.4, hono@^4.12.12, hono@^4.12.14:
+hono@^4.11.4, hono@^4.12.12, hono@^4.12.18:
   version "4.12.18"
   resolved "https://registry.yarnpkg.com/hono/-/hono-4.12.18.tgz#f6d301938868c3a8bdb639495f4e326a19181505"
   integrity sha512-RWzP96k/yv0PQfyXnWjs6zot20TqfpfsNXhOnev8d1InAxubW93L11/oNUc3tQqn2G0bSdAOBpX+2uDFHV7kdQ==
@@ -3853,7 +3873,7 @@ jiti@^2.6.1:
   resolved "https://registry.yarnpkg.com/jiti/-/jiti-2.6.1.tgz#178ef2fc9a1a594248c20627cd820187a4d78d92"
   integrity sha512-ekilCSN1jwRvIbgeg/57YFh8qQDNbwDb9xT/qu2DAHbFFZUicIl4ygVaAvzveMhMVr3LnpSKTNnwt8PoOfmKhQ==
 
-jose@^5.2.0:
+jose@^5.10.0:
   version "5.10.0"
   resolved "https://registry.yarnpkg.com/jose/-/jose-5.10.0.tgz#c37346a099d6467c401351a9a0c2161e0f52c4be"
   integrity sha512-s+3Al/p9g32Iq+oqXxkW//7jk2Vig6FF1CFqzVXoTUXt2qz89YWbL+OwS17NFYEvxC35n0FKeGO2LGYSxeM2Gg==
@@ -4079,15 +4099,15 @@ mcp-use@1.23.1:
     cli-highlight "^2.1.11"
     redis "^5.10.0"
 
-mcp-use@1.24.1, mcp-use@^1.24.1:
-  version "1.24.1"
-  resolved "https://registry.yarnpkg.com/mcp-use/-/mcp-use-1.24.1.tgz#871258cf1d4f4c7821cc1ef6ddac5496cddf9a98"
-  integrity sha512-/pz1z12W5ysl3x7IfRXDQ+fqwx13QTOnmgyO92pzfe01xm6f4MdlauNb8MkCkfuJLhtZHYxoyplSQj0wzrhUnw==
+mcp-use@1.27.1, mcp-use@^1.27.1:
+  version "1.27.1"
+  resolved "https://registry.yarnpkg.com/mcp-use/-/mcp-use-1.27.1.tgz#bcdd551c958311f8c3c86aa1b7fd6e579d4846d4"
+  integrity sha512-7dXrn3GOYod7XlRN+eYCDHnKTv6gMHUkGyyCrUlHRRdvldE6l5X9Kxt7B54I17lNlpwe4FiXecd/H6ZHQikBpQ==
   dependencies:
     "@hono/node-server" "^1.19.13"
     "@mcp-ui/server" "^6.1.0"
-    "@mcp-use/cli" "3.0.1"
-    "@mcp-use/inspector" "2.1.0"
+    "@mcp-use/cli" "3.1.4"
+    "@mcp-use/inspector" "5.0.1"
     "@modelcontextprotocol/ext-apps" "^1.0.1"
     "@modelcontextprotocol/sdk" "^1.26.0"
     express "^5.2.1"
@@ -4715,10 +4735,10 @@ react-docgen@^8.0.0, react-docgen@^8.0.2:
     resolve "^1.22.1"
     strip-indent "^4.0.0"
 
-react-dom@^19.2.5:
-  version "19.2.5"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-19.2.5.tgz#b8768b10837d0b8e9ca5b9e2d58dff3d880ea25e"
-  integrity sha512-J5bAZz+DXMMwW/wV3xzKke59Af6CHY7G4uYLN1OvBcKEsWOs4pQExj86BBKamxl/Ik5bx9whOrvBlSDfWzgSag==
+react-dom@^19.2.6:
+  version "19.2.6"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-19.2.6.tgz#44a81b0bcca22da814c00847d09d01c8615529b7"
+  integrity sha512-0prMI+hvBbPjsWnxDLxlCGyM8PN6UuWjEUCYmZhO67xIV9Xasa/r/vDnq+Xyq4Lo27g8QSbO5YzARu0D1Sps3g==
   dependencies:
     scheduler "^0.27.0"
 
@@ -4766,10 +4786,10 @@ react-syntax-highlighter@^16.1.0:
     prismjs "^1.30.0"
     refractor "^5.0.0"
 
-react@^19.2.5:
-  version "19.2.5"
-  resolved "https://registry.yarnpkg.com/react/-/react-19.2.5.tgz#c888ab8b8ef33e2597fae8bdb2d77edbdb42858b"
-  integrity sha512-llUJLzz1zTUBrskt2pwZgLq59AemifIftw4aB7JxOqf1HY2FDaGDxgwpAPVzHU1kdWabH7FauP4i1oEeer2WCA==
+react@^19.2.6:
+  version "19.2.6"
+  resolved "https://registry.yarnpkg.com/react/-/react-19.2.6.tgz#3dadb8e12b2a7934c1d5317973e5dce1301f9a4d"
+  integrity sha512-sfWGGfavi0xr8Pg0sVsyHMAOziVYKgPLNrS7ig+ivMNb3wbCBw3KxtflsGBAwD3gYQlE/AEZsTLgToRrSCjb0Q==
 
 readdirp@^5.0.0:
   version "5.0.0"
@@ -5738,7 +5758,7 @@ zod@4.3.5:
   resolved "https://registry.yarnpkg.com/zod/-/zod-4.3.5.tgz#aeb269a6f9fc259b1212c348c7c5432aaa474d2a"
   integrity sha512-k7Nwx6vuWx1IJ9Bjuf4Zt1PEllcwe7cls3VNzm4CQ1/hgtFUK2bRNG3rvnpPUhFjmqJKAKtjV576KnUkHocg/g==
 
-zod@4.3.6, "zod@^3.25 || ^4.0", "zod@^3.25.76 || ^4":
-  version "4.3.6"
-  resolved "https://registry.yarnpkg.com/zod/-/zod-4.3.6.tgz#89c56e0aa7d2b05107d894412227087885ab112a"
-  integrity sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==
+zod@4.4.3, "zod@^3.25 || ^4.0", "zod@^3.25.76 || ^4":
+  version "4.4.3"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-4.4.3.tgz#b680f172885d18bbebf21a834ea25e55a1bbf356"
+  integrity sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==
