@@ -22,7 +22,7 @@
     "dist"
   ],
   "dependencies": {
-    "@mcp-use/inspector": "^1.0.1",
+    "@mcp-use/inspector": "^5.0.1",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@propelauth/node": "^2.1.35",
     "clsx": "^2.1.1",
