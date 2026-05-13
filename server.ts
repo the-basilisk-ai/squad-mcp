@@ -113,11 +113,6 @@ server.app.get("/.well-known/oauth-authorization-server", async c => {
     return c.json({ error: "Failed to fetch auth server metadata" }, 502);
   }
   const metadata = await response.json();
-  // RFC 8414: issuer must match the URL the metadata was discovered at.
-  // Since we proxy AS metadata under mcpUrl, the issuer must be mcpUrl —
-  // otherwise strict clients (e.g. Smithery) reject the discovery response.
-  // Trailing slash matters: Smithery normalizes the base URL with one.
-  metadata.issuer = mcpUrl.endsWith("/") ? mcpUrl : `${mcpUrl}/`;
   metadata.authorization_endpoint = `${mcpUrl}/oauth/authorize`;
   return c.json(metadata);
 });
