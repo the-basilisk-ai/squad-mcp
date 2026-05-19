@@ -8,13 +8,9 @@ updates:
     labels:
       - dependencies
     groups:
-      production-minor-patch:
-        dependency-type: production
-        update-types:
-          - minor
-          - patch
-      dev-dependencies:
-        dependency-type: development
+      npm-minor-patch:
+        patterns:
+          - "*"
         update-types:
           - minor
           - patch
