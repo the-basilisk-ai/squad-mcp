@@ -48,9 +48,9 @@ const server = new MCPServer({
   sessionStore,
   streamManager,
   oauth: oauthCustomProvider({
-    issuer: AUTH_URL,
+    issuer: `${AUTH_URL}/oauth/2.1`,
     jwksUrl: `${AUTH_URL}/.well-known/jwks.json`,
-    authEndpoint: `${process.env.MCP_URL || BASE_URI}/oauth/authorize`,
+    authEndpoint: `${AUTH_URL}/oauth/2.1/authorize`,
     tokenEndpoint: `${AUTH_URL}/oauth/2.1/token`,
     scopesSupported: SCOPES,
     grantTypesSupported: ["authorization_code", "refresh_token"],
@@ -90,21 +90,11 @@ server.app.use("/mcp/*", async (c, next) => {
 // Health check (used by Railway for deployment readiness)
 server.app.get("/health", c => c.json({ status: "ok", version: "3.0.0" }));
 
-// Proxy the authorize endpoint to PropelAuth, forwarding all parameters including
-// the RFC 8707 `resource` parameter that PropelAuth requires.
-server.app.get("/oauth/authorize", c => {
-  const url = new URL(`${AUTH_URL}/oauth/2.1/authorize`);
-  for (const [key, value] of Object.entries(c.req.query())) {
-    if (value !== undefined) {
-      url.searchParams.set(key, value);
-    }
-  }
-  return c.redirect(url.toString(), 302);
-});
-
-// PropelAuth serves OAuth metadata at a non-standard path (/oauth/2.1 suffix).
-// Proxy it at the standard path so MCP clients can discover registration_endpoint.
-const mcpUrl = process.env.MCP_URL || BASE_URI;
+// PropelAuth serves metadata at /.well-known/oauth-authorization-server/oauth/2.1
+// (RFC 8414 path-suffix form, matching its issuer https://auth.meetsquad.ai/oauth/2.1).
+// We proxy it at the standard path on our origin so legacy clients that hit our
+// /.well-known/oauth-authorization-server keep working — mcp-use auto-mounts a
+// default handler at this path that builds the wrong upstream URL, so we override.
 server.app.get("/.well-known/oauth-authorization-server", async c => {
   const response = await fetch(
     `${AUTH_URL}/.well-known/oauth-authorization-server/oauth/2.1`,
@@ -112,9 +102,7 @@ server.app.get("/.well-known/oauth-authorization-server", async c => {
   if (!response.ok) {
     return c.json({ error: "Failed to fetch auth server metadata" }, 502);
   }
-  const metadata = await response.json();
-  metadata.authorization_endpoint = `${mcpUrl}/oauth/authorize`;
-  return c.json(metadata);
+  return c.json(await response.json());
 });
 
 // OpenAI Apps Challenge verification
@@ -122,8 +110,10 @@ server.app.get("/.well-known/openai-apps-challenge", c =>
   c.text("ywfOLPwG3Z3bK1EX5FLG2ho27wlOPA9bUkpewskLD90"),
 );
 
-// Protected resource metadata must point authorization_servers to our server
-// so clients discover our proxied /.well-known/oauth-authorization-server.
+// Strict MCP clients (Smithery) discover via protected-resource metadata and
+// follow authorization_servers to PropelAuth directly — where issuer matches
+// the discovery URL via RFC 8414 path-suffix.
+const mcpUrl = process.env.MCP_URL || BASE_URI;
 for (const path of [
   "/.well-known/oauth-protected-resource",
   "/.well-known/oauth-protected-resource/mcp",
@@ -132,7 +122,7 @@ for (const path of [
   server.app.get(path, c =>
     c.json({
       resource: `${mcpUrl}/mcp`,
-      authorization_servers: [mcpUrl],
+      authorization_servers: [`${AUTH_URL}/oauth/2.1`],
       scopes_supported: SCOPES,
     }),
   );
