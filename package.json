@@ -61,6 +61,7 @@
     "ajv": "^8.18.0",
     "basic-ftp": "^5.2.2",
     "picomatch": "^4.0.4",
+    "shell-quote": "^1.8.4",
     "@nestjs/core": "^11.1.18",
     "tar": "^7.5.12",
     "express-rate-limit": "^8.2.2",
