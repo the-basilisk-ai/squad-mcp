@@ -25,7 +25,7 @@ config();
 const PORT = parseInt(process.env.PORT || "3232", 10);
 const BASE_URI = process.env.BASE_URI || `http://localhost:${PORT}`;
 const AUTH_URL = getPropelAuthUrl();
-const SCOPES = ["read:workspace", "write:workspace"];
+const SCOPES = ["read:workspace", "write:workspace", "openid", "email"];
 
 // Connect Redis if available (skipped during build — Railway internal DNS isn't reachable)
 let sessionStore: RedisSessionStore | undefined;
