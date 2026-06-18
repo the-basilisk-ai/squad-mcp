@@ -90,21 +90,6 @@ server.app.use("/mcp/*", async (c, next) => {
 // Health check (used by Railway for deployment readiness)
 server.app.get("/health", c => c.json({ status: "ok", version: "3.0.0" }));
 
-// PropelAuth serves metadata at /.well-known/oauth-authorization-server/oauth/2.1
-// (RFC 8414 path-suffix form, matching its issuer https://auth.meetsquad.ai/oauth/2.1).
-// We proxy it at the standard path on our origin so legacy clients that hit our
-// /.well-known/oauth-authorization-server keep working — mcp-use auto-mounts a
-// default handler at this path that builds the wrong upstream URL, so we override.
-server.app.get("/.well-known/oauth-authorization-server", async c => {
-  const response = await fetch(
-    `${AUTH_URL}/.well-known/oauth-authorization-server/oauth/2.1`,
-  );
-  if (!response.ok) {
-    return c.json({ error: "Failed to fetch auth server metadata" }, 502);
-  }
-  return c.json(await response.json());
-});
-
 // OpenAI Apps Challenge verification
 server.app.get("/.well-known/openai-apps-challenge", c =>
   c.text("ywfOLPwG3Z3bK1EX5FLG2ho27wlOPA9bUkpewskLD90"),
