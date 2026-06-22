@@ -808,10 +808,10 @@
   resolved "https://registry.npmjs.org/@nestjs/axios/-/axios-4.0.1.tgz"
   integrity sha512-68pFJgu+/AZbWkGu65Z3r55bTsCPlgyKaV4BSG8yUAD72q1PPuyVRgUwFv6BxdnibTUHlyxm06FmYWNC+bjN7A==
 
-"@nestjs/common@11.1.26":
-  version "11.1.26"
-  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-11.1.26.tgz#de8b8bb3e6c8376d0059a4d691c8ce93e268f42d"
-  integrity sha512-0VARQyzuGbprvjO+slWq9Jtj1P0jYCSKAUSv9LWFNWD39ZbDzXXM1pMs35kReVXwchra0urMfTQxw4uAOfdSzA==
+"@nestjs/common@11.1.27":
+  version "11.1.27"
+  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-11.1.27.tgz#30099df1bd4f9e7572095f8f8ca785ce1b0d9bd3"
+  integrity sha512-kEGSzqM2lWr4whh4Ubflw+oPZSEzxvRMu9WL+LveZploJWTjec5bBlCiRVlVzTPg2kIwBiLwWSvCCW7Wnin1gg==
   dependencies:
     uid "2.0.2"
     file-type "21.3.4"
@@ -819,7 +819,7 @@
     load-esm "1.0.3"
     tslib "2.8.1"
 
-"@nestjs/core@11.1.26", "@nestjs/core@^11.1.18":
+"@nestjs/core@11.1.27", "@nestjs/core@^11.1.18":
   version "11.1.19"
   resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-11.1.19.tgz#d724f1afc0caac29e005464f0f659425fc80235b"
   integrity sha512-6nJkWa2efrYi+XlU686J9y5L7OvxpLVjT0T/sxRKE7Jvpffiihelup4WSvLvRhdHDjj/5SuoWEwqReXAaaeHmw==
@@ -847,17 +847,17 @@
     consola "^2.15.0"
     node-fetch "^2.6.1"
 
-"@openapitools/openapi-generator-cli@^2.38.0":
-  version "2.38.0"
-  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.38.0.tgz#c11f10aced1e4b8b30a37f7d20b25be200fba7c6"
-  integrity sha512-A2ZSRX1gyPhMRzD/1Rn4qpBxDQrDBF4BDMIEkfAwpeZbhaOeWXhudvgeI2GlHCswHubHtLxmGeTubNf7wTgmJQ==
+"@openapitools/openapi-generator-cli@^2.39.0":
+  version "2.39.0"
+  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.39.0.tgz#3f666f2d84c006cca9d822c5c2564f2094b72c2b"
+  integrity sha512-AKFn02Jvzrh/suDt3SipgtjwvNvT/pUu3hr5PMwcHbwW3XkQfmT27+DWak7rgsnKYBQwVP4D/lSFT+eBI7W2/w==
   dependencies:
     "@inquirer/select" "1.3.3"
     "@nestjs/axios" "4.0.1"
-    "@nestjs/common" "11.1.26"
-    "@nestjs/core" "11.1.26"
+    "@nestjs/common" "11.1.27"
+    "@nestjs/core" "11.1.27"
     "@nuxtjs/opencollective" "0.3.2"
-    axios "^1.17.0"
+    axios "^1.18.0"
     chalk "4.1.2"
     commander "8.3.0"
     compare-versions "6.1.1"
@@ -1899,18 +1899,18 @@
   resolved "https://registry.yarnpkg.com/@standard-schema/spec/-/spec-1.1.0.tgz#a79b55dbaf8604812f52d140b2c9ab41bc150bb8"
   integrity sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==
 
-"@storybook/builder-vite@10.4.5":
-  version "10.4.5"
-  resolved "https://registry.yarnpkg.com/@storybook/builder-vite/-/builder-vite-10.4.5.tgz#30745c54d3346a0ae53c22c83fd09c31d9f2de9c"
-  integrity sha512-UFtMIojDT61OWhc2ti0wf6pUNlBRLYixyygXXTolaCxdACum6SOgJim+mEZE4S3VuTaZgjTRNyoc0WSJPqjQ2g==
+"@storybook/builder-vite@10.4.6":
+  version "10.4.6"
+  resolved "https://registry.yarnpkg.com/@storybook/builder-vite/-/builder-vite-10.4.6.tgz#18c70a3f5b3ab520db3a2371922b5e6366e50b66"
+  integrity sha512-BHBtD81HiXUiDQz/CaFynLtWmm7AFUQn8VnXuHipZ8KlnUANopa4yqdVuy/Gwz8ub254uFI5NMZsW/KlgWNgNg==
   dependencies:
-    "@storybook/csf-plugin" "10.4.5"
+    "@storybook/csf-plugin" "10.4.6"
     ts-dedent "^2.0.0"
 
-"@storybook/csf-plugin@10.4.5":
-  version "10.4.5"
-  resolved "https://registry.yarnpkg.com/@storybook/csf-plugin/-/csf-plugin-10.4.5.tgz#aa085da39a5b27b5592b90c46d4d1180e3979813"
-  integrity sha512-OsSsSLulBmdKTz7MIKLgoWADZB8bjYaAjZZy/THdI50G/TTd6FVSXQMCM7GO7xQZ/EguRY1PmjOVCLbgcnXsDA==
+"@storybook/csf-plugin@10.4.6":
+  version "10.4.6"
+  resolved "https://registry.yarnpkg.com/@storybook/csf-plugin/-/csf-plugin-10.4.6.tgz#cd3362ada67417f1ce9e8e31d2dc403f05b65d91"
+  integrity sha512-NILLxDqpA/JR/AazGWpsz+4fadJwRU4uhHephGtYpVOWnQA/DkJfKT6zpcJVq8+QA8A2zKMLX3GVKsXIrxjuDA==
   dependencies:
     unplugin "^2.3.5"
 
@@ -1924,33 +1924,33 @@
   resolved "https://registry.yarnpkg.com/@storybook/icons/-/icons-2.0.2.tgz#765b49b902a2bdf6f3a5a1aa8dc0cdcd3c55c5b5"
   integrity sha512-KZBCpXsshAIjczYNXR/rlxEtCUX/eAbpFNwKi8bcOomrLA4t/SyPz5RF+lVPO2oZBUE4sAkt43mfJUevQDSEEw==
 
-"@storybook/react-dom-shim@10.4.5":
-  version "10.4.5"
-  resolved "https://registry.yarnpkg.com/@storybook/react-dom-shim/-/react-dom-shim-10.4.5.tgz#8d990fa232b3ea11b36b6d96fc781136d3ab28cb"
-  integrity sha512-fKdikHC7cDgSuaBirPwvgFBmfO//3cln0y3GmDEQchUV2VFDrZ7ZL1/iH7dA21XuiFFhQcDRRkArJmvMAGG5Cg==
+"@storybook/react-dom-shim@10.4.6":
+  version "10.4.6"
+  resolved "https://registry.yarnpkg.com/@storybook/react-dom-shim/-/react-dom-shim-10.4.6.tgz#9c9921ead173f854b71395eb646e02c28c1257a8"
+  integrity sha512-iGNmKzrq9vgl2PDrYAnZKI+yvac3Ym+lJXXuQaqlFRS23zA5MNm4EBX+rAG7WulqchoK6NaZ0KQOs2mAgEpTMg==
 
-"@storybook/react-vite@^10.4.5":
-  version "10.4.5"
-  resolved "https://registry.yarnpkg.com/@storybook/react-vite/-/react-vite-10.4.5.tgz#53c34b7699f8ae5fa97253fb8cc0a6a98fe54f9b"
-  integrity sha512-hppQmaI7UK+bd0VHP4rtPSwQptL+F0DkGy3ZwH89z2+KqNp8vmX2BFTKKaGRDc+wie8f/0fxWNLwSP2ZYUhG/Q==
+"@storybook/react-vite@^10.4.6":
+  version "10.4.6"
+  resolved "https://registry.yarnpkg.com/@storybook/react-vite/-/react-vite-10.4.6.tgz#e48e848e82584a7cf2947ec1f40977095a6bc266"
+  integrity sha512-0arEQtybqGYXHbXpTot+Wv9YtG+V5Vp43QayXavPKQ20M8mpEzhyCPKd0EhqMGSC1Z1UEt0hm365WUBhI9LfKA==
   dependencies:
     "@joshwooding/vite-plugin-react-docgen-typescript" "^0.7.0"
     "@rollup/pluginutils" "^5.0.2"
-    "@storybook/builder-vite" "10.4.5"
-    "@storybook/react" "10.4.5"
+    "@storybook/builder-vite" "10.4.6"
+    "@storybook/react" "10.4.6"
     empathic "^2.0.0"
     magic-string "^0.30.0"
     react-docgen "^8.0.0"
     resolve "^1.22.8"
     tsconfig-paths "^4.2.0"
 
-"@storybook/react@10.4.5":
-  version "10.4.5"
-  resolved "https://registry.yarnpkg.com/@storybook/react/-/react-10.4.5.tgz#f8df4b6a1dcc4fe5092dca961dbda7bf001c79a2"
-  integrity sha512-VMEqdjplKJTf8KA5ER9kJp51dOJKlgvb9H0F45RL1pX42+briPmTe8VL0yJR3GyMBpicFbFpjZ7AC22DgZ6vNg==
+"@storybook/react@10.4.6":
+  version "10.4.6"
+  resolved "https://registry.yarnpkg.com/@storybook/react/-/react-10.4.6.tgz#32b44b23ce69d68f64c9fada7d93729533a09eab"
+  integrity sha512-9Y7YecrVFe1/01KYjfOLxVqTg2Aq+IO6TEv6sC2U0PfD0AWCSCmQ91QqgBpN/XW4aFFWoiZNinyXMUlU8zxy2w==
   dependencies:
     "@storybook/global" "^5.0.0"
-    "@storybook/react-dom-shim" "10.4.5"
+    "@storybook/react-dom-shim" "10.4.6"
     react-docgen "^8.0.2"
     react-docgen-typescript "^2.2.2"
 
@@ -2479,7 +2479,7 @@ asynckit@^0.4.0:
   resolved "https://registry.npmjs.org/asynckit/-/asynckit-0.4.0.tgz"
   integrity sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==
 
-axios@^1.16.0, axios@^1.17.0:
+axios@^1.16.0, axios@^1.18.0:
   version "1.16.0"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.16.0.tgz#f8e5dd931cef2a5f8c32216d5784eda2f8750eb7"
   integrity sha512-6hp5CwvTPlN2A31g5dxnwAX0orzM7pmCRDLnZSX772mv8WDqICwFjowHuPs04Mc8deIld1+ejhtaMn5vp6b+1w==
@@ -3141,7 +3141,7 @@ es-set-tostringtag@^2.1.0:
     has-tostringtag "^1.0.2"
     hasown "^2.0.2"
 
-esbuild@0.27.1, esbuild@0.28.1, "esbuild@^0.18.0 || ^0.19.0 || ^0.20.0 || ^0.21.0 || ^0.22.0 || ^0.23.0 || ^0.24.0 || ^0.25.0 || ^0.26.0 || ^0.27.0", esbuild@^0.28.1, esbuild@~0.28.0:
+esbuild@0.27.1, esbuild@0.28.1, "esbuild@^0.18.0 || ^0.19.0 || ^0.20.0 || ^0.21.0 || ^0.22.0 || ^0.23.0 || ^0.24.0 || ^0.25.0 || ^0.26.0 || ^0.27.0 || ^0.28.0", esbuild@^0.28.1, esbuild@~0.28.0:
   version "0.28.1"
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.28.1.tgz#ef45b4634c9c9d97a296aea4114a5f9840f95578"
   integrity sha512-HrJrvZv5ayxBzPfwphOoNzkzOIIlifzk0KJrGK2c8R4+LKpMtpYLQeUdjnwjWv/LZlkH2laZk+4w78pi99D4Vw==
@@ -5064,10 +5064,10 @@ std-env@^4.0.0-rc.1:
   resolved "https://registry.yarnpkg.com/std-env/-/std-env-4.0.0.tgz#ba3dc31c3a46bc5ba21138aa20a6a4ceb5bb9b7e"
   integrity sha512-zUMPtQ/HBY3/50VbpkupYHbRroTRZJPRLvreamgErJVys0ceuzMkD44J/QjqhHjOzK42GQ3QZIeFG1OYfOtKqQ==
 
-storybook@^10.4.5:
-  version "10.4.5"
-  resolved "https://registry.yarnpkg.com/storybook/-/storybook-10.4.5.tgz#020108c21a0e76795f0f95c58afa3981c1ebe723"
-  integrity sha512-QZuv1gS9Tf9RMCjDw5JOfv1XSB5IhU0uhSKQNS7l/N9zDpmSydirCspkCNT9e0zkFfPkZ9vmQUTzHY/BA07saA==
+storybook@^10.4.6:
+  version "10.4.6"
+  resolved "https://registry.yarnpkg.com/storybook/-/storybook-10.4.6.tgz#c28a2edb9bd01388d567f0c48f56c0386811016b"
+  integrity sha512-6wkA6LxfDSSilloITsrFOJfsnw0mDUP2h8Ls+lRt8oRsudtz2RWFhLv+Toiwg6NW7hUpdTDc2hzR7DztJid6+A==
   dependencies:
     "@storybook/global" "^5.0.0"
     "@storybook/icons" "^2.0.2"
@@ -5076,7 +5076,7 @@ storybook@^10.4.5:
     "@vitest/expect" "3.2.4"
     "@vitest/spy" "3.2.4"
     "@webcontainer/env" "^1.1.1"
-    esbuild "^0.18.0 || ^0.19.0 || ^0.20.0 || ^0.21.0 || ^0.22.0 || ^0.23.0 || ^0.24.0 || ^0.25.0 || ^0.26.0 || ^0.27.0"
+    esbuild "^0.18.0 || ^0.19.0 || ^0.20.0 || ^0.21.0 || ^0.22.0 || ^0.23.0 || ^0.24.0 || ^0.25.0 || ^0.26.0 || ^0.27.0 || ^0.28.0"
     open "^10.2.0"
     oxc-parser "^0.127.0"
     oxc-resolver "^11.19.1"
