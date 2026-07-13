@@ -609,35 +609,13 @@
   resolved "https://registry.npmjs.org/@lukeed/csprng/-/csprng-1.1.0.tgz"
   integrity sha512-Z7C/xXCiGWsg0KuKsHTKJxbWhpI3Vs5GwLfOean7MGyVFGqdRgBbAjOCh6u4bbjPc/8MJ2pZmK/0DLdCbivLDA==
 
-"@mcp-ui/server@6.1.0", "@mcp-ui/server@^6.1.0":
+"@mcp-ui/server@6.1.0":
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/@mcp-ui/server/-/server-6.1.0.tgz#5db8728dd940aaf3d8a0b2a6219b78737ca7c363"
   integrity sha512-uxv9JrzEzHfdGo/V/KTFKp5WeCOsaiAoQZ3V88jw1dSXUofONEw4rMwEvVP3612aj/unS2TIeM0o1I0asfIxtw==
   dependencies:
     "@modelcontextprotocol/ext-apps" "^0.3.1"
     "@modelcontextprotocol/sdk" "^1.25.1"
-
-"@mcp-use/cli@3.2.0":
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/@mcp-use/cli/-/cli-3.2.0.tgz#57fab80334cf9bf0fc506f4c234f6e4287abe1ca"
-  integrity sha512-RaC5iGdxfIMHhpAwXWfjgEPSDgyXfBGwaJI4Jt6X4NfaDTKC5vOyczkIgFeKjb9OGhSnrmYJQVnut7a9No7giA==
-  dependencies:
-    "@mcp-use/inspector" "6.0.0"
-    "@tailwindcss/vite" "^4.2.0"
-    "@vitejs/plugin-react" "^6.0.0"
-    chalk "^5.6.2"
-    chokidar "^5.0.0"
-    commander "^14.0.2"
-    dotenv "^17.3.1"
-    esbuild "0.27.1"
-    mcp-use "1.28.0"
-    open "^11.0.0"
-    tar "^7.5.11"
-    tsx "^4.21.0"
-    vite "^8.0.5"
-    vite-plugin-singlefile "^2.3.2"
-    ws "^8.19.0"
-    zod "4.3.5"
 
 "@mcp-use/cli@3.6.4":
   version "3.6.4"
@@ -661,7 +639,7 @@
     ws "^8.19.0"
     zod "4.3.5"
 
-"@mcp-use/inspector@12.0.3":
+"@mcp-use/inspector@12.0.3", "@mcp-use/inspector@^12.0.3":
   version "12.0.3"
   resolved "https://registry.yarnpkg.com/@mcp-use/inspector/-/inspector-12.0.3.tgz#69364908112c3261681298fee1c2fb1c84b5ad83"
   integrity sha512-X/oTEo+ut95861YxAolgNS41imd+WuMn2SjURi/ibpd7D25+f1cxe6VgnIqNd/OlV9QwdFzAZMm8Zg4Ohu8qYw==
@@ -690,45 +668,6 @@
     lucide-react "^0.562.0"
     markdown-to-jsx "^9.7.4"
     mcp-use "1.34.3"
-    motion "^12.34.2"
-    next-themes "^0.4.6"
-    open "^11.0.0"
-    posthog-node "^5.24.17"
-    react-resizable-panels "^4.6.4"
-    react-syntax-highlighter "^16.1.0"
-    sonner "^2.0.7"
-    tailwind-merge "^3.5.0"
-    zod "4.3.5"
-
-"@mcp-use/inspector@6.0.0", "@mcp-use/inspector@^6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@mcp-use/inspector/-/inspector-6.0.0.tgz#66614ddbcf375f1805f72d5e0b46333c4d9672ef"
-  integrity sha512-6PzjwKDVNhAN+lOtHpv8mrtRYNUkfM590evlJLn6cw68eHKBpnR8g9z4DP4FsE47HsSU5e0uls0P5EArbF42Bg==
-  dependencies:
-    "@hono/node-server" "^1.19.13"
-    "@modelcontextprotocol/ext-apps" "^1.0.1"
-    "@modelcontextprotocol/sdk" "^1.26.0"
-    "@paper-design/shaders-react" "^0.0.72"
-    "@radix-ui/react-alert-dialog" "^1.1.15"
-    "@radix-ui/react-avatar" "^1.1.11"
-    "@radix-ui/react-checkbox" "^1.3.3"
-    "@radix-ui/react-dialog" "^1.1.15"
-    "@radix-ui/react-dropdown-menu" "^2.1.16"
-    "@radix-ui/react-label" "^2.1.8"
-    "@radix-ui/react-popover" "^1.1.15"
-    "@radix-ui/react-select" "^2.2.6"
-    "@radix-ui/react-switch" "^1.2.6"
-    "@radix-ui/react-tooltip" "^1.2.8"
-    "@scarf/scarf" "^1.4.0"
-    "@tailwindcss/vite" "^4.2.0"
-    "@types/react-syntax-highlighter" "^15.5.13"
-    class-variance-authority "^0.7.1"
-    clsx "^2.1.1"
-    cmdk "^1.1.1"
-    hono "^4.12.12"
-    lucide-react "^0.562.0"
-    markdown-to-jsx "^9.7.4"
-    mcp-use "1.28.0"
     motion "^12.34.2"
     next-themes "^0.4.6"
     open "^11.0.0"
@@ -1281,11 +1220,6 @@
   version "1.351.3"
   resolved "https://registry.yarnpkg.com/@posthog/types/-/types-1.351.3.tgz#c19596acf6b7e1dee311249cb2b880f934d6d257"
   integrity sha512-Fuckp/fdL0Ku/kVYljbUdJli8vF07e5+tBsf4GzYBQjfZCGhlT0l37XqVQ05Uk7l/pUDONZD+OOXNBgBzW32gA==
-
-"@posthog/types@1.352.0":
-  version "1.352.0"
-  resolved "https://registry.yarnpkg.com/@posthog/types/-/types-1.352.0.tgz#dda7f5550b72bd431a82d7cd7face97732123c56"
-  integrity sha512-pp7VBMlkhlLmv2TyOoss028lPPD4ElnZlX5y3hqq6oijK5BMZbjVuTAgvFYNLiKbuze/i5ndFGyXTtfCwlMQeA==
 
 "@propelauth/node-apis@^2.1.35":
   version "2.1.35"
@@ -2735,7 +2669,7 @@ cli-boxes@^3.0.0:
   resolved "https://registry.yarnpkg.com/cli-boxes/-/cli-boxes-3.0.0.tgz#71a10c716feeba005e4504f36329ef0b17cf3145"
   integrity sha512-/lzGpEWL/8PfI0BmBOPRwp0c/wFNX1RdUML3jK/RcSBA9T8mZDdQpqYBKtCFTOfQbwPqWEOpjqW+Fnayc0969g==
 
-cli-highlight@2.1.11, cli-highlight@^2.1.11:
+cli-highlight@2.1.11:
   version "2.1.11"
   resolved "https://registry.yarnpkg.com/cli-highlight/-/cli-highlight-2.1.11.tgz#49736fa452f0aaf4fae580e30acb26828d2dc1bf"
   integrity sha512-9KDcoEVwyUXrjcJNvHD0NFc/hiwe/WPVYIleQh2O1N2Zro5gWJZ/K+3DGn8w8P/F6FxOgzyC5bxDyHIgCSPhGg==
@@ -3201,7 +3135,7 @@ es-set-tostringtag@^2.1.0:
     has-tostringtag "^1.0.2"
     hasown "^2.0.2"
 
-esbuild@0.27.1, esbuild@0.28.1, "esbuild@^0.18.0 || ^0.19.0 || ^0.20.0 || ^0.21.0 || ^0.22.0 || ^0.23.0 || ^0.24.0 || ^0.25.0 || ^0.26.0 || ^0.27.0 || ^0.28.0", esbuild@^0.28.1, esbuild@~0.28.0:
+esbuild@0.28.1, "esbuild@^0.18.0 || ^0.19.0 || ^0.20.0 || ^0.21.0 || ^0.22.0 || ^0.23.0 || ^0.24.0 || ^0.25.0 || ^0.26.0 || ^0.27.0 || ^0.28.0", esbuild@^0.28.1, esbuild@~0.28.0:
   version "0.28.1"
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.28.1.tgz#ef45b4634c9c9d97a296aea4114a5f9840f95578"
   integrity sha512-HrJrvZv5ayxBzPfwphOoNzkzOIIlifzk0KJrGK2c8R4+LKpMtpYLQeUdjnwjWv/LZlkH2laZk+4w78pi99D4Vw==
@@ -4027,28 +3961,6 @@ math-intrinsics@^1.1.0:
   resolved "https://registry.npmjs.org/math-intrinsics/-/math-intrinsics-1.1.0.tgz"
   integrity sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==
 
-mcp-use@1.28.0:
-  version "1.28.0"
-  resolved "https://registry.yarnpkg.com/mcp-use/-/mcp-use-1.28.0.tgz#7eb1f2a02b2d533c6f243bd0e47bf2991e1556bb"
-  integrity sha512-+FJKH1Yyw2PScjM+uE/UPIqkx65ZzlM2cxMpCsMfksyujRcSGddQ5OBh630LCUZii36OfB6tkdn7DZXtsy/Dyw==
-  dependencies:
-    "@hono/node-server" "^1.19.13"
-    "@mcp-ui/server" "^6.1.0"
-    "@mcp-use/cli" "3.2.0"
-    "@mcp-use/inspector" "6.0.0"
-    "@modelcontextprotocol/ext-apps" "^1.0.1"
-    "@modelcontextprotocol/sdk" "^1.26.0"
-    express "^5.2.1"
-    hono "^4.12.12"
-    jose "^6.1.3"
-    node-mocks-http "^1.17.2"
-    posthog-js "^1.351.3"
-    posthog-node "^5.24.17"
-  optionalDependencies:
-    chalk "^5.6.2"
-    cli-highlight "^2.1.11"
-    redis "^5.10.0"
-
 mcp-use@1.34.3, mcp-use@^1.34.3:
   version "1.34.3"
   resolved "https://registry.yarnpkg.com/mcp-use/-/mcp-use-1.34.3.tgz#f187207bb2c83f8c31179ab21f6fcb93c09fd4bd"
@@ -4270,7 +4182,7 @@ node-fetch@^2.6.1:
   dependencies:
     whatwg-url "^5.0.0"
 
-node-mocks-http@1.17.2, node-mocks-http@^1.17.2:
+node-mocks-http@1.17.2:
   version "1.17.2"
   resolved "https://registry.yarnpkg.com/node-mocks-http/-/node-mocks-http-1.17.2.tgz#e947d9b94defb13e3775414a8200c848f6b2fc74"
   integrity sha512-HVxSnjNzE9NzoWMx9T9z4MLqwMpLwVvA0oVZ+L+gXskYXEJ6tFn3Kx4LargoB6ie7ZlCLplv7QbWO6N+MysWGA==
@@ -4558,25 +4470,6 @@ posthog-js@1.351.3:
     query-selector-shadow-dom "^1.0.1"
     web-vitals "^5.1.0"
 
-posthog-js@^1.351.3:
-  version "1.352.0"
-  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.352.0.tgz#11ab0b6ba08ef5c8c926725d69eec83b0c565850"
-  integrity sha512-LxLKyoE+Y2z+WQ8CTO3PqQQDBuz64mHLJUoRuAYNXmp3vtxzrygZEz7UNnCT+BZ4/G44Qeq6JDYk1TRS7pIRDA==
-  dependencies:
-    "@opentelemetry/api" "^1.9.0"
-    "@opentelemetry/api-logs" "^0.208.0"
-    "@opentelemetry/exporter-logs-otlp-http" "^0.208.0"
-    "@opentelemetry/resources" "^2.2.0"
-    "@opentelemetry/sdk-logs" "^0.208.0"
-    "@posthog/core" "1.23.1"
-    "@posthog/types" "1.352.0"
-    core-js "^3.38.1"
-    dompurify "^3.3.1"
-    fflate "^0.4.8"
-    preact "^10.28.2"
-    query-selector-shadow-dom "^1.0.1"
-    web-vitals "^5.1.0"
-
 posthog-node@5.24.17, posthog-node@^5.24.17:
   version "5.24.17"
   resolved "https://registry.yarnpkg.com/posthog-node/-/posthog-node-5.24.17.tgz#ad04f7d38be22e2c1ad2cba48096b50029724912"
@@ -4815,7 +4708,7 @@ redent@^3.0.0:
     indent-string "^4.0.0"
     strip-indent "^3.0.0"
 
-redis@5.10.0, redis@^5.10.0:
+redis@5.10.0:
   version "5.10.0"
   resolved "https://registry.yarnpkg.com/redis/-/redis-5.10.0.tgz#c1b26ba2acd9c5fcc0d1724a3c7f0984ca43f48b"
   integrity sha512-0/Y+7IEiTgVGPrLFKy8oAEArSyEJkU0zvgV5xyi9NzNQ+SLZmyFbUsWIbgPcd4UdUh00opXGKlXJwMmsis5Byw==
@@ -5285,7 +5178,7 @@ tapable@^2.3.3:
   resolved "https://registry.yarnpkg.com/tapable/-/tapable-2.3.3.tgz#5da7c9992c46038221267985ab28421a8879f160"
   integrity sha512-uxc/zpqFg6x7C8vOE7lh6Lbda8eEL9zmVm/PLeTPBRhh1xCgdWaQ+J1CUieGpIfm2HdtsUpRv+HshiasBMcc6A==
 
-tar@^7.5.11, tar@^7.5.12, tar@^7.5.16:
+tar@^7.5.12, tar@^7.5.16:
   version "7.5.16"
   resolved "https://registry.yarnpkg.com/tar/-/tar-7.5.16.tgz#f11e063afed4554f758049d082909e37d6b53ced"
   integrity sha512-56adEpPMouktRlBLXiaYFFzZ/3+JXa8P9n7WbR+ibIjtviN55mEaOkiysCnPnWm+7kkui1Dn8J9l+g6zV8731w==
@@ -5529,7 +5422,7 @@ vite-plugin-singlefile@^2.3.2:
   dependencies:
     micromatch "^4.0.8"
 
-"vite@^6.0.0 || ^7.0.0 || ^8.0.0", vite@^8.0.16, vite@^8.0.5, vite@^8.1.4:
+"vite@^6.0.0 || ^7.0.0 || ^8.0.0", vite@^8.0.16, vite@^8.1.4:
   version "8.1.4"
   resolved "https://registry.yarnpkg.com/vite/-/vite-8.1.4.tgz#3cd711f31de805e5154ab47948349e693314d581"
   integrity sha512-bTT9PsdWO+MQMNG9ZXIP/qM9wGh37DFxTV/sPq9cFpHr3w4jkgef032PkAL9jAqhk3Nz8NQw3O8n6/xFkqO4QQ==
