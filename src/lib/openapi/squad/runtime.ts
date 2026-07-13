@@ -13,7 +13,7 @@
  */
 
 
-export const BASE_PATH = "https://api.meetsquad.ai".replace(/\/+$/, "");
+export const BASE_PATH = "https://api.v1.meetsquad.ai".replace(/\/+$/, "");
 
 export interface ConfigurationParameters {
     basePath?: string; // override base path
