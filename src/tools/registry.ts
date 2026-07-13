@@ -17,6 +17,8 @@ import {
   WorkspaceSelectionRequired,
 } from "./helpers.js";
 
+export type { OAuthServer } from "./helpers.js";
+
 export type ToolScope = "read" | "write";
 
 export type ToolContext = {
