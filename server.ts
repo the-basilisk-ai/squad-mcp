@@ -7,6 +7,7 @@ import {
   runWithContext,
 } from "mcp-use/server";
 import { getPropelAuthUrl } from "./src/helpers/config.js";
+import { initKv } from "./src/helpers/kv.js";
 import { introspectToken } from "./src/helpers/oauth.js";
 import { connectRedis } from "./src/helpers/redis.js";
 import { logger } from "./src/lib/logger.js";
@@ -24,11 +25,13 @@ let sessionStore: RedisSessionStore | undefined;
 let streamManager: RedisStreamManager | undefined;
 if (process.env.REDIS_URL && !process.argv.includes("build")) {
   ({ sessionStore, streamManager } = await connectRedis());
+  await initKv(process.env.REDIS_URL);
 } else if (!process.env.REDIS_URL) {
   logger.warn(
     {},
     "REDIS_URL not set, using in-memory sessions (not deploy-safe)",
   );
+  await initKv(undefined);
 }
 
 const server = new MCPServer({

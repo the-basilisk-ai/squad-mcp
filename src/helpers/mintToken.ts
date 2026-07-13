@@ -1,26 +1,15 @@
 import { initBaseAuth } from "@propelauth/node";
 import { logger } from "../lib/logger.js";
 import { getPropelAuthUrl } from "./config.js";
+import { kv } from "./kv.js";
 
 const JWT_DURATION_MINUTES = 60;
-const CACHE_TTL_MS = 55 * 60 * 1000; // 55 min (5 min buffer before JWT expiry)
-const CACHE_MAX_SIZE = 10_000; // max concurrent users before eviction
-const EVICTION_RATIO = 0.1;
-
-type CachedToken = {
-  jwt: string;
-  createdAt: number;
-};
-
-// In-memory only — lost on restart, which just means a few extra createAccessToken calls to warm up.
-const tokenCache = new Map<string, CachedToken>();
-let cacheHits = 0;
-let cacheMisses = 0;
+const CACHE_TTL_SECONDS = 55 * 60; // 5 min buffer before JWT expiry
 
 // Lazy singleton — initialized on first use
 let authInstance: ReturnType<typeof initBaseAuth> | null = null;
 
-function getAuth(): ReturnType<typeof initBaseAuth> {
+export function getPropelAuthClient(): ReturnType<typeof initBaseAuth> {
   if (!authInstance) {
     const apiKey = process.env.PROPELAUTH_API_KEY;
     if (!apiKey) {
@@ -34,62 +23,27 @@ function getAuth(): ReturnType<typeof initBaseAuth> {
   return authInstance;
 }
 
-function evictOldest(): void {
-  if (tokenCache.size < CACHE_MAX_SIZE) return;
-  const entries = Array.from(tokenCache.entries());
-  entries.sort((a, b) => a[1].createdAt - b[1].createdAt);
-  const evictCount = Math.ceil(CACHE_MAX_SIZE * EVICTION_RATIO);
-  for (let i = 0; i < evictCount && i < entries.length; i++) {
-    tokenCache.delete(entries[i][0]);
-  }
-}
-
-function removeExpired(): void {
-  const now = Date.now();
-  for (const [userId, entry] of tokenCache.entries()) {
-    if (now - entry.createdAt > CACHE_TTL_MS) {
-      tokenCache.delete(userId);
-    }
-  }
-}
-
-// Periodic cleanup and stats logging (unref so it doesn't prevent process exit)
-setInterval(
-  () => {
-    removeExpired();
-    const total = cacheHits + cacheMisses;
-    if (total > 0) {
-      logger.info(
-        `JWT token cache stats: hits=${cacheHits} misses=${cacheMisses} size=${tokenCache.size} hitRate=${Math.round((cacheHits / total) * 100)}%`,
-      );
-      cacheHits = 0;
-      cacheMisses = 0;
-    }
-  },
-  60 * 60 * 1000,
-).unref();
-
 /**
- * Get a short-lived JWT for calling the Squad API on behalf of a user.
- * Mints via PropelAuth createAccessToken and caches per userId.
+ * Get a short-lived JWT for calling the Squad platform API on behalf of a
+ * user. The API derives tenant context from the token's active org, so
+ * tokens are minted and cached per (user, org) pair.
  */
-export async function getServiceToken(userId: string): Promise<string> {
-  const cached = tokenCache.get(userId);
-  if (cached && Date.now() - cached.createdAt < CACHE_TTL_MS) {
-    cacheHits++;
-    return cached.jwt;
-  }
-  cacheMisses++;
+export async function getServiceToken(
+  userId: string,
+  activeOrgId: string,
+): Promise<string> {
+  const cacheKey = `mcp:jwt:${userId}:${activeOrgId}`;
+  const cached = await kv().get(cacheKey);
+  if (cached) return cached;
 
-  const auth = getAuth();
+  const auth = getPropelAuthClient();
   const result = await auth.createAccessToken({
     userId,
     durationInMinutes: JWT_DURATION_MINUTES,
+    activeOrgId,
   });
 
-  evictOldest();
-  tokenCache.set(userId, { jwt: result.access_token, createdAt: Date.now() });
-
+  await kv().set(cacheKey, result.access_token, CACHE_TTL_SECONDS);
   logger.debug({ userId }, "Minted new service JWT for user");
   return result.access_token;
 }

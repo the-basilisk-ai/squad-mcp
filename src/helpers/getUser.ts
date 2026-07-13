@@ -1,8 +1,11 @@
-import { z } from "zod";
+import { WorkspaceDirectoryDocument } from "../gql/graphql.js";
 import { logger } from "../lib/logger.js";
-import { getServiceToken } from "./mintToken.js";
+import { execute } from "../lib/squad-api-client.js";
+import { kv } from "./kv.js";
+import { getPropelAuthClient, getServiceToken } from "./mintToken.js";
 
 export type UserContext = {
+  /** PropelAuth org ID — the ID minted into service tokens and shown to agents. */
   orgId: string;
   workspaceId: string;
   token: string;
@@ -16,215 +19,174 @@ export type OrgInfo = {
 export type WorkspaceInfo = {
   id: string;
   name: string;
-};
-
-/**
- * In-memory workspace selection cache with LRU eviction and TTL.
- *
- * LIMITATION: This cache is not shared across server instances.
- * For horizontal scaling, consider using Redis or another shared store.
- * Users will need to re-select their workspace after server restarts
- * or when load-balanced to a different instance.
- */
-const WORKSPACE_CACHE_MAX_SIZE = 10000;
-const WORKSPACE_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
-
-type WorkspaceEntry = {
   orgId: string;
-  workspaceId: string;
-  lastAccessed: number;
+  orgName: string;
 };
 
-const workspaceSelections = new Map<string, WorkspaceEntry>();
+export type WorkspaceDirectory = {
+  orgs: OrgInfo[];
+  workspaces: WorkspaceInfo[];
+};
 
-/**
- * Evict oldest entries if cache is full
- */
-function evictOldestEntries(): void {
-  if (workspaceSelections.size < WORKSPACE_CACHE_MAX_SIZE) {
-    return;
-  }
+const SELECTION_TTL_SECONDS = 24 * 60 * 60;
 
-  // Find entries to evict (oldest 10%)
-  const entries = Array.from(workspaceSelections.entries());
-  entries.sort((a, b) => a[1].lastAccessed - b[1].lastAccessed);
+const selectionKey = (userId: string) => `mcp:selection:${userId}`;
 
-  const evictCount = Math.ceil(WORKSPACE_CACHE_MAX_SIZE * 0.1);
-  for (let i = 0; i < evictCount && i < entries.length; i++) {
-    workspaceSelections.delete(entries[i][0]);
-  }
-
-  logger.debug(
-    { evicted: evictCount },
-    "Evicted oldest workspace selections from cache",
-  );
-}
-
-/**
- * Remove expired entries (called periodically)
- */
-function removeExpiredEntries(): void {
-  const now = Date.now();
-  const expiredKeys: string[] = [];
-
-  // Collect expired keys first
-  for (const [userId, entry] of workspaceSelections.entries()) {
-    if (now - entry.lastAccessed > WORKSPACE_CACHE_TTL_MS) {
-      expiredKeys.push(userId);
-    }
-  }
-
-  // Then delete them
-  for (const key of expiredKeys) {
-    workspaceSelections.delete(key);
-  }
-
-  if (expiredKeys.length > 0) {
-    logger.debug(
-      { expired: expiredKeys.length },
-      "Removed expired workspace selections from cache",
-    );
-  }
-}
-
-// Run cleanup every hour
-setInterval(removeExpiredEntries, 60 * 60 * 1000);
-
-/**
- * Store workspace selection for a user
- */
-export function setWorkspaceSelection(
+export async function setWorkspaceSelection(
   userId: string,
   orgId: string,
   workspaceId: string,
-): void {
-  evictOldestEntries();
-  workspaceSelections.set(userId, {
-    orgId,
-    workspaceId,
-    lastAccessed: Date.now(),
-  });
+): Promise<void> {
+  await kv().set(
+    selectionKey(userId),
+    JSON.stringify({ orgId, workspaceId }),
+    SELECTION_TTL_SECONDS,
+  );
 }
 
-/**
- * Get stored workspace selection for a user
- */
-export function getWorkspaceSelection(
+export async function getWorkspaceSelection(
   userId: string,
-): { orgId: string; workspaceId: string } | undefined {
-  const entry = workspaceSelections.get(userId);
-  if (!entry) {
+): Promise<{ orgId: string; workspaceId: string } | undefined> {
+  const raw = await kv().get(selectionKey(userId));
+  if (!raw) return undefined;
+  try {
+    return JSON.parse(raw) as { orgId: string; workspaceId: string };
+  } catch {
+    await kv().del(selectionKey(userId));
     return undefined;
   }
+}
 
-  // Check if expired
-  if (Date.now() - entry.lastAccessed > WORKSPACE_CACHE_TTL_MS) {
-    workspaceSelections.delete(userId);
-    return undefined;
-  }
-
-  // Update last accessed time (LRU)
-  entry.lastAccessed = Date.now();
-  return { orgId: entry.orgId, workspaceId: entry.workspaceId };
+export async function clearWorkspaceSelection(userId: string): Promise<void> {
+  await kv().del(selectionKey(userId));
 }
 
 /**
- * Clear workspace selection for a user
- */
-export function clearWorkspaceSelection(userId: string): void {
-  workspaceSelections.delete(userId);
-}
-
-/**
- * List all organisations accessible to the user.
- * Rebuilt against the new Squad platform API in M1 Task 03.
+ * List the user's organisations from PropelAuth. This is the entry point of
+ * the selection flow — it needs no backend call and yields the org IDs that
+ * service tokens are minted against.
  */
 export async function listUserOrganisations(
-  _accessToken: string,
-): Promise<OrgInfo[]> {
-  logger.warn({}, "listUserOrganisations called before v4 rebuild");
-  throw new Error(
-    "Workspace listing is temporarily unavailable while this server is rebuilt for the new Squad platform.",
-  );
-}
-
-/**
- * List all workspaces in an organisation.
- * Rebuilt against the new Squad platform API in M1 Task 03.
- */
-export async function listOrgWorkspaces(
-  _accessToken: string,
-  orgId: string,
-): Promise<WorkspaceInfo[]> {
-  logger.warn({ orgId }, "listOrgWorkspaces called before v4 rebuild");
-  throw new Error(
-    "Workspace listing is temporarily unavailable while this server is rebuilt for the new Squad platform.",
-  );
-}
-
-/**
- * Get user context for OAuth users.
- * Uses list orgs/workspaces endpoints and stored selection.
- *
- * @param accessToken - OAuth access token
- * @param userId - User ID from OAuth token (sub claim)
- * @returns User context with orgId, workspaceId, and token
- */
-export const getUserContext = async (
-  _accessToken: string,
   userId: string,
-): Promise<UserContext> => {
-  const token = await getServiceToken(userId);
+): Promise<OrgInfo[]> {
+  const metadata = await getPropelAuthClient().fetchUserMetadataByUserId(
+    userId,
+    true,
+  );
+  if (!metadata) {
+    throw new Error("User not found in the authentication provider.");
+  }
+  const orgInfoById = metadata.orgIdToOrgInfo;
+  const orgs = orgInfoById
+    ? (Object.values(orgInfoById) as Array<{
+        orgId?: string;
+        orgName?: string;
+      }>)
+    : [];
+  return orgs.flatMap(org =>
+    typeof org.orgId === "string"
+      ? [{ id: org.orgId, name: org.orgName ?? "Unnamed organisation" }]
+      : [],
+  );
+}
 
-  // Check if user has a stored workspace selection
-  const storedSelection = getWorkspaceSelection(userId);
-  if (storedSelection) {
-    return {
-      orgId: storedSelection.orgId,
-      workspaceId: storedSelection.workspaceId,
+/**
+ * Fetch every organisation and workspace the user can access, in one API
+ * call. The workspaces query spans all accessible organisations, so a token
+ * minted for any one org is sufficient.
+ */
+export async function fetchWorkspaceDirectory(
+  userId: string,
+  anyOrgId: string,
+): Promise<WorkspaceDirectory> {
+  const token = await getServiceToken(userId, anyOrgId);
+  const data = await execute(
+    WorkspaceDirectoryDocument,
+    {},
+    {
       token,
+      workspaceId: "",
+    },
+  );
+
+  const orgByInternalId = new Map<string, OrgInfo>();
+  for (const org of data.organisations ?? []) {
+    if (org.id && org.propelAuthOrgId) {
+      orgByInternalId.set(org.id, {
+        id: org.propelAuthOrgId,
+        name: org.name ?? "Unnamed organisation",
+      });
+    }
+  }
+
+  const workspaces: WorkspaceInfo[] = [];
+  for (const ws of data.workspaces ?? []) {
+    if (!ws.id) continue;
+    const org = ws.organisationId
+      ? orgByInternalId.get(ws.organisationId)
+      : undefined;
+    if (!org) {
+      logger.warn(
+        { workspaceId: ws.id },
+        "Workspace without resolvable organisation in directory",
+      );
+      continue;
+    }
+    workspaces.push({
+      id: ws.id,
+      name: ws.name ?? "Unnamed workspace",
+      orgId: org.id,
+      orgName: org.name,
+    });
+  }
+
+  return { orgs: Array.from(orgByInternalId.values()), workspaces };
+}
+
+/**
+ * Resolve tenant context for a tool call: stored selection first, then
+ * auto-select when exactly one workspace is accessible, otherwise ask the
+ * agent to call select_workspace.
+ */
+export const getUserContext = async (userId: string): Promise<UserContext> => {
+  const stored = await getWorkspaceSelection(userId);
+  if (stored) {
+    return {
+      orgId: stored.orgId,
+      workspaceId: stored.workspaceId,
+      token: await getServiceToken(userId, stored.orgId),
     };
   }
 
-  // No stored selection - try to auto-select if user has only one org/workspace
-  const orgs = await listUserOrganisations(token);
-
+  const orgs = await listUserOrganisations(userId);
   if (orgs.length === 0) {
     throw new Error(
       "No organisations found for this user. Please create an organisation first.",
     );
   }
 
-  if (orgs.length > 1) {
-    throw new WorkspaceSelectionRequired(
-      "Multiple organisations found. Please use the select_workspace tool to choose one.",
-      orgs,
-    );
-  }
-
-  // Single org - check workspaces
-  const orgId = orgs[0].id;
-  const workspaces = await listOrgWorkspaces(token, orgId);
-
-  if (workspaces.length === 0) {
+  const directory = await fetchWorkspaceDirectory(userId, orgs[0].id);
+  if (directory.workspaces.length === 0) {
     throw new Error(
-      `No workspaces found in organisation "${orgs[0].name}". Please create a workspace first.`,
+      "No workspaces found. Please create a workspace in the Squad app first.",
     );
   }
 
-  if (workspaces.length > 1) {
+  if (directory.workspaces.length > 1) {
     throw new WorkspaceSelectionRequired(
-      "Multiple workspaces found. Please use the select_workspace tool to choose one.",
-      orgs,
-      workspaces,
+      "Multiple workspaces available. Please use the select_workspace tool to choose one.",
+      directory.orgs,
+      directory.workspaces,
     );
   }
 
-  // Single org with single workspace - auto-select and store
-  const workspaceId = workspaces[0].id;
-  setWorkspaceSelection(userId, orgId, workspaceId);
-
-  return { orgId, workspaceId, token };
+  const workspace = directory.workspaces[0];
+  await setWorkspaceSelection(userId, workspace.orgId, workspace.id);
+  return {
+    orgId: workspace.orgId,
+    workspaceId: workspace.id,
+    token: await getServiceToken(userId, workspace.orgId),
+  };
 };
 
 /**
@@ -241,23 +203,3 @@ export class WorkspaceSelectionRequired extends Error {
     this.workspaces = workspaces;
   }
 }
-
-export const chatToolHelperSchema = ({
-  defaultInProgressText = "Thinking...",
-  defaultCompletedText = "Done",
-}: {
-  defaultInProgressText?: string;
-  defaultCompletedText?: string;
-}) =>
-  z.object({
-    inProgressText: z
-      .string()
-      .optional()
-      .default(defaultInProgressText)
-      .describe("Text to display while the tool is in progress"),
-    completedText: z
-      .string()
-      .optional()
-      .default(defaultCompletedText)
-      .describe("Text to display when the tool has completed"),
-  });

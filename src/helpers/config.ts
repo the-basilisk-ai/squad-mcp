@@ -1,29 +1,20 @@
 /**
- * Get PropelAuth URL based on SQUAD_ENV
+ * Environment switching for the Squad platform.
+ * v4 has two environments: dev and production (SQUAD_ENV, default production).
  */
+
 export function getPropelAuthUrl(): string {
   const squadEnv = process.env.SQUAD_ENV || "production";
-
   if (squadEnv === "dev") {
-    return "https://26904088430.propelauthtest.com";
+    return "https://48820142.propelauthtest.com";
   }
-  if (squadEnv === "staging") {
-    return "https://auth.app.meetsquad.ai";
-  }
-  return "https://auth.meetsquad.ai"; // production
+  return "https://auth.meetsquad.ai";
 }
 
-/**
- * Get Squad API URL based on SQUAD_ENV
- */
 export function getSquadApiUrl(): string {
   const squadEnv = process.env.SQUAD_ENV || "production";
-
   if (squadEnv === "dev") {
-    return "https://dev.api.meetsquad.ai";
-  }
-  if (squadEnv === "staging") {
-    return "https://uat.api.meetsquad.ai";
+    return "https://dev.api.v2.meetsquad.ai";
   }
   return "https://api.meetsquad.ai";
 }
@@ -36,17 +27,10 @@ export function getSquadGraphqlUrl(): string {
   return process.env.SQUAD_GRAPHQL_URL || `${getSquadApiUrl()}/graphql`;
 }
 
-/**
- * Get Squad App URL based on SQUAD_ENV
- */
 export function getSquadAppUrl(): string {
   const squadEnv = process.env.SQUAD_ENV || "production";
-
   if (squadEnv === "dev") {
-    return "https://dev.meetsquad.ai";
-  }
-  if (squadEnv === "staging") {
-    return "https://uat.meetsquad.ai";
+    return "https://dev.v2.meetsquad.ai";
   }
   return "https://app.meetsquad.ai";
 }

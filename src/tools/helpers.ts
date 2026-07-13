@@ -79,7 +79,7 @@ export function formatWorkspaceSelectionError(
   let message = error.message;
   message += `\n\nAvailable organisations:\n${error.orgs.map(o => `- ${o.name} (${o.id})`).join("\n")}`;
   if (error.workspaces) {
-    message += `\n\nAvailable workspaces:\n${error.workspaces.map(w => `- ${w.name} (${w.id})`).join("\n")}`;
+    message += `\n\nAvailable workspaces:\n${error.workspaces.map(w => `- ${w.name} (${w.id}) in ${w.orgName} (${w.orgId})`).join("\n")}`;
   }
   return message;
 }

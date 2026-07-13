@@ -1,0 +1,13 @@
+query WorkspaceDirectory {
+  organisations {
+    id
+    name
+    propelAuthOrgId
+  }
+  workspaces(limit: 100) {
+    id
+    name
+    organisationId
+    isDefault
+  }
+}

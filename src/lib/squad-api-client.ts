@@ -39,13 +39,17 @@ export async function execute<TResult, TVariables>(
   variables: TVariables,
   ctx: ApiContext,
 ): Promise<TResult> {
+  const headers: Record<string, string> = {
+    "content-type": "application/json",
+    authorization: `Bearer ${ctx.token}`,
+  };
+  if (ctx.workspaceId) {
+    headers["x-workspace-id"] = ctx.workspaceId;
+  }
+
   const response = await fetch(getSquadGraphqlUrl(), {
     method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authorization: `Bearer ${ctx.token}`,
-      "x-workspace-id": ctx.workspaceId,
-    },
+    headers,
     body: JSON.stringify({ query: print(document), variables }),
   });
 

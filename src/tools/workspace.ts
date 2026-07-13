@@ -1,11 +1,10 @@
 import { z } from "zod";
 import {
+  fetchWorkspaceDirectory,
   getWorkspaceSelection,
-  listOrgWorkspaces,
   listUserOrganisations,
   setWorkspaceSelection,
 } from "../helpers/getUser.js";
-import { getServiceToken } from "../helpers/mintToken.js";
 import { logger } from "../lib/logger.js";
 import {
   formatApiError,
@@ -39,24 +38,26 @@ export function registerWorkspaceTools(server: OAuthServer) {
     async (_params, ctx) => {
       try {
         const userId = getUserId(ctx.auth);
-        const token = await getServiceToken(userId);
 
-        const orgs = await listUserOrganisations(token);
-        const result: Array<{
-          org: { id: string; name: string };
-          workspaces: Array<{ id: string; name: string }>;
-        }> = [];
-
-        for (const org of orgs) {
-          const workspaces = await listOrgWorkspaces(token, org.id);
-          result.push({ org, workspaces });
+        const orgs = await listUserOrganisations(userId);
+        if (orgs.length === 0) {
+          return toolError(
+            "No organisations found for this user. Please create one in the Squad app first.",
+          );
         }
 
-        const currentSelection = getWorkspaceSelection(userId);
+        const directory = await fetchWorkspaceDirectory(userId, orgs[0].id);
+        const available = directory.orgs.map(org => ({
+          org,
+          workspaces: directory.workspaces
+            .filter(ws => ws.orgId === org.id)
+            .map(ws => ({ id: ws.id, name: ws.name })),
+        }));
+        const currentSelection = await getWorkspaceSelection(userId);
 
         return toolSuccess({
-          currentSelection: currentSelection || null,
-          available: result,
+          currentSelection: currentSelection ?? null,
+          available,
         });
       } catch (error) {
         logger.debug({ err: error, tool: "list_workspaces" }, "Tool error");
@@ -86,11 +87,9 @@ export function registerWorkspaceTools(server: OAuthServer) {
     async (params, ctx) => {
       try {
         const userId = getUserId(ctx.auth);
-        const token = await getServiceToken(userId);
         const { orgId, workspaceId } = params;
 
-        // Verify the user has access to this org/workspace
-        const orgs = await listUserOrganisations(token);
+        const orgs = await listUserOrganisations(userId);
         const org = orgs.find(o => o.id === orgId);
         if (!org) {
           return toolError(
@@ -98,16 +97,17 @@ export function registerWorkspaceTools(server: OAuthServer) {
           );
         }
 
-        const workspaces = await listOrgWorkspaces(token, orgId);
-        const workspace = workspaces.find(w => w.id === workspaceId);
+        const directory = await fetchWorkspaceDirectory(userId, orgId);
+        const workspace = directory.workspaces.find(
+          ws => ws.id === workspaceId && ws.orgId === orgId,
+        );
         if (!workspace) {
           return toolError(
             `Workspace ${workspaceId} not found in organisation ${org.name}.`,
           );
         }
 
-        // Store the selection
-        setWorkspaceSelection(userId, orgId, workspaceId);
+        await setWorkspaceSelection(userId, orgId, workspaceId);
 
         return toolSuccess({
           message: `Switched to workspace "${workspace.name}" in organisation "${org.name}"`,
