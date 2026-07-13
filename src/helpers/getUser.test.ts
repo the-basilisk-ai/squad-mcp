@@ -36,7 +36,12 @@ const oneOrgMetadata = {
 function directoryResponse(workspaces: Array<Record<string, unknown>>) {
   return {
     organisations: [
-      { id: "int-org-1", name: "Acme", propelAuthOrgId: "pa-org-1" },
+      {
+        id: "int-org-1",
+        name: "Acme",
+        slug: "acme",
+        propelAuthOrgId: "pa-org-1",
+      },
     ],
     workspaces,
   };
@@ -55,7 +60,7 @@ describe("getUserContext", () => {
     mockFetchUserMetadata.mockResolvedValue(oneOrgMetadata);
     mockExecute.mockResolvedValue(
       directoryResponse([
-        { id: "ws-1", name: "Main", organisationId: "int-org-1" },
+        { id: "ws-1", name: "Main", slug: "main", organisationId: "int-org-1" },
       ]),
     );
 
@@ -64,12 +69,16 @@ describe("getUserContext", () => {
     expect(ctx).toEqual({
       orgId: "pa-org-1",
       workspaceId: "ws-1",
+      orgSlug: "acme",
+      workspaceSlug: "main",
       token: "svc-jwt",
     });
     expect(mockGetServiceToken).toHaveBeenCalledWith("user-1", "pa-org-1");
     await expect(getWorkspaceSelection("user-1")).resolves.toEqual({
       orgId: "pa-org-1",
       workspaceId: "ws-1",
+      orgSlug: "acme",
+      workspaceSlug: "main",
     });
   });
 
@@ -109,7 +118,9 @@ describe("getUserContext", () => {
 
     expect(error).toBeInstanceOf(WorkspaceSelectionRequired);
     const selection = error as InstanceType<typeof WorkspaceSelectionRequired>;
-    expect(selection.orgs).toEqual([{ id: "pa-org-1", name: "Acme" }]);
+    expect(selection.orgs).toEqual([
+      { id: "pa-org-1", name: "Acme", slug: "acme" },
+    ]);
     expect(selection.workspaces?.map(w => w.id)).toEqual(["ws-1", "ws-2"]);
     expect(selection.workspaces?.[0].orgId).toBe("pa-org-1");
   });
@@ -119,10 +130,15 @@ describe("fetchWorkspaceDirectory", () => {
   it("maps workspaces onto PropelAuth org IDs and drops unresolvable ones", async () => {
     mockExecute.mockResolvedValue({
       organisations: [
-        { id: "int-org-1", name: "Acme", propelAuthOrgId: "pa-org-1" },
+        {
+          id: "int-org-1",
+          name: "Acme",
+          slug: "acme",
+          propelAuthOrgId: "pa-org-1",
+        },
       ],
       workspaces: [
-        { id: "ws-1", name: "Main", organisationId: "int-org-1" },
+        { id: "ws-1", name: "Main", slug: "main", organisationId: "int-org-1" },
         { id: "ws-x", name: "Orphan", organisationId: "int-org-unknown" },
       ],
     });
@@ -130,7 +146,14 @@ describe("fetchWorkspaceDirectory", () => {
     const directory = await fetchWorkspaceDirectory("user-1", "pa-org-1");
 
     expect(directory.workspaces).toEqual([
-      { id: "ws-1", name: "Main", orgId: "pa-org-1", orgName: "Acme" },
+      {
+        id: "ws-1",
+        name: "Main",
+        slug: "main",
+        orgId: "pa-org-1",
+        orgName: "Acme",
+        orgSlug: "acme",
+      },
     ]);
     const executeCtx = mockExecute.mock.calls[0][2];
     expect(executeCtx).toEqual({ token: "svc-jwt", workspaceId: "" });

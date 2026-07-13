@@ -15,12 +15,12 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
  */
 type Documents = {
     "mutation UpdateWorkspace($where: WorkspaceWhere!, $update: WorkspaceUpdateInput!) {\n  updateWorkspaces(where: $where, update: $update) {\n    workspaces {\n      id\n      name\n      description\n      missionStatement\n      logoUrl\n      slug\n    }\n  }\n}": typeof types.UpdateWorkspaceDocument,
-    "query WorkspaceDirectory {\n  organisations {\n    id\n    name\n    propelAuthOrgId\n  }\n  workspaces(limit: 100) {\n    id\n    name\n    organisationId\n    isDefault\n  }\n}": typeof types.WorkspaceDirectoryDocument,
+    "query WorkspaceDirectory {\n  organisations {\n    id\n    name\n    slug\n    propelAuthOrgId\n  }\n  workspaces(limit: 100) {\n    id\n    name\n    slug\n    organisationId\n    isDefault\n  }\n}": typeof types.WorkspaceDirectoryDocument,
     "query WorkspaceOverview($workspaceId: String!, $days: Int) {\n  workspaces(where: {id: {eq: $workspaceId}}, limit: 1) {\n    id\n    name\n    description\n    missionStatement\n    slug\n    organisationId\n    onboardingStatus\n  }\n  goalList(limit: 5) {\n    id\n    displayId\n    title\n    importance\n  }\n  signalActivitySummary(days: $days) {\n    source\n    count\n  }\n  chainHealth {\n    signalCount\n    activeSignalCount\n    staleSignalCount\n    insightCount\n    sourceCount\n    signalHealthPercent\n  }\n  openActions: actions(statuses: [suggested, in_progress], limit: 50) {\n    id\n  }\n  pendingBriefs: onePagerList(\n    filters: {onePagerStatus: [building, draft, in_review]}\n    limit: 50\n  ) {\n    id\n  }\n}": typeof types.WorkspaceOverviewDocument,
 };
 const documents: Documents = {
     "mutation UpdateWorkspace($where: WorkspaceWhere!, $update: WorkspaceUpdateInput!) {\n  updateWorkspaces(where: $where, update: $update) {\n    workspaces {\n      id\n      name\n      description\n      missionStatement\n      logoUrl\n      slug\n    }\n  }\n}": types.UpdateWorkspaceDocument,
-    "query WorkspaceDirectory {\n  organisations {\n    id\n    name\n    propelAuthOrgId\n  }\n  workspaces(limit: 100) {\n    id\n    name\n    organisationId\n    isDefault\n  }\n}": types.WorkspaceDirectoryDocument,
+    "query WorkspaceDirectory {\n  organisations {\n    id\n    name\n    slug\n    propelAuthOrgId\n  }\n  workspaces(limit: 100) {\n    id\n    name\n    slug\n    organisationId\n    isDefault\n  }\n}": types.WorkspaceDirectoryDocument,
     "query WorkspaceOverview($workspaceId: String!, $days: Int) {\n  workspaces(where: {id: {eq: $workspaceId}}, limit: 1) {\n    id\n    name\n    description\n    missionStatement\n    slug\n    organisationId\n    onboardingStatus\n  }\n  goalList(limit: 5) {\n    id\n    displayId\n    title\n    importance\n  }\n  signalActivitySummary(days: $days) {\n    source\n    count\n  }\n  chainHealth {\n    signalCount\n    activeSignalCount\n    staleSignalCount\n    insightCount\n    sourceCount\n    signalHealthPercent\n  }\n  openActions: actions(statuses: [suggested, in_progress], limit: 50) {\n    id\n  }\n  pendingBriefs: onePagerList(\n    filters: {onePagerStatus: [building, draft, in_review]}\n    limit: 50\n  ) {\n    id\n  }\n}": types.WorkspaceOverviewDocument,
 };
 
@@ -45,7 +45,7 @@ export function graphql(source: "mutation UpdateWorkspace($where: WorkspaceWhere
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query WorkspaceDirectory {\n  organisations {\n    id\n    name\n    propelAuthOrgId\n  }\n  workspaces(limit: 100) {\n    id\n    name\n    organisationId\n    isDefault\n  }\n}"): (typeof documents)["query WorkspaceDirectory {\n  organisations {\n    id\n    name\n    propelAuthOrgId\n  }\n  workspaces(limit: 100) {\n    id\n    name\n    organisationId\n    isDefault\n  }\n}"];
+export function graphql(source: "query WorkspaceDirectory {\n  organisations {\n    id\n    name\n    slug\n    propelAuthOrgId\n  }\n  workspaces(limit: 100) {\n    id\n    name\n    slug\n    organisationId\n    isDefault\n  }\n}"): (typeof documents)["query WorkspaceDirectory {\n  organisations {\n    id\n    name\n    slug\n    propelAuthOrgId\n  }\n  workspaces(limit: 100) {\n    id\n    name\n    slug\n    organisationId\n    isDefault\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

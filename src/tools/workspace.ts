@@ -107,7 +107,12 @@ export function registerWorkspaceTools(server: OAuthServer) {
           );
         }
 
-        await setWorkspaceSelection(userId, orgId, workspaceId);
+        await setWorkspaceSelection(userId, {
+          orgId,
+          workspaceId,
+          orgSlug: workspace.orgSlug,
+          workspaceSlug: workspace.slug,
+        });
 
         return toolSuccess({
           message: `Switched to workspace "${workspace.name}" in organisation "${org.name}"`,

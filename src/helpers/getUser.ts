@@ -9,18 +9,23 @@ export type UserContext = {
   orgId: string;
   workspaceId: string;
   token: string;
+  orgSlug: string;
+  workspaceSlug: string;
 };
 
 export type OrgInfo = {
   id: string;
   name: string;
+  slug?: string;
 };
 
 export type WorkspaceInfo = {
   id: string;
   name: string;
+  slug: string;
   orgId: string;
   orgName: string;
+  orgSlug: string;
 };
 
 export type WorkspaceDirectory = {
@@ -32,25 +37,36 @@ const SELECTION_TTL_SECONDS = 24 * 60 * 60;
 
 const selectionKey = (userId: string) => `mcp:selection:${userId}`;
 
+export type StoredSelection = {
+  orgId: string;
+  workspaceId: string;
+  orgSlug: string;
+  workspaceSlug: string;
+};
+
 export async function setWorkspaceSelection(
   userId: string,
-  orgId: string,
-  workspaceId: string,
+  selection: StoredSelection,
 ): Promise<void> {
   await kv().set(
     selectionKey(userId),
-    JSON.stringify({ orgId, workspaceId }),
+    JSON.stringify(selection),
     SELECTION_TTL_SECONDS,
   );
 }
 
 export async function getWorkspaceSelection(
   userId: string,
-): Promise<{ orgId: string; workspaceId: string } | undefined> {
+): Promise<StoredSelection | undefined> {
   const raw = await kv().get(selectionKey(userId));
   if (!raw) return undefined;
   try {
-    return JSON.parse(raw) as { orgId: string; workspaceId: string };
+    const parsed = JSON.parse(raw) as StoredSelection;
+    if (!parsed.orgId || !parsed.workspaceId) {
+      await kv().del(selectionKey(userId));
+      return undefined;
+    }
+    return parsed;
   } catch {
     await kv().del(selectionKey(userId));
     return undefined;
@@ -115,6 +131,7 @@ export async function fetchWorkspaceDirectory(
       orgByInternalId.set(org.id, {
         id: org.propelAuthOrgId,
         name: org.name ?? "Unnamed organisation",
+        slug: org.slug ?? undefined,
       });
     }
   }
@@ -135,8 +152,10 @@ export async function fetchWorkspaceDirectory(
     workspaces.push({
       id: ws.id,
       name: ws.name ?? "Unnamed workspace",
+      slug: ws.slug ?? ws.id,
       orgId: org.id,
       orgName: org.name,
+      orgSlug: org.slug ?? "",
     });
   }
 
@@ -154,6 +173,8 @@ export const getUserContext = async (userId: string): Promise<UserContext> => {
     return {
       orgId: stored.orgId,
       workspaceId: stored.workspaceId,
+      orgSlug: stored.orgSlug,
+      workspaceSlug: stored.workspaceSlug,
       token: await getServiceToken(userId, stored.orgId),
     };
   }
@@ -181,10 +202,17 @@ export const getUserContext = async (userId: string): Promise<UserContext> => {
   }
 
   const workspace = directory.workspaces[0];
-  await setWorkspaceSelection(userId, workspace.orgId, workspace.id);
+  await setWorkspaceSelection(userId, {
+    orgId: workspace.orgId,
+    workspaceId: workspace.id,
+    orgSlug: workspace.orgSlug,
+    workspaceSlug: workspace.slug,
+  });
   return {
     orgId: workspace.orgId,
     workspaceId: workspace.id,
+    orgSlug: workspace.orgSlug,
+    workspaceSlug: workspace.slug,
     token: await getServiceToken(userId, workspace.orgId),
   };
 };
