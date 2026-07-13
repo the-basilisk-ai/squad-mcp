@@ -1,7 +1,0 @@
-{
-  "supportsES6": true,
-  "enumPropertyNaming": "PascalCase",
-  "modelPropertyNaming": "camelCase",
-  "useSingleRequestParameter": true,
-  "generateAliasAsModel": true
-}

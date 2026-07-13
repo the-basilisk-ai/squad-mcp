@@ -1,23 +1,22 @@
 import { z } from "zod";
 import {
-  getUserContext,
   getWorkspaceSelection,
   listOrgWorkspaces,
   listUserOrganisations,
   setWorkspaceSelection,
 } from "../helpers/getUser.js";
 import { getServiceToken } from "../helpers/mintToken.js";
-import { squadClient } from "../lib/clients/squad.js";
 import { logger } from "../lib/logger.js";
 import {
   formatApiError,
-  formatWorkspaceSelectionError,
   getUserId,
   type OAuthServer,
   toolError,
   toolSuccess,
-  WorkspaceSelectionRequired,
 } from "./helpers.js";
+
+const MIGRATION_MESSAGE =
+  "This tool is temporarily unavailable while the server is rebuilt for the new Squad platform. It returns later in this release.";
 
 /**
  * Register workspace tools with the MCP server
@@ -137,27 +136,7 @@ export function registerWorkspaceTools(server: OAuthServer) {
         openWorldHint: false,
       },
     },
-    async (_params, ctx) => {
-      try {
-        const userId = getUserId(ctx.auth);
-        const userContext = await getUserContext(ctx.auth.accessToken, userId);
-        const { orgId, workspaceId } = userContext;
-
-        const workspace = await squadClient(userContext).getWorkspace({
-          orgId,
-          workspaceId,
-        });
-
-        return toolSuccess(workspace);
-      } catch (error) {
-        if (error instanceof WorkspaceSelectionRequired) {
-          return toolError(formatWorkspaceSelectionError(error));
-        }
-        logger.debug({ err: error, tool: "get_workspace" }, "Tool error");
-        const message = await formatApiError(error);
-        return toolError(`Unable to retrieve workspace: ${message}`);
-      }
-    },
+    async () => toolError(MIGRATION_MESSAGE),
   );
 
   // Update Workspace
@@ -197,27 +176,6 @@ export function registerWorkspaceTools(server: OAuthServer) {
         openWorldHint: false,
       },
     },
-    async (params, ctx) => {
-      try {
-        const userId = getUserId(ctx.auth);
-        const userContext = await getUserContext(ctx.auth.accessToken, userId);
-        const { orgId, workspaceId } = userContext;
-
-        const workspace = await squadClient(userContext).updateWorkspace({
-          orgId,
-          workspaceId,
-          updateWorkspacePayload: params,
-        });
-
-        return toolSuccess(workspace);
-      } catch (error) {
-        if (error instanceof WorkspaceSelectionRequired) {
-          return toolError(formatWorkspaceSelectionError(error));
-        }
-        logger.debug({ err: error, tool: "update_workspace" }, "Tool error");
-        const message = await formatApiError(error);
-        return toolError(`Unable to update workspace: ${message}`);
-      }
-    },
+    async () => toolError(MIGRATION_MESSAGE),
   );
 }

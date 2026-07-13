@@ -1,6 +1,6 @@
 {
   "name": "@squadai/tools",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "main": "./dist/server.js",
   "types": "./dist/server.d.ts",
   "license": "MIT",
@@ -10,13 +10,10 @@
     "dev": "mcp-use dev",
     "start": "mcp-use start",
     "deploy": "mcp-use deploy",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
     "test": "vitest run",
     "prepare": "husky",
     "format": "biome check .",
-    "format:fix": "biome check --write .",
-    "openapi:squad": "npx tsx ./scripts/openapi-unify-tags.ts && openapi-generator-cli generate -g typescript-fetch -c ./openapi-generator-config.json -i ./openapi/squad.json -o src/lib/openapi/squad && npx tsx ./scripts/openapi-client-esm-fix.ts"
+    "format:fix": "biome check --write ."
   },
   "files": [
     "dist"
@@ -25,26 +22,14 @@
     "@mcp-use/inspector": "^6.0.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@propelauth/node": "^2.1.35",
-    "clsx": "^2.1.1",
     "dotenv": "^17.4.2",
     "mcp-use": "^1.33.0",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
     "zod": "4.4.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.1",
-    "@openapitools/openapi-generator-cli": "^2.39.0",
-    "@storybook/react-vite": "^10.4.6",
-    "@tailwindcss/vite": "^4.3.2",
     "@types/node": "^25.9.3",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.1.0",
-    "@vitejs/plugin-react": "^6.0.3",
-    "glob": "^13.0.6",
     "husky": "^9.1.7",
-    "serve": "^14.2.6",
-    "storybook": "^10.4.6",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
     "vite": "^8.1.0",

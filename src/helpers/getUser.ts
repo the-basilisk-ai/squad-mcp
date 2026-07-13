@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { squadClient } from "../lib/clients/squad.js";
 import { logger } from "../lib/logger.js";
 import { getServiceToken } from "./mintToken.js";
 
@@ -137,42 +136,30 @@ export function clearWorkspaceSelection(userId: string): void {
 }
 
 /**
- * List all organisations accessible to the user
+ * List all organisations accessible to the user.
+ * Rebuilt against the new Squad platform API in M1 Task 03.
  */
 export async function listUserOrganisations(
-  accessToken: string,
+  _accessToken: string,
 ): Promise<OrgInfo[]> {
-  try {
-    const client = squadClient({ token: accessToken });
-    const response = await client.listOrganisations();
-    return response.data.map(org => ({
-      id: org.id,
-      name: org.name,
-    }));
-  } catch (error) {
-    logger.error({ err: error }, "Failed to list organisations");
-    throw error;
-  }
+  logger.warn({}, "listUserOrganisations called before v4 rebuild");
+  throw new Error(
+    "Workspace listing is temporarily unavailable while this server is rebuilt for the new Squad platform.",
+  );
 }
 
 /**
- * List all workspaces in an organisation
+ * List all workspaces in an organisation.
+ * Rebuilt against the new Squad platform API in M1 Task 03.
  */
 export async function listOrgWorkspaces(
-  accessToken: string,
+  _accessToken: string,
   orgId: string,
 ): Promise<WorkspaceInfo[]> {
-  try {
-    const client = squadClient({ token: accessToken });
-    const response = await client.listWorkspaces({ orgId });
-    return response.data.map(ws => ({
-      id: ws.id,
-      name: ws.name,
-    }));
-  } catch (error) {
-    logger.error({ err: error, orgId }, "Failed to list workspaces");
-    throw error;
-  }
+  logger.warn({ orgId }, "listOrgWorkspaces called before v4 rebuild");
+  throw new Error(
+    "Workspace listing is temporarily unavailable while this server is rebuilt for the new Squad platform.",
+  );
 }
 
 /**
