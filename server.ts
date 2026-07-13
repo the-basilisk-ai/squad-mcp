@@ -11,6 +11,11 @@ import { initKv } from "./src/helpers/kv.js";
 import { introspectToken } from "./src/helpers/oauth.js";
 import { connectRedis } from "./src/helpers/redis.js";
 import { logger } from "./src/lib/logger.js";
+import { registerActionReadTools } from "./src/tools/actions-read.js";
+import { registerEvidenceTools } from "./src/tools/evidence.js";
+import { registerEntityTools } from "./src/tools/get-entity.js";
+import { registerSearchTools } from "./src/tools/search.js";
+import { registerStrategyReadTools } from "./src/tools/strategy-read.js";
 import { registerWorkspaceTools } from "./src/tools/workspace.js";
 
 config();
@@ -110,6 +115,11 @@ for (const path of [
 
 // Register tools (the full v4 surface lands milestone by milestone)
 registerWorkspaceTools(server);
+registerSearchTools(server);
+registerEntityTools(server);
+registerEvidenceTools(server);
+registerActionReadTools(server);
+registerStrategyReadTools(server);
 
 // mcp-use build imports this file for type generation — skip env validation during build
 if (!process.argv.includes("build")) {

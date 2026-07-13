@@ -1,0 +1,71 @@
+query GoalList($limit: Int, $offset: Int, $minImportance: Int) {
+  goalList(limit: $limit, offset: $offset, minImportance: $minImportance) {
+    id
+    displayId
+    title
+    importance
+    updatedAt
+  }
+}
+
+query ResearchQuestionList($limit: Int, $sufficiencyStatus: String) {
+  researchQuestionList(limit: $limit, sufficiencyStatus: $sufficiencyStatus) {
+    id
+    displayId
+    question
+    category
+    rationale
+    sufficiencyStatus
+    signalCount
+    sourceTypeCount
+    createdAt
+  }
+}
+
+query ResearchQuestionsByGoal($goalId: String!) {
+  researchQuestionsByGoal(goalId: $goalId) {
+    id
+    displayId
+    question
+    category
+    rationale
+    sufficiencyStatus
+    signalCount
+    sourceTypeCount
+    createdAt
+  }
+}
+
+query ActivityStream(
+  $first: Int
+  $after: String
+  $entityType: [String!]
+  $actorType: [String!]
+  $agentId: String
+  $action: [String!]
+) {
+  activityStream(
+    first: $first
+    after: $after
+    entityType: $entityType
+    actorType: $actorType
+    agentId: $agentId
+    action: $action
+  ) {
+    endCursor
+    hasNextPage
+    events {
+      id
+      action
+      actorType
+      actorUser {
+        userId
+        displayName
+      }
+      agentName
+      entityType
+      entityId
+      createdAt
+    }
+  }
+}

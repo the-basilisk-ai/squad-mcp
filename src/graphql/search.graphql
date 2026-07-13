@@ -1,0 +1,18 @@
+query CommandSearch($search: String!, $limitPerType: Int) {
+  commandSearchEntities(search: $search, limitPerType: $limitPerType) {
+    id
+    displayId
+    title
+    type
+  }
+}
+
+query DocumentTextSearch($search: String, $limit: Int) {
+  documentSearch(search: $search, limit: $limit) {
+    id
+    displayId
+    title
+    kind
+    updatedAt
+  }
+}

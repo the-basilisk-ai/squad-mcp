@@ -1,0 +1,140 @@
+query SignalList(
+  $limit: Int
+  $offset: Int
+  $source: SignalSource
+  $signalType: SignalType
+  $clusterId: String
+  $createdAfter: DateTime
+  $createdBefore: DateTime
+  $status: [SignalStatus!]
+  $sentiment: SignalSentimentFilter
+) {
+  signalList(
+    limit: $limit
+    offset: $offset
+    source: $source
+    signalType: $signalType
+    clusterId: $clusterId
+    createdAfter: $createdAfter
+    createdBefore: $createdBefore
+    status: $status
+    sentiment: $sentiment
+  ) {
+    id
+    displayId
+    contentSummary
+    source
+    signalType
+    sentiment
+    strength
+    occurrenceCount
+    status
+    createdAt
+    cluster {
+      id
+      displayId
+      label
+    }
+  }
+}
+
+query ClusterList(
+  $limit: Int
+  $offset: Int
+  $signalType: SignalType
+  $requireLabel: Boolean
+) {
+  clusterList(
+    limit: $limit
+    offset: $offset
+    signalType: $signalType
+    requireLabel: $requireLabel
+  ) {
+    id
+    displayId
+    label
+    labelConfidence
+    memberCount
+    cohesionScore
+    signalType
+    status
+    updatedAt
+  }
+}
+
+query GetCluster($id: String!) {
+  cluster(id: $id) {
+    id
+    displayId
+    label
+    labelConfidence
+    memberCount
+    cohesionScore
+    signalType
+    status
+    createdAt
+    updatedAt
+    signals {
+      id
+      displayId
+      contentSummary
+      source
+      strength
+      createdAt
+    }
+    linkedInsights {
+      id
+      displayId
+      title
+      combinedScore
+    }
+  }
+}
+
+query InsightList(
+  $limit: Int
+  $offset: Int
+  $category: String
+  $excludeCategories: [String!]
+  $minCombinedScore: Float
+  $status: String
+  $sortBy: String
+) {
+  insightList(
+    limit: $limit
+    offset: $offset
+    category: $category
+    excludeCategories: $excludeCategories
+    minCombinedScore: $minCombinedScore
+    status: $status
+    sortBy: $sortBy
+  ) {
+    id
+    displayId
+    title
+    category
+    status
+    combinedScore
+    evidenceCount
+    signalCount
+    goalCount
+    updatedAt
+  }
+}
+
+query GoalInsights($goalId: String!) {
+  goal(id: $goalId) {
+    id
+    displayId
+    insights {
+      id
+      displayId
+      title
+      category
+      status
+      combinedScore
+      evidenceCount
+      updatedAt
+    }
+  }
+}

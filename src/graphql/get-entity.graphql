@@ -1,0 +1,198 @@
+query GetSignal($id: String!) {
+  signal(id: $id) {
+    id
+    displayId
+    content
+    contentSummary
+    source
+    derivedSource
+    signalType
+    sentiment
+    strength
+    occurrenceCount
+    status
+    createdAt
+    lastSeenAt
+    externalSource {
+      sourceUri
+    }
+    cluster {
+      id
+      displayId
+      label
+    }
+    insights {
+      id
+      displayId
+      title
+    }
+  }
+}
+
+query GetSignalRelated($id: String!, $limit: Int) {
+  signal(id: $id) {
+    id
+    displayId
+    relatedSignals(limit: $limit) {
+      id
+      displayId
+      contentSummary
+      source
+      signalType
+      strength
+      createdAt
+    }
+  }
+}
+
+query GetInsight($id: String!, $withEvidence: Boolean!) {
+  insight(id: $id) {
+    id
+    displayId
+    title
+    description
+    category
+    status
+    combinedScore
+    strengthScore
+    momentumScore
+    evidenceCount
+    signalCount
+    goalCount
+    createdAt
+    updatedAt
+    lastEvidenceAt
+    goals {
+      id
+      displayId
+      title
+      importance
+    }
+    suggestedActions {
+      id
+      displayId
+      title
+      status
+      priority
+    }
+    signals @include(if: $withEvidence) {
+      id
+      displayId
+      contentSummary
+      source
+      createdAt
+      externalSource {
+        sourceUri
+      }
+    }
+  }
+}
+
+query GetAction($id: String!) {
+  action(id: $id) {
+    id
+    displayId
+    title
+    body
+    rationale
+    notes
+    status
+    priority
+    category
+    effort
+    dueAt
+    snoozedUntil
+    createdAt
+    statusChangedAt
+    assignee {
+      userId
+      displayName
+    }
+    insight {
+      id
+      displayId
+      title
+    }
+    outputDocument {
+      id
+      displayId
+      title
+    }
+  }
+}
+
+query GetGoal($id: String!) {
+  goal(id: $id) {
+    id
+    displayId
+    title
+    content
+    importance
+    createdAt
+    updatedAt
+    insights {
+      id
+      displayId
+      title
+      combinedScore
+    }
+    researchQuestions {
+      id
+      displayId
+      question
+      sufficiencyStatus
+    }
+  }
+}
+
+query GetDocumentMeta($id: String!) {
+  document(id: $id) {
+    id
+    displayId
+    title
+    kind
+    path
+    tags
+    updatedAt
+    directoryId
+    onePagerStatus
+    onePagerType
+    sourceAction {
+      id
+      displayId
+      title
+    }
+    sourceInsight {
+      id
+      displayId
+      title
+    }
+  }
+}
+
+query GetDocumentMarkdown($documentId: String!) {
+  documentMarkdownExport(documentId: $documentId)
+}
+
+query GetOnePager($displayId: String!) {
+  onePager(displayId: $displayId) {
+    id
+    displayId
+    title
+    onePagerStatus
+    onePagerType
+    decisionRecommendation
+    failureReason
+    updatedAt
+    sourceAction {
+      id
+      displayId
+      title
+    }
+    sourceInsight {
+      id
+      displayId
+      title
+    }
+  }
+}
