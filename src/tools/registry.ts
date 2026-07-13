@@ -7,6 +7,7 @@ import {
 } from "../helpers/getUser.js";
 import { logger } from "../lib/logger.js";
 import { SquadApiError } from "../lib/squad-api-client.js";
+import { captureToolCall } from "../lib/telemetry.js";
 import {
   type AuthInfo,
   formatApiError,
@@ -89,22 +90,43 @@ export function registerTool<S extends z.ZodType>(
         }
       }
 
+      let resolvedContext: UserContext | undefined;
+      const getContext = async () => {
+        resolvedContext ??= await getUserContext(userId);
+        return resolvedContext;
+      };
+      const telemetry = (
+        ok: boolean,
+        extra: Partial<Parameters<typeof captureToolCall>[0]> = {},
+      ) =>
+        captureToolCall({
+          tool: def.name,
+          userId,
+          orgId: resolvedContext?.orgId,
+          workspaceId: resolvedContext?.workspaceId,
+          durationMs: Date.now() - started,
+          ok,
+          ...extra,
+        });
+
       try {
         const result = await def.handler(params as z.infer<S>, {
           userId,
           auth: ctx.auth,
-          getContext: () => getUserContext(userId),
+          getContext,
         });
         logger.debug(
           { tool: def.name, ms: Date.now() - started, ok: !result.isError },
           "tool call",
         );
+        telemetry(!result.isError);
         return result;
       } catch (error) {
         logger.debug(
           { err: error, tool: def.name, ms: Date.now() - started },
           "tool call failed",
         );
+        telemetry(false, { error });
 
         if (error instanceof WorkspaceSelectionRequired) {
           return toolError(formatWorkspaceSelectionError(error));

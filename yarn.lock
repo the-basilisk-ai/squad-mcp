@@ -1486,6 +1486,20 @@
   dependencies:
     cross-spawn "^7.0.6"
 
+"@posthog/core@^1.40.1", "@posthog/core@^1.40.2":
+  version "1.40.2"
+  resolved "https://registry.yarnpkg.com/@posthog/core/-/core-1.40.2.tgz#8da481552458582c1d93ae132575ce8cf82484f7"
+  integrity sha512-H12j7O9iHGvpK9t2ko8W4pvfbV1pBDxrsWC1LA6yp2RhzwvC4T3sWhu+AekDQJSRSrJEWlB0t/Ueq9QhPSq7FQ==
+  dependencies:
+    "@posthog/types" "^1.393.0"
+
+"@posthog/mcp@^0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@posthog/mcp/-/mcp-0.9.0.tgz#a0f4161a246def1c585aaa3bc21ca0755ea7feac"
+  integrity sha512-TSLB25q3E+6rHZjdrdyombU0rvNqPou2FLrxnRkseejUH0vikhp23Cr8zLZIsdkhXXPFKp9Q0Wg2kqCKBWVilw==
+  dependencies:
+    "@posthog/core" "^1.40.1"
+
 "@posthog/types@1.351.3":
   version "1.351.3"
   resolved "https://registry.yarnpkg.com/@posthog/types/-/types-1.351.3.tgz#c19596acf6b7e1dee311249cb2b880f934d6d257"
@@ -1495,6 +1509,11 @@
   version "1.352.0"
   resolved "https://registry.yarnpkg.com/@posthog/types/-/types-1.352.0.tgz#dda7f5550b72bd431a82d7cd7face97732123c56"
   integrity sha512-pp7VBMlkhlLmv2TyOoss028lPPD4ElnZlX5y3hqq6oijK5BMZbjVuTAgvFYNLiKbuze/i5ndFGyXTtfCwlMQeA==
+
+"@posthog/types@^1.393.0":
+  version "1.393.0"
+  resolved "https://registry.yarnpkg.com/@posthog/types/-/types-1.393.0.tgz#60b8330d6a0b09f87a610ab7a14f4bac0444ab4a"
+  integrity sha512-vzWeEJZ7ERQhFRoQYaP5jzN1JvIu46UJyHXsuv+dTGW2r3sMgREOhNxXLZjmFHwZ8/FOHQoyqqQmXTCXZSfMSg==
 
 "@propelauth/node-apis@^2.1.35":
   version "2.1.35"
@@ -4453,6 +4472,13 @@ posthog-node@5.24.17, posthog-node@^5.24.17:
   integrity sha512-mdb8TKt+YCRbGQdYar3AKNUPCyEiqcprScF4unYpGALF6HlBaEuO6wPuIqXXpCWkw4VclJYCKbb6lq6pH6bJeA==
   dependencies:
     "@posthog/core" "1.23.1"
+
+posthog-node@^5.41.0:
+  version "5.41.0"
+  resolved "https://registry.yarnpkg.com/posthog-node/-/posthog-node-5.41.0.tgz#af9621fd13b243ad27ac9611173d98c2453cafe9"
+  integrity sha512-jOkX6THOr5WD+FGUEaTxekas8c7NOC3TqJ2Byfe2KMimQdL/F/osz17uSbkNzR4V9WFZoe8YaGP3Xp0EUpPKGg==
+  dependencies:
+    "@posthog/core" "^1.40.2"
 
 powershell-utils@^0.1.0:
   version "0.1.0"
