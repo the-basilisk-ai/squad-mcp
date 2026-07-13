@@ -12,15 +12,15 @@
   },
   "servers": [
     {
-      "url": "https://api.meetsquad.ai",
+      "url": "https://api.v1.meetsquad.ai",
       "description": "Production server"
     },
     {
-      "url": "https://uat.api.meetsquad.ai",
+      "url": "https://uat.api.v1.meetsquad.ai",
       "description": "Staging server"
     },
     {
-      "url": "https://dev.api.meetsquad.ai",
+      "url": "https://dev.api.v1.meetsquad.ai",
       "description": "Development server"
     }
   ],

@@ -8,9 +8,9 @@ export function getPropelAuthUrl(): string {
     return "https://26904088430.propelauthtest.com";
   }
   if (squadEnv === "staging") {
-    return "https://auth.app.meetsquad.ai";
+    return "https://auth.uat.v1.meetsquad.ai";
   }
-  return "https://auth.meetsquad.ai"; // production
+  return "https://auth.v1.meetsquad.ai"; // production
 }
 
 /**
@@ -20,12 +20,12 @@ export function getSquadApiUrl(): string {
   const squadEnv = process.env.SQUAD_ENV || "production";
 
   if (squadEnv === "dev") {
-    return "https://dev.api.meetsquad.ai";
+    return "https://dev.api.v1.meetsquad.ai";
   }
   if (squadEnv === "staging") {
-    return "https://uat.api.meetsquad.ai";
+    return "https://uat.api.v1.meetsquad.ai";
   }
-  return "https://api.meetsquad.ai";
+  return "https://api.v1.meetsquad.ai";
 }
 
 /**
