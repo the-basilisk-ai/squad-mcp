@@ -29,6 +29,14 @@ export function getSquadApiUrl(): string {
 }
 
 /**
+ * GraphQL endpoint of the Squad platform API.
+ * SQUAD_GRAPHQL_URL overrides (also used by codegen introspection).
+ */
+export function getSquadGraphqlUrl(): string {
+  return process.env.SQUAD_GRAPHQL_URL || `${getSquadApiUrl()}/graphql`;
+}
+
+/**
  * Get Squad App URL based on SQUAD_ENV
  */
 export function getSquadAppUrl(): string {

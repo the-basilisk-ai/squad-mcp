@@ -1,0 +1,2288 @@
+type Action {
+  assignee: ActorUser
+  assigneeUserId: String
+  body: String
+  category: ActionCategory
+  chatPrompt: String
+  createdAt: DateTime
+  displayId: Int
+  dueAt: DateTime
+  effort: ActionEffort
+  id: String
+  insight: Insight
+  insightId: String
+  notes: String
+  outputDocument: Document
+  outputDocumentId: String
+  priority: ActionPriority
+  rationale: String
+  snoozedUntil: DateTime
+  source: ActionSource
+  sourceId: String
+  sourceType: ActionSourceType
+  status: ActionStatus
+  statusChangedAt: DateTime
+  title: String
+  updatedAt: DateTime
+}
+
+enum ActionCategory {
+  comms
+  operational
+  product
+  strategic
+  workspace
+}
+
+enum ActionEffort {
+  high
+  low
+  medium
+}
+
+input ActionLinkTargetInput {
+  insightId: String
+  onePagerId: String
+}
+
+enum ActionMutationType {
+  CREATED
+  DELETED
+  ONE_PAGER_STATE_CHANGED
+  UPDATED
+}
+
+enum ActionPriority {
+  P0
+  P1
+  P2
+}
+
+union ActionSource = Document | Insight
+
+enum ActionSourceType {
+  document
+  insight
+  standalone
+}
+
+enum ActionStatus {
+  completed
+  dismissed
+  in_progress
+  suggested
+}
+
+type ActionSubscriptionPayload {
+  action: Action
+  actionId: String
+  mutationType: ActionMutationType
+  onePagerId: String
+  onePagerStatus: String
+
+  """
+  Session ID of the client that triggered the change.
+  """
+  sourceSessionId: String
+}
+
+enum ActionSurface {
+  actions_page
+  chat
+  dashboard
+  detail
+}
+
+type ActivityChangedPayload {
+  auditEvent: AuditEvent
+  mutationType: String
+}
+
+type ActivityFeed {
+  endCursor: String
+  events: [AuditEvent!]
+  hasNextPage: Boolean
+}
+
+type ActivityTrendPoint {
+  date: String
+  squad: Int
+  user: Int
+}
+
+type ActorUser {
+  avatarUrl: String
+  displayName: String
+  email: String
+  firstName: String
+  lastName: String
+  userId: String
+}
+
+input AddGithubRepoInput {
+  defaultBranch: String
+  description: String
+  fullName: String!
+  isPrivate: Boolean
+  language: String
+  name: String!
+  owner: String!
+}
+
+type Agent {
+  """
+  The action set this agent runs on each tick. Empty list only if the agent is mid-edit; the resource layer rejects creates with zero actions.
+  """
+  actions: [AgentAction!]
+  activeAgentInvocations: [AgentInvocation!]
+  cadence: AgentCadence
+  createdAt: DateTime
+  createdByUserId: String
+  creationNote: String
+  dedupKey: String
+  deliveries: [AgentDelivery!]
+  id: String
+
+  """
+  The standing brief — what the agent does with its sources each run. Nullable only through the agent-sources cutover window.
+  """
+  instructions: String
+  lastRunAt: DateTime
+  latestReport: Report
+  latestRun: AgentRun
+  name: String
+  nextRunAt: DateTime
+  reports(limit: Int = 20, offset: Int = 0): [Report!]
+  researchConfig: ResearchAgentConfig
+  runs(limit: Int = 20): [AgentRun!]
+
+  """
+  Where the agent looks for information each run (directed reading).
+  """
+  sources: [AgentSource!]
+  startAt: DateTime
+  status: AgentStatus
+  triggers: [AgentTrigger!]
+  type: AgentType
+  updatedAt: DateTime
+  urlConfig: UrlAgentConfig
+}
+
+"""
+A single behaviour an agent performs on each run. Agents fan out to all of their actions in parallel; `position` is reserved for ordered execution and ignored today.
+"""
+type AgentAction {
+  agentId: String
+  config: AgentActionConfig
+  createdAt: DateTime
+  id: String
+  position: Int
+  type: AgentActionType
+  updatedAt: DateTime
+}
+
+"""
+Type-specific action configuration. Resolve to one of the concrete types matching the parent action's `type`.
+"""
+interface AgentActionConfig {
+  type: AgentActionType
+}
+
+"""
+Discriminated action input. Exactly one of `extractSignals`, `groomKnowledge`, or `generateReport` must be provided; the resolver enforces this. `extractSignals` and `groomKnowledge` carry no config — pass `true` to include them.
+"""
+input AgentActionInput {
+  extractSignals: Boolean
+  generateReport: GenerateReportActionConfigInput
+  groomKnowledge: Boolean
+  position: Int
+}
+
+"""
+What an action does when its parent agent runs. `extract_signals` fans out the signal-extraction pipeline; `groom_knowledge` rebuilds/extends knowledge documents; `generate_report` produces a report (and routes through child deliveries).
+"""
+enum AgentActionType {
+  extract_signals
+  generate_report
+  groom_knowledge
+}
+
+input AgentActionUpdateInput {
+  config: AgentActionInput
+  position: Int
+}
+
+"""
+Schedule cadence for an agent.
+"""
+enum AgentCadence {
+  annually
+  daily
+  hourly
+  monthly
+  quarterly
+  weekly
+}
+
+"""
+Discriminated agent config. Provide exactly one of `url` or `research` matching the parent `type`.
+"""
+input AgentConfigInput {
+  research: ResearchAgentConfigInput
+  url: UrlAgentConfigInput
+}
+
+input AgentCreateInput {
+  """
+  Must contain at least one action.
+  """
+  actions: [AgentActionInput!]!
+
+  """
+  Legacy convenience: when `triggers` is omitted, a single schedule trigger is created from this cadence. Ignored when `triggers` is provided.
+  """
+  cadence: AgentCadence
+  config: AgentConfigInput
+  creationNote: String
+
+  """
+  The standing brief — required when `type`/`config` are omitted (the unified model).
+  """
+  instructions: String
+  name: String!
+
+  """
+  Sources created with the agent — where it looks for information each run.
+  """
+  sources: [AgentSourceConfigInput!]
+  startAt: DateTime
+
+  """
+  Triggers that fire this agent. When provided it must be non-empty and replaces `cadence` (a schedule is just one trigger type). When omitted, a single schedule trigger is created from `cadence` (defaults to weekly).
+  """
+  triggers: [AgentTriggerInput!]
+
+  """
+  Legacy shape (with `config`). Omit both and provide `instructions` (+ optional `sources`) instead — the unified model derives the legacy columns during the cutover window.
+  """
+  type: AgentType
+}
+
+type AgentDelivery {
+  actionId: String
+  channel: AgentDeliveryChannel
+  config: AgentDeliveryConfig
+  createdAt: DateTime
+  id: String
+  lastDeliveredAt: DateTime
+  lastError: String
+  status: AgentDeliveryStatus
+  updatedAt: DateTime
+}
+
+"""
+Destination channel for an agent's report.
+"""
+enum AgentDeliveryChannel {
+  email
+  insights
+  knowledge
+  slack
+}
+
+"""
+Channel-specific delivery configuration. Resolve to one of the concrete types.
+"""
+interface AgentDeliveryConfig {
+  channel: AgentDeliveryChannel
+}
+
+"""
+Discriminated delivery config. Exactly one of the four channel sub-inputs must be provided; the resolver enforces this.
+"""
+input AgentDeliveryConfigInput {
+  email: EmailDeliveryConfigInput
+  insights: InsightsDeliveryConfigInput
+  knowledge: KnowledgeDeliveryConfigInput
+  slack: SlackDeliveryConfigInput
+}
+
+"""
+Attaches a delivery to a `generate_report` action. The parent agent is derived from the action (the resource layer enforces the action-type check).
+"""
+input AgentDeliveryCreateInput {
+  actionId: String!
+  channel: AgentDeliveryChannel!
+  config: AgentDeliveryConfigInput!
+}
+
+"""
+Channel-level pause/error status, independent of the parent agent.
+"""
+enum AgentDeliveryStatus {
+  active
+  error
+  paused
+}
+
+input AgentDeliveryUpdateInput {
+  config: AgentDeliveryConfigInput
+  status: AgentDeliveryStatus
+}
+
+type AgentInvocation {
+  agentId: String
+  agentName: String
+  agentRunId: String
+  agentTask: String
+  errorMessage: String
+  finishedAt: DateTime
+  id: String
+  startedAt: DateTime
+  status: String
+}
+
+enum AgentMutationType {
+  CREATED
+  DELETED
+  UPDATED
+}
+
+type AgentRun {
+  agent: Agent
+  agentId: String
+  changed: Boolean
+  contentHash: String
+  createdAt: DateTime
+  dispatchedAt: DateTime
+  documentsTouched: Int
+  errorMessage: String
+  externalSourceId: String
+  finishedAt: DateTime
+  id: String
+  report: Report
+  signalsCreated: Int
+  sourceOutcomes: [AgentRunSourceOutcome!]
+  startedAt: DateTime
+  status: AgentRunStatus
+  trigger: AgentTrigger
+  triggerContext: AgentRunTriggerContext
+  triggeredBy: AgentRunTrigger
+  triggeredByUserId: String
+}
+
+enum AgentRunMutationType {
+  CREATED
+  UPDATED
+}
+
+"""
+Per-source outcome for a run (agent-sources) — ids/enums/counts, never content.
+"""
+type AgentRunSourceOutcome {
+  changed: Boolean
+  contentChars: Int
+  errorKind: String
+  outcome: String
+  sourceId: String
+  type: AgentSourceType
+}
+
+"""
+Lifecycle status of a single agent run.
+"""
+enum AgentRunStatus {
+  failed
+  no_change
+  pending
+  running
+  success
+  success_partial
+}
+
+type AgentRunSubscriptionPayload {
+  agentId: String
+  agentRun: AgentRun
+  agentRunId: String
+  mutationType: AgentRunMutationType
+  sourceSessionId: String
+}
+
+"""
+What caused an agent run to be created. `event` = fired by an event trigger.
+"""
+enum AgentRunTrigger {
+  event
+  manual
+  schedule
+}
+
+"""
+The entity that fired an event-origin run (event-as-input, ADR-009).
+"""
+type AgentRunTriggerContext {
+  entityId: String
+  entityType: String
+  event: String
+  provider: String
+  source: String
+}
+
+"""
+Where an agent looks for information each run — directed reading, not a boundary.
+"""
+type AgentSource {
+  agentId: String
+  consecutiveFailures: Int
+  createdAt: DateTime
+  id: String
+  label: String
+  lastErrorKind: String
+  lastReadAt: DateTime
+  notionDatabaseId: String
+  notionDatabaseKind: String
+  notionPageId: String
+  slackChannelId: String
+  status: AgentSourceStatus
+  type: AgentSourceType
+  updatedAt: DateTime
+  url: String
+}
+
+"""
+Discriminated source config. Provide exactly one of `url`, `notionPage`, `notionDatabase`, or `slackChannel`.
+"""
+input AgentSourceConfigInput {
+  notionDatabase: NotionDatabaseSourceConfigInput
+  notionPage: NotionPageSourceConfigInput
+  slackChannel: SlackChannelSourceConfigInput
+  url: UrlSourceConfigInput
+}
+
+input AgentSourceCreateInput {
+  agentId: String!
+  config: AgentSourceConfigInput!
+}
+
+"""
+Per-source status, independent of the parent agent. `error` = structurally dead (e.g. page left the sync scope).
+"""
+enum AgentSourceStatus {
+  active
+  error
+  paused
+}
+
+"""
+What kind of place an agent source points at.
+"""
+enum AgentSourceType {
+  notion_database
+  notion_page
+  slack_channel
+  url
+}
+
+"""
+Update a source's config, label, and/or status.
+"""
+input AgentSourceUpdateInput {
+  config: AgentSourceConfigInput
+  label: String
+  status: AgentSourceStatus
+}
+
+"""
+Top-level lifecycle status of an agent.
+"""
+enum AgentStatus {
+  active
+  error
+  paused
+}
+
+type AgentSubscriptionPayload {
+  agent: Agent
+  agentId: String
+  mutationType: AgentMutationType
+  sourceSessionId: String
+}
+
+"""
+What fires an agent run — a schedule or an event subscription.
+"""
+type AgentTrigger {
+  agentId: String
+  cadence: AgentCadence
+  createdAt: DateTime
+  health: String!
+  id: String
+  integrationId: String
+  integrationNotionPageId: String
+  integrationProvider: String
+  integrationRepoFullName: String
+  integrationSlackChannelId: String
+  integrationSourceLabel: String
+  integrationTriggerType: String
+  lastFiredAt: DateTime
+  lastRunAt: DateTime
+  nextRunAt: DateTime
+  squadEvent: String
+  squadEventDirectoryId: String
+  squadEventDocumentId: String
+  squadEventMinScore: Float
+  startAt: DateTime
+  status: AgentTriggerStatus
+  type: AgentTriggerType
+  updatedAt: DateTime
+}
+
+"""
+Discriminated trigger config. Provide exactly one sub-input matching `type`: `schedule`, `squadEvent`, or `integrationEvent`.
+"""
+input AgentTriggerConfigInput {
+  integrationEvent: IntegrationEventTriggerConfigInput
+  schedule: ScheduleTriggerConfigInput
+  squadEvent: SquadEventTriggerConfigInput
+}
+
+input AgentTriggerCreateInput {
+  agentId: String!
+  config: AgentTriggerConfigInput!
+  type: AgentTriggerType!
+}
+
+"""
+A trigger to create alongside a new agent (no `agentId` — the agent is being created). One per schedule/event the agent should fire on.
+"""
+input AgentTriggerInput {
+  config: AgentTriggerConfigInput!
+  type: AgentTriggerType!
+}
+
+"""
+Per-trigger status, independent of the parent agent. `error` = dead (e.g. its integration disconnected).
+"""
+enum AgentTriggerStatus {
+  active
+  error
+  paused
+}
+
+"""
+What fires an agent run. `schedule` runs on a cadence; `squad_event` / `integration_event` fire when a matching event occurs. `agent_event` (chaining) is reserved — present for forward-compat but not creatable in v1.
+"""
+enum AgentTriggerType {
+  agent_event
+  integration_event
+  schedule
+  squad_event
+}
+
+"""
+Update a trigger's config and/or status. Trigger `type` is immutable.
+"""
+input AgentTriggerUpdateInput {
+  config: AgentTriggerConfigInput
+  status: AgentTriggerStatus
+}
+
+"""
+What kind of ingestion this agent performs. `url` fetches a fixed URL each run; `research` hands a free-text brief to an agent that decides whether to web-search, query internal data, or both.
+"""
+enum AgentType {
+  research
+  url
+}
+
+"""
+Agent-level fields only. Action mutations go through `agentActionCreate`/`agentActionUpdate`/`agentActionDelete`.
+"""
+input AgentUpdateInput {
+  cadence: AgentCadence
+  config: AgentConfigInput
+  creationNote: String
+
+  """
+  The standing brief (unified model). The resource mirrors it onto the legacy research prompt during the cutover window.
+  """
+  instructions: String
+  name: String
+  startAt: DateTime
+}
+
+type AuditChange {
+  field: String
+  newValue: JSON
+  oldValue: JSON
+}
+
+type AuditEvent {
+  action: String
+  actorType: String
+  actorUser: ActorUser
+  actorUserId: String
+  agentId: String
+  agentName: String
+  agentRunId: String
+  changes: [AuditChange!]
+  createdAt: DateTime
+  entityId: String
+  entityType: String
+  id: String
+  metadata: JSON
+  templateKey: String
+}
+
+type BlockSourceStat {
+  blockId: String
+  signalCount: Int
+}
+
+type ChainHealth {
+  activeSignalCount: Int
+  insightCount: Int
+  signalCount: Int
+  signalHealthPercent: Int
+  sourceCount: Int
+  staleSignalCount: Int
+}
+
+type Cluster {
+  cohesionScore: Float
+  createdAt: DateTime
+  dirty: Boolean
+  displayId: Int
+  id: String
+  label: String
+  labelConfidence: Float
+  labelDirty: Boolean
+  labelGeneratedAt: DateTime
+  linkedInsights: [Insight!]
+  memberCount: Int
+  signalType: SignalType
+  signals: [Signal!]
+  status: String
+  updatedAt: DateTime
+}
+
+enum ClusterMutationType {
+  CREATED
+  DELETED
+  UPDATED
+}
+
+type ClusterSubscriptionPayload {
+  cluster: Cluster
+  clusterId: String
+  mutationType: ClusterMutationType
+
+  """
+  Session ID of the client that triggered the change.
+  """
+  sourceSessionId: String
+}
+
+type CommandSearchEntity {
+  displayId: Int
+  id: String!
+  title: String!
+  type: String!
+}
+
+type ContentVersion {
+  blockNoteJson: String
+  content: String
+  createdAt: DateTime
+  entityId: String
+  entityType: String
+  id: String
+  source: String
+  title: String
+  version: Int
+}
+
+type Conversation {
+  createdAt: DateTime
+  id: String
+  messages: [ConversationMessage!]
+  title: String
+  updatedAt: DateTime
+}
+
+type ConversationMessage {
+  content: String
+  createdAt: DateTime
+  elapsedMs: Int
+  id: String
+  metadata: String
+  role: String
+}
+
+enum ConversationMutationType {
+  CREATED
+  DELETED
+  UPDATED
+}
+
+type ConversationSubscriptionPayload {
+  conversation: Conversation
+  conversationId: String
+  mutationType: ConversationMutationType
+
+  """
+  Session ID of the client that triggered the change.
+  """
+  sourceSessionId: String
+}
+
+type CreateDirectoryResponse {
+  directory: Directory
+}
+
+input CreateDocumentInput {
+  blockNoteJson: String
+  content: String!
+
+  """
+  Optional directory ID to place the document in
+  """
+  directoryId: String
+  icon: String
+  title: String!
+}
+
+input CreateGoalInput {
+  blockNoteJson: String
+  content: String!
+  importance: Int!
+  title: String!
+}
+
+input CreateIntegrationSourceInput {
+  config: JSON
+  integrationId: String
+  name: String!
+  provider: String!
+  sourceCountry: String
+  sourceImageUrl: String
+  sourceName: String
+  sourceRef: String
+  triggerType: String!
+}
+
+input CreateNotionPageConfigInput {
+  includeChildren: Boolean
+  includeDatabases: Boolean
+  integrationSourceId: String!
+  maxDepth: Int
+  rootDataSourceId: String
+  rootPageId: String
+}
+
+type CreateWorkspacesResponse {
+  workspaces: [Workspace!]
+}
+
+scalar DateTime
+
+input DateTimeSet {
+  set: String
+}
+
+enum DecisionRecommendation {
+  build
+  defer
+  research
+}
+
+type DeleteDirectoryResponse {
+  success: Boolean
+}
+
+type DeleteOnePagerPayload {
+  onePagerId: String
+  success: Boolean
+}
+
+type Directory {
+  children: [Directory!]
+  documents: [Document!]
+  icon: String
+  id: String
+
+  """
+  System-managed directories (e.g. 'Agent Reports') are visible but cannot be renamed, moved, or deleted via the API.
+  """
+  isSystem: Boolean
+  name: String
+  parentId: String
+  path: String
+  slug: String
+  tags: [String!]
+}
+
+input DirectoryCreateInput {
+  icon: String
+  name: String!
+  parentId: String
+  slug: String
+}
+
+enum DirectoryMutationType {
+  CREATED
+  DELETED
+  UPDATED
+}
+
+type DirectorySubscriptionPayload {
+  directory: Directory
+  directoryId: String
+  mutationType: DirectoryMutationType
+
+  """
+  Session ID of the client that triggered the change.
+  """
+  sourceSessionId: String
+}
+
+input DirectoryUpdateInput {
+  icon: String
+  name: String
+  parentId: String
+}
+
+type Document {
+  blockNoteJson: String
+  confidenceAtDraft: String
+  content: String
+  counterEvidenceCountAtDraft: Int
+  createdAt: DateTime
+  decisionRecommendation: DecisionRecommendation
+  directoryId: String
+  displayId: Int
+  failureReason: String
+  icon: String
+  id: String
+  insights: [Insight!]
+  isRead: Boolean
+  kind: DocumentKind
+  lastModifiedBy: LastModifier
+  linkedInsights: [Insight!]
+  onePagerStatus: OnePagerStatus
+  onePagerType: OnePagerType
+  path: String
+  referencedBy: [Document!]
+  referencedDocuments: [Document!]
+  referencedGoals: [Goal!]
+  referencedInsights: [Insight!]
+  referencedSignals: [Signal!]
+  relatedOnePagers: [Document!]
+  slug: String
+  sourceAction: Action
+  sourceActionId: String
+  sourceInsight: Insight
+  sourceInsightId: String
+  sourcePrompt: String
+  supportingEvidenceCountAtDraft: Int
+  tags: [String!]
+  title: String
+  updatedAt: DateTime
+}
+
+type DocumentBlockProvenance {
+  blockId: String
+  documentId: String
+  isMutated: Boolean
+  mappedAt: DateTime
+  rawPayload: JSON
+  source: String
+  sourceId: String
+  sourceUri: String
+}
+
+enum DocumentKind {
+  knowledge
+  one_pager
+}
+
+enum DocumentMutationType {
+  CREATED
+  DELETED
+  UPDATED
+}
+
+type DocumentSubscriptionPayload {
+  document: Document
+  documentId: String
+  mutationType: DocumentMutationType
+
+  """
+  Session ID of the client that triggered the change. Use this to filter out your own updates.
+  """
+  sourceSessionId: String
+}
+
+enum EdgeLabel {
+  BELONGS_TO
+  CITES
+  DERIVED_FROM
+  INFORMS
+  RELATED_TO
+  SUPPORTS_GOAL
+}
+
+type EmailDeliveryConfig implements AgentDeliveryConfig {
+  channel: AgentDeliveryChannel
+  recipientUserIds: [String!]
+}
+
+input EmailDeliveryConfigInput {
+  recipientUserIds: [String!]!
+}
+
+enum EntityType {
+  Action
+  Document
+  Goal
+  Insight
+}
+
+type ExternalSource {
+  contentHash: String
+  createdAt: DateTime
+  id: String
+  ingestedAt: DateTime
+  rawPayload: String
+  source: String
+  sourceUri: String
+}
+
+type ExtractSignalsActionConfig implements AgentActionConfig {
+  type: AgentActionType
+}
+
+type GenerateReportActionConfig implements AgentActionConfig {
+  inquiry: String
+  onUnchanged: Boolean
+  title: String
+  type: AgentActionType
+}
+
+"""
+Config for a `generate_report` action. The other two action types carry no config today.
+"""
+input GenerateReportActionConfigInput {
+  inquiry: String!
+  onUnchanged: Boolean = false
+  title: String
+}
+
+type GithubRepo {
+  createdAt: DateTime
+  defaultBranch: String
+  description: String
+  directoryId: String
+  fullName: String
+  id: String
+  isPrivate: Boolean
+  language: String
+  lastScannedAt: DateTime
+  name: String
+  owner: String
+  scanError: String
+  scanStatus: String
+  updatedAt: DateTime
+}
+
+type GithubRepoInfo {
+  defaultBranch: String
+  description: String
+  fullName: String
+  isPrivate: Boolean
+  isTracked: Boolean
+  language: String
+  name: String
+  owner: String
+  starCount: Int
+}
+
+type Goal {
+  blockNoteJson: String
+  content: String
+  createdAt: DateTime
+  displayId: Int
+  id: String
+  importance: Int
+  insights: [Insight!]
+  lastModifiedBy: LastModifier
+  referencedBy: [Document!]
+  researchQuestions: [ResearchQuestion!]
+  title: String
+  updatedAt: DateTime
+}
+
+enum GoalMutationType {
+  CREATED
+  DELETED
+  UPDATED
+}
+
+type GoalSubscriptionPayload {
+  goal: Goal
+  goalId: String
+  mutationType: GoalMutationType
+
+  """
+  Session ID of the client that triggered the change.
+  """
+  sourceSessionId: String
+}
+
+type GroomKnowledgeActionConfig implements AgentActionConfig {
+  type: AgentActionType
+}
+
+type InboxContext {
+  tenant: InboxTenant
+}
+
+type InboxCredentials {
+  applicationIdentifier: String
+  context: InboxContext
+  contextHash: String
+  subscriberHash: String
+  subscriberId: String
+}
+
+type InboxTenant {
+  id: String
+}
+
+type Insight {
+  actionRankingStartedAt: DateTime
+  category: String
+  combinedScore: Float
+  createdAt: DateTime
+  description: String
+  displayId: Int
+  documents: [Document!]
+  evidenceCount: Int
+  goal: Goal
+  goalCount: Int
+  goals: [Goal!]
+  id: String
+  lastEvidenceAt: DateTime
+  lastModifiedBy: LastModifier
+  momentumScore: Float
+  referencedBy: [Document!]
+  signalCount: Int
+  signals: [Signal!]
+  source: JSON
+  status: String
+  strengthScore: Float
+  suggestedActions(status: ActionStatus): [Action!]
+  title: String
+  updatedAt: DateTime
+}
+
+enum InsightMutationType {
+  CREATED
+  DELETED
+  UPDATED
+}
+
+type InsightSubscriptionPayload {
+  insight: Insight
+  insightId: String
+  mutationType: InsightMutationType
+
+  """
+  Session ID of the client that triggered the change.
+  """
+  sourceSessionId: String
+}
+
+type InsightsDeliveryConfig implements AgentDeliveryConfig {
+  channel: AgentDeliveryChannel
+  goalId: String
+  maxPerRun: Int
+  minConfidence: Float
+}
+
+input InsightsDeliveryConfigInput {
+  goalId: String
+  maxPerRun: Int!
+  minConfidence: Float!
+}
+
+type Integration {
+  availableTriggerTypes: [TriggerTypeInfo!]
+  createdAt: DateTime
+  id: String
+  name: String
+  provider: String
+  status: String
+  triggers: [IntegrationTrigger!]
+  updatedAt: DateTime
+}
+
+"""
+Integration trigger config (ADR-006). Per-source scope is provider-grain: at most one of `notionPageId` (Notion page), `slackChannelId` (Slack channel), or `repoFullName` (GitHub repo); Gong and generic Composio scope to the connection only.
+"""
+input IntegrationEventTriggerConfigInput {
+  integrationId: String
+  notionPageId: String
+  provider: String!
+  repoFullName: String
+  slackChannelId: String
+  sourceLabel: String
+  triggerType: String!
+}
+
+type IntegrationTrigger {
+  createdAt: DateTime
+  id: String
+  lastSyncedAt: DateTime
+  name: String
+  sourceCountry: String
+  sourceImageUrl: String
+  sourceName: String
+  sourceRef: String
+  status: String
+  syncTotal: Int
+  triggerConfig: String
+  triggerType: String
+  updatedAt: DateTime
+}
+
+scalar JSON
+
+type KnowledgeDeliveryConfig implements AgentDeliveryConfig {
+  channel: AgentDeliveryChannel
+
+  """
+  Folder to pin every run's document into. `null` means the agent picks the best folder for each run's content.
+  """
+  directoryId: String
+}
+
+"""
+Knowledge-channel delivery config. Omit `directoryId` (or pass null) to let the agent pick the best folder per run.
+"""
+input KnowledgeDeliveryConfigInput {
+  directoryId: String
+}
+
+type LastModifier {
+  actorType: String
+  actorUser: ActorUser
+  at: DateTime
+}
+
+input LinkEntitiesInput {
+  edgeLabel: EdgeLabel!
+  sourceId: String!
+  sourceType: EntityType!
+  targetId: String!
+  targetType: EntityType!
+}
+
+input LinkOnePagerTargetInput {
+  insightId: String
+  onePagerId: String
+}
+
+type LinkResult {
+  error: String
+  success: Boolean
+}
+
+type MoonUnlock {
+  achievementType: String
+  moonFact: String
+  moonId: String
+  moonName: String
+  moonPlanet: String
+  moonRarity: String
+  reason: String
+  unlockedAt: DateTime
+  unlockedByUserId: String
+}
+
+type Mutation {
+  addDirectoryTag(id: String!, tag: String!): Directory
+  addDocumentTag(id: String!, tag: String!): Document
+  addGithubRepo(input: AddGithubRepoInput!): GithubRepo
+
+  """
+  Append an action to an existing agent. The discriminated input must match the action type.
+  """
+  agentActionCreate(agentId: String!, input: AgentActionInput!): AgentAction
+  agentActionDelete(id: String!): Boolean
+
+  """
+  Update an action's config and/or position. The config sub-input must match the existing action's type — passing a mismatched sub-input is a bad-user-input error.
+  """
+  agentActionUpdate(id: String!, input: AgentActionUpdateInput!): AgentAction
+  agentCreate(input: AgentCreateInput!): Agent
+  agentDelete(id: String!): Boolean
+  agentDeliveryCreate(input: AgentDeliveryCreateInput!): AgentDelivery
+  agentDeliveryDelete(id: String!): Boolean
+  agentDeliveryPause(id: String!): AgentDelivery
+  agentDeliveryResume(id: String!): AgentDelivery
+  agentDeliveryUpdate(
+    id: String!
+    input: AgentDeliveryUpdateInput!
+  ): AgentDelivery
+  agentPause(id: String!): Agent
+  agentResume(id: String!): Agent
+
+  """
+  Force a fresh run now. Bypasses change-detection. Inserts a pending run row and immediately dispatches the `agent.run` event so the handler picks it up without waiting for the hourly cron tick. Rejects with `WORKFLOW_RUN_IN_PROGRESS` (BAD_USER_INPUT) if a pending or running row already exists.
+  """
+  agentRunNow(agentId: String!): AgentRun
+  agentSourceCreate(input: AgentSourceCreateInput!): AgentSource
+  agentSourceDelete(id: String!): Boolean
+  agentSourcePause(id: String!): AgentSource
+  agentSourceResume(id: String!): AgentSource
+  agentSourceUpdate(id: String!, input: AgentSourceUpdateInput!): AgentSource
+  agentTriggerCreate(input: AgentTriggerCreateInput!): AgentTrigger
+  agentTriggerDelete(id: String!): Boolean
+  agentTriggerPause(id: String!): AgentTrigger
+  agentTriggerResume(id: String!): AgentTrigger
+  agentTriggerUpdate(id: String!, input: AgentTriggerUpdateInput!): AgentTrigger
+  agentUpdate(id: String!, input: AgentUpdateInput!): Agent
+  assignAction(actionId: String!, assigneeUserId: String): Action
+  cancelOnePagerGeneration(onePagerId: String!): Document
+  createDirectory(input: DirectoryCreateInput!): CreateDirectoryResponse
+  createDocument(input: CreateDocumentInput!): Document
+  createGoal(input: CreateGoalInput!): Goal
+  createIntegrationSource(
+    input: CreateIntegrationSourceInput!
+  ): IntegrationTrigger
+  createNotionPageConfig(input: CreateNotionPageConfigInput!): NotionPageConfig
+  createResearchQuestion(
+    category: String
+    goalId: String
+    question: String!
+    rationale: String
+  ): ResearchQuestion
+  createWorkspaces(input: [WorkspaceCreateInput!]!): CreateWorkspacesResponse
+  deleteConversation(id: String!): Boolean
+  deleteDirectory(id: String!): DeleteDirectoryResponse
+  deleteDocument(id: String!): Boolean
+  deleteGoal(id: String!): Boolean
+  deleteInsight(id: String!): Boolean
+  deleteIntegrationTrigger(id: String!): Boolean
+
+  """
+  Remove a scope root. Cascade-deletes every synced KB document descended from it so the file explorer stays in sync with the picker.
+  """
+  deleteNotionPageConfig(id: String!): Boolean
+  deleteOnePager(onePagerId: String!): DeleteOnePagerPayload
+  deleteResearchQuestion(id: String!): Boolean
+  deleteSignal(id: String!): Boolean
+  disconnectIntegration(id: String!): Boolean
+  dismissAction(actionId: String!, surface: ActionSurface): Action
+  generateOnePagerFromAction(
+    actionId: String!
+    type: OnePagerType
+  ): TakeActionPayload
+  generateOnePagerFromInsight(insightId: String!, type: OnePagerType): Document
+  linkAction(actionId: String!, target: ActionLinkTargetInput!): Action
+  linkEntities(input: LinkEntitiesInput!): LinkResult
+  linkOnePager(
+    onePagerId: String!
+    target: LinkOnePagerTargetInput!
+  ): LinkResult
+  markActionDone(id: String!, surface: ActionSurface): Action
+  markBlockMutated(blockId: String!, documentId: String!): Boolean
+  markDocumentAsRead(id: String!): Document
+  moveDocumentToDirectory(
+    """
+    null to move to root
+    """
+    directoryId: String
+    documentId: String!
+  ): Document
+  removeDirectoryTag(id: String!, tag: String!): Directory
+  removeDocumentTag(id: String!, tag: String!): Document
+  removeGithubRepo(id: String!): Boolean
+
+  """
+  Re-fire a specific delivery for a past report. Knowledge channel is rejected — the document already exists; use `reportRegenerate` or edit it directly.
+  """
+  reportRedeliver(deliveryId: String!, reportId: String!): AgentDelivery
+
+  """
+  Re-generate the report by re-running the agent with `force=true`. Creates a new pending agent_run row with `triggeredBy='manual'` and immediately dispatches the `agent.run` event. Rejects with `WORKFLOW_RUN_IN_PROGRESS` (BAD_USER_INPUT) if a run is already in flight.
+  """
+  reportRegenerate(agentId: String!): AgentRun
+  rescanGithubRepo(id: String!): GithubRepo
+  restoreVersion(versionId: String!): Boolean
+  retryOnePagerGeneration(onePagerId: String!): Document
+  reviewDocument(documentId: String!): Boolean
+  setIntegrationSourceStatus(
+    id: String!
+
+    """
+    One of: active | paused | error
+    """
+    status: String!
+  ): IntegrationTrigger
+  setOnePagerStatus(
+    onePagerId: String!
+    recommendation: DecisionRecommendation
+    status: OnePagerStatus!
+  ): Document
+  snoozeAction(actionId: String!): Action
+  startAction(id: String!, surface: ActionSurface): Action
+  triggerActionRanking(insightId: String!): TriggerActionRankingPayload
+
+  """
+  Kick off a Notion KB backfill for the workspace's current scope. Fires the `notion.backfill.requested` Inngest event; per-page sync is fanned out from there. Returns false if no Notion integration is active.
+  """
+  triggerNotionBackfill(rootConfigId: String): Boolean
+  unlinkAction(actionId: String!, target: ActionLinkTargetInput!): Action
+  unlinkEntities(input: UnlinkEntitiesInput!): LinkResult
+  unlinkOnePager(
+    onePagerId: String!
+    target: LinkOnePagerTargetInput!
+  ): LinkResult
+  updateAction(
+    actionId: String!
+    input: UpdateActionInput!
+    surface: ActionSurface
+  ): Action
+  updateActionNotes(actionId: String!, notes: String!): Action
+  updateConversationTitle(id: String!, title: String!): Conversation
+  updateDirectory(
+    id: String!
+    input: DirectoryUpdateInput!
+  ): UpdateDirectoryResponse
+  updateDocument(id: String!, input: UpdateDocumentInput!): Document
+  updateGoal(id: String!, input: UpdateGoalInput!): Goal
+  updateInsight(id: String!, input: UpdateInsightInput!): Insight
+  updateIntegrationSourceConfig(
+    id: String!
+
+    """
+    Trigger configuration as a JSON-encoded string
+    """
+    triggerConfig: String!
+  ): IntegrationTrigger
+  updateNotificationSubscription(
+    input: UpdateNotificationSubscriptionInput!
+  ): NotificationSubscription
+  updateOnePager(input: UpdateOnePagerInput!, onePagerId: String!): Document
+  updateSlackChannelConfig(
+    input: UpdateSlackChannelConfigInput!
+  ): SlackChannelConfig
+  updateWorkspaces(
+    update: WorkspaceUpdateInput!
+    where: WorkspaceWhere!
+  ): UpdateWorkspacesResponse
+
+  """
+  Create or update the config for a Slack channel. The `mode` controls automatic capture; notification and thread-sync toggles use `updateSlackChannelConfig`.
+  """
+  upsertSlackChannelConfig(
+    input: UpsertSlackChannelConfigInput!
+  ): SlackChannelConfig
+}
+
+type NotificationSubscription {
+  active: Boolean
+  categoryId: String
+  description: String
+  label: String
+}
+
+type NotificationSubscriptionChangedPayload {
+  active: Boolean
+  categoryId: String
+  userId: String
+  workspaceId: String
+}
+
+input NotionDatabaseSourceConfigInput {
+  kind: String!
+  label: String!
+  notionId: String!
+}
+
+type NotionPageConfig {
+  createdAt: DateTime!
+  firstIngestCompletedAt: DateTime
+  id: String!
+  includeChildren: Boolean!
+  includeDatabases: Boolean!
+  integrationSourceId: String!
+  lastCrawlAt: DateTime
+  maxDepth: Int
+  rootDataSourceId: String
+  rootPageId: String
+  updatedAt: DateTime!
+}
+
+type NotionPageLink {
+  archived: Boolean!
+  id: String!
+  inTrash: Boolean!
+  isKbIncluded: Boolean!
+  kbDocumentId: String
+  lastEditedTime: DateTime!
+  notionDataSourceId: String
+  notionPageId: String!
+  parentDatabaseId: String
+  parentPageId: String
+  rootConfigId: String
+}
+
+input NotionPageSourceConfigInput {
+  label: String!
+  notionPageId: String!
+}
+
+type NotionTreeNode {
+  id: String!
+  object: String!
+  parentDatabaseId: String
+  parentPageId: String
+  title: String
+  url: String
+}
+
+type OnePagerActivityPayload {
+  """
+  ISO timestamp of the activity.
+  """
+  at: String
+
+  """
+  Human-readable live status, e.g. "Fetching signals…".
+  """
+  label: String
+  onePagerId: String
+  toolName: String
+}
+
+input OnePagerListFilters {
+  createdAfter: DateTime
+  createdBefore: DateTime
+  onePagerStatus: [OnePagerStatus!]
+  onePagerType: OnePagerType
+  sourceInsightId: String
+}
+
+enum OnePagerStatus {
+  building
+  draft
+  failed
+  finalised
+  in_review
+}
+
+enum OnePagerType {
+  decision
+  prd
+}
+
+type Organisation {
+  id: String
+  name: String
+  propelAuthOrgId: String
+  slug: String
+}
+
+type ProviderInfo {
+  agentTriggerTypes: [TriggerTypeInfo!]
+  authType: String
+  availableTriggers: [TriggerTypeInfo!]
+  category: String
+  connected: Boolean
+  description: String
+  iconUrl: String
+  integrationId: String
+  key: String
+  name: String
+  requiresSetup: Boolean
+  status: String
+}
+
+type Query {
+  action(id: String!): Action
+  actionList(
+    includeSnoozed: Boolean
+    insightId: String
+    limit: Int = 50
+    offset: Int = 0
+    status: [ActionStatus!]
+  ): [Action!]
+  actions(
+    assigneeUserId: String
+    dueBefore: DateTime
+    includeSnoozed: Boolean
+    limit: Int = 50
+    offset: Int = 0
+    priority: [String!]
+    standaloneOnly: Boolean
+    statuses: [ActionStatus!]
+  ): [Action!]
+  activityFeed(
+    entityId: String
+    entityType: String
+    limit: Int
+    offset: Int
+  ): [AuditEvent!]
+  activityStream(
+    action: [String!]
+    actorType: [String!]
+    actorUserId: [String!]
+    after: String
+    agentId: String
+    entityType: [String!]
+    first: Int = 50
+  ): ActivityFeed
+  activityTrend(days: Int = 14): [ActivityTrendPoint!]
+  agent(id: String!): Agent
+
+  """
+  All non-deleted agents in the current workspace.
+  """
+  agentList(limit: Int = 50, offset: Int = 0, status: AgentStatus): [Agent!]
+  agentRuns(agentId: String!, limit: Int = 20, offset: Int = 0): [AgentRun!]
+
+  """
+  Get all directories as a flat list (use parentId to build tree client-side)
+  """
+  allDirectories: [Directory!]
+
+  """
+  List all available integration providers with their connection status
+  """
+  availableProviders: [ProviderInfo!]
+  blockSourceStats(documentId: String!): [BlockSourceStat!]
+  chainHealth: ChainHealth
+  cluster(id: String!): Cluster
+  clusterList(
+    dirty: Boolean
+    limit: Int = 50
+    offset: Int = 0
+    requireLabel: Boolean = true
+    signalType: SignalType
+  ): [Cluster!]
+  commandSearchEntities(
+    limitPerType: Int = 8
+    search: String!
+  ): [CommandSearchEntity!]!
+  contentVersions(
+    entityId: String!
+    entityType: String!
+    limit: Int = 20
+  ): [ContentVersion!]
+  conversation(id: String!): Conversation
+  conversationList(limit: Int = 50, offset: Int = 0): [Conversation!]
+
+  """
+  Get all root-level directories (those without a parent)
+  """
+  directories: [Directory!]
+  directory(id: String!): Directory
+
+  """
+  Get full directory tree with nested children
+  """
+  directoryTree: [Directory!]
+  document(id: String!): Document
+  documentList(limit: Int = 50, offset: Int = 0): [Document!]
+  documentMarkdownExport(documentId: String!): String
+  documentProvenance(documentId: String!): [DocumentBlockProvenance!]
+  documentSearch(limit: Int = 20, search: String): [Document!]!
+  externalSources(
+    limit: Int = 50
+    offset: Int = 0
+    source: String
+  ): [ExternalSource!]
+
+  """
+  List repositories from the connected GitHub account
+  """
+  githubAvailableRepos: [GithubRepoInfo!]
+
+  """
+  List tracked GitHub repositories for the current workspace
+  """
+  githubTrackedRepos: [GithubRepo!]
+  goal(id: String!): Goal
+  goalList(
+    limit: Int = 50
+    maxImportance: Int
+    minImportance: Int
+    offset: Int = 0
+  ): [Goal!]
+  inboxCredentials(workspaceId: String): InboxCredentials
+  insight(id: String!): Insight
+  insightList(
+    category: String
+    excludeCategories: [String!]
+    limit: Int = 50
+    minCombinedScore: Float
+    offset: Int = 0
+    sortBy: String = "combinedScore"
+    status: String
+  ): [Insight!]
+  integration(id: String!): Integration
+  integrationByProvider(provider: String!): Integration
+
+  """
+  List all integrations for the current workspace
+  """
+  integrationList: [Integration!]
+  integrationTriggerList(integrationId: String!): [IntegrationTrigger!]
+  mentionSearchDirectories(limit: Int = 20, search: String): [Directory!]
+  mentionSearchDocuments(limit: Int = 20, search: String): [Document!]
+  mentionSearchGoals(limit: Int = 20, search: String): [Goal!]
+  mentionSearchInsights(limit: Int = 20, search: String): [Insight!]
+  mentionSearchSignals(limit: Int = 20, search: String): [Signal!]
+  moonUnlock(moonId: String!): MoonUnlock
+  moonUnlockCount: Int
+  notificationSubscriptions(workspaceId: String): [NotificationSubscription!]
+
+  """
+  Return the direct child pages + child databases of a Notion page. Backs the expand/collapse UX in the scope picker.
+  """
+  notionPageChildren(pageId: String!, pageSize: Int): [NotionTreeNode!]
+
+  """
+  List the Notion signal-scope roots for the current workspace.
+  """
+  notionPageConfigList: [NotionPageConfig!]
+
+  """
+  List the Notion page links for the current workspace.
+  """
+  notionPageLinkList(
+    isKbIncluded: Boolean
+    limit: Int
+    rootConfigId: String
+  ): [NotionPageLink!]
+
+  """
+  Search the connected Notion workspace for pages and database data_sources. Drives the scope picker tree. Requires an active Notion integration on the workspace.
+  """
+  notionTreeSearch(
+    """
+    'page' or 'data_source'
+    """
+    objectFilter: String
+    pageSize: Int
+    query: String
+    startCursor: String
+  ): [NotionTreeNode!]
+  onePager(displayId: String!): Document
+  onePagerLatestActivity(onePagerId: String!): OnePagerActivityPayload
+  onePagerList(
+    filters: OnePagerListFilters
+    limit: Int = 50
+    offset: Int = 0
+  ): [Document!]
+  orgMemberList: [ActorUser!]
+  organisations: [Organisation!]
+
+  """
+  List all available provider categories for filtering
+  """
+  providerCategories: [String!]
+  report(id: String!): Report
+  reportList(agentId: String!, limit: Int = 20, offset: Int = 0): [Report!]
+  researchQuestionList(
+    limit: Int = 50
+    sufficiencyStatus: String
+  ): [ResearchQuestion!]
+  researchQuestionsByGoal(goalId: String!): [ResearchQuestion!]
+
+  """
+  Get documents that are not in any directory
+  """
+  rootDocuments: [Document!]
+  signal(id: String!): Signal
+  signalActivitySummary(days: Int = 7): [SignalSourceCount!]
+  signalList(
+    clusterId: String
+    createdAfter: DateTime
+    createdBefore: DateTime
+    limit: Int = 50
+    minStrength: Float
+    offset: Int = 0
+    sentiment: SignalSentimentFilter
+    signalType: SignalType
+    sortBy: SignalSortField = createdAt
+    sortDirection: SignalSortDirection = desc
+    source: SignalSource
+    status: [SignalStatus!]
+  ): [Signal!]
+  signalTimeSeries(days: Int = 14): [SignalTimeSeriesPoint!]
+
+  """
+  List all Slack channel configurations for the current workspace
+  """
+  slackChannelConfigs: [SlackChannelConfig!]
+
+  """
+  Channels visible to the Squidge bot for the given Slack integration. Used by the agent delivery picker.
+  """
+  slackChannels(integrationId: String!): [SlackChannel!]
+
+  """
+  Channels the bot is a member of in the linked Slack workspace, joined with each channel's current capture/notification config.
+  """
+  slackVisibleChannels: [SlackVisibleChannel!]
+
+  """
+  Get IDs of unlocked moons (efficient for UI filtering)
+  """
+  unlockedMoonIds: [String!]
+  unlockedMoons(limit: Int = 50, offset: Int = 0): [MoonUnlock!]
+  workspaces(
+    limit: Int
+    sort: [WorkspaceSort!]
+    where: WorkspaceWhere
+  ): [Workspace!]
+}
+
+type Report {
+  actionId: String
+  agent: Agent
+  agentRun: AgentRun
+  agentRunId: String
+  createdAt: DateTime
+  deliveries: [ReportDelivery!]
+  document: Document
+  documentId: String
+  id: String
+  inquirySnapshot: String
+  modelId: String
+  summary: String
+  titleSnapshot: String
+  tokensUsed: Int
+}
+
+type ReportDelivery {
+  agentDeliveryId: String
+  attemptCount: Int
+  channel: AgentDeliveryChannel
+  createdAt: DateTime
+  errorMessage: String
+  id: String
+  reportId: String
+  sentAt: DateTime
+  status: ReportDeliveryStatus
+  targetSnapshot: JSON
+  updatedAt: DateTime
+}
+
+enum ReportDeliveryMutationType {
+  CREATED
+  UPDATED
+}
+
+"""
+Per-channel send attempt status for a report delivery.
+"""
+enum ReportDeliveryStatus {
+  failed
+  partial
+  pending
+  sent
+  skipped
+}
+
+type ReportDeliverySubscriptionPayload {
+  mutationType: ReportDeliveryMutationType
+  reportDelivery: ReportDelivery
+  reportDeliveryId: String
+  reportId: String
+  sourceSessionId: String
+}
+
+enum ReportMutationType {
+  CREATED
+}
+
+type ReportSubscriptionPayload {
+  agentId: String
+  mutationType: ReportMutationType
+  report: Report
+  reportId: String
+  sourceSessionId: String
+}
+
+type ResearchAgentConfig {
+  prompt: String
+}
+
+input ResearchAgentConfigInput {
+  prompt: String!
+}
+
+type ResearchQuestion {
+  category: String
+  confidenceAggregate: Float
+  createdAt: DateTime
+  createdBy: String
+  displayId: Int
+  id: String
+  question: String
+  rationale: String
+  signalCount: Int
+  sourceTypeCount: Int
+  sufficiencyStatus: String
+  updatedAt: DateTime
+}
+
+input ScheduleTriggerConfigInput {
+  cadence: AgentCadence!
+  startAt: DateTime
+}
+
+type Signal {
+  cluster: Cluster
+  confidence: Float
+  content: String
+  contentSummary: String
+  createdAt: DateTime
+  derivedSource: String
+  displayId: Int
+  externalSource: ExternalSource
+  halfLifeDays: Float
+  id: String
+  insights: [Insight!]
+  lastModifiedBy: LastModifier
+  lastSeenAt: DateTime
+  occurrenceCount: Int
+  referencedBy: [Document!]
+  relatedSignals(limit: Int = 5): [Signal!]
+  sentiment: SignalSentiment
+  signalCount: Int
+  signalType: SignalType
+  source: SignalSource
+  status: String
+  strength: Float
+  updatedAt: DateTime
+  validFrom: DateTime
+  validTo: DateTime
+}
+
+enum SignalMutationType {
+  CREATED
+  DELETED
+  UPDATED
+}
+
+enum SignalSentiment {
+  mixed
+  negative
+  neutral
+  positive
+}
+
+enum SignalSentimentFilter {
+  mixed
+  negative
+  neutral
+  positive
+}
+
+enum SignalSortDirection {
+  asc
+  desc
+}
+
+enum SignalSortField {
+  createdAt
+  lastSeenAt
+  strength
+}
+
+enum SignalSource {
+  agent
+  amplitude
+  api
+  app_store
+  capterra
+  document
+  file_upload
+  g2
+  github
+  gong
+  google_play
+  google_reviews
+  intercom
+  jira
+  linear
+  manual
+  notion
+  posthog
+  research
+  salesforce
+  slack
+  trustpilot
+  typeform
+  webhook
+  website
+  zendesk
+}
+
+type SignalSourceCount {
+  count: Int
+  source: String
+}
+
+enum SignalStatus {
+  active
+  stale
+  tombstoned
+}
+
+type SignalSubscriptionPayload {
+  mutationType: SignalMutationType
+  signal: Signal
+  signalId: String
+
+  """
+  Session ID of the client that triggered the change.
+  """
+  sourceSessionId: String
+}
+
+type SignalTimeSeriesPoint {
+  count: Int
+  date: String
+  source: String
+}
+
+enum SignalType {
+  agent_insight
+  bug_report
+  churn_risk
+  competitive_intel
+  feature_request
+  pain_point
+  praise
+}
+
+"""
+A Slack channel the bot is a member of, for picker UIs.
+"""
+type SlackChannel {
+  id: String
+  isPrivate: Boolean
+  memberCount: Int
+  name: String
+}
+
+type SlackChannelConfig {
+  autoGenerateTitle: Boolean!
+  createdAt: DateTime!
+  id: String!
+  isNotificationChannel: Boolean!
+  mode: String!
+  slackChannelId: String!
+  slackChannelName: String!
+  slackTeamId: String!
+  threadSyncEnabled: Boolean!
+  updatedAt: DateTime!
+}
+
+enum SlackChannelMode {
+  auto
+  manual
+  off
+}
+
+input SlackChannelSourceConfigInput {
+  integrationId: String!
+  label: String!
+  slackChannelId: String!
+}
+
+type SlackDeliveryConfig implements AgentDeliveryConfig {
+  channel: AgentDeliveryChannel
+  channelId: String
+  channelName: String
+  integrationId: String
+}
+
+input SlackDeliveryConfigInput {
+  channelId: String!
+  channelName: String!
+  integrationId: String!
+}
+
+"""
+A Slack channel the bot is a member of, joined with this workspace's current config row (if any).
+"""
+type SlackVisibleChannel {
+  currentConfig: SlackChannelConfig
+  isPrivate: Boolean!
+  memberCount: Int
+  slackChannelId: String!
+  slackChannelName: String!
+  slackTeamId: String!
+}
+
+enum SortDirection {
+  ASC
+  DESC
+}
+
+"""
+A workspace domain event a squad_event trigger can fire on.
+"""
+enum SquadEvent {
+  COMPETITOR_CREATED
+  COMPETITOR_UPDATED
+  INSIGHT_CREATED
+  KNOWLEDGE_CREATED
+  KNOWLEDGE_UPDATED
+}
+
+"""
+Optional, type-appropriate filter for a squad_event trigger (ADR-005).
+"""
+input SquadEventFilterInput {
+  directoryId: String
+  documentId: String
+  minScore: Float
+}
+
+input SquadEventTriggerConfigInput {
+  event: SquadEvent!
+  filter: SquadEventFilterInput
+}
+
+input StringFilter {
+  eq: String
+}
+
+type Subscription {
+  actionChanged(workspaceId: String!): ActionSubscriptionPayload
+  activityChanged: ActivityChangedPayload
+
+  """
+  All agent CREATED/UPDATED/DELETED events in the current workspace. The argument is informational — the channel is scoped to the authenticated tenant.
+  """
+  agentChanged(workspaceId: String!): AgentSubscriptionPayload
+
+  """
+  New agent runs as they're created/updated for a specific agent. Filters by `agentId` server-side.
+  """
+  agentRunCreated(agentId: String!): AgentRunSubscriptionPayload
+  clusterChanged: ClusterSubscriptionPayload
+  conversationChanged: ConversationSubscriptionPayload
+  directoryChanged: DirectorySubscriptionPayload
+  documentChanged: DocumentSubscriptionPayload
+  documentUpdated(documentId: String!): DocumentSubscriptionPayload
+  goalChanged: GoalSubscriptionPayload
+  goalUpdated(goalId: String!): GoalSubscriptionPayload
+  insightChanged: InsightSubscriptionPayload
+  insightUpdated(insightId: String!): InsightSubscriptionPayload
+  notificationSubscriptionChanged: NotificationSubscriptionChangedPayload
+  onePagerActivity(onePagerId: String!): OnePagerActivityPayload
+
+  """
+  New reports for a specific agent.
+  """
+  reportCreated(agentId: String!): ReportSubscriptionPayload
+
+  """
+  Delivery status changes for a specific report.
+  """
+  reportDeliveryChanged(reportId: String!): ReportDeliverySubscriptionPayload
+  signalChanged: SignalSubscriptionPayload
+  workspaceChanged: WorkspaceSubscriptionPayload
+  workspaceUpdated(workspaceId: String!): WorkspaceSubscriptionPayload
+}
+
+type TakeActionPayload {
+  onePagerDisplayId: String
+  onePagerId: String
+}
+
+type TriggerActionRankingPayload {
+  dispatched: Boolean
+  insightId: String
+}
+
+type TriggerTypeInfo {
+  description: String
+  name: String
+  type: String
+}
+
+input UnlinkEntitiesInput {
+  edgeLabel: EdgeLabel!
+  sourceId: String!
+  sourceType: EntityType!
+  targetId: String!
+  targetType: EntityType!
+}
+
+input UpdateActionInput {
+  category: ActionCategory
+  effort: ActionEffort
+  priority: ActionPriority
+  status: ActionStatus
+}
+
+type UpdateDirectoryResponse {
+  directory: Directory
+}
+
+input UpdateDocumentInput {
+  blockNoteJson: String
+  content: String
+
+  """
+  Create a version snapshot before updating
+  """
+  createVersion: Boolean
+
+  """
+  Move document to this directory (null for root)
+  """
+  directoryId: String
+  icon: String
+  title: String
+}
+
+input UpdateGoalInput {
+  blockNoteJson: String
+  content: String
+
+  """
+  Create a version snapshot before updating
+  """
+  createVersion: Boolean
+  importance: Int
+  title: String
+}
+
+input UpdateInsightInput {
+  category: String
+  status: String
+}
+
+input UpdateNotificationSubscriptionInput {
+  active: Boolean!
+  categoryId: String!
+  workspaceId: String!
+}
+
+input UpdateOnePagerInput {
+  blockNoteJson: String
+  body: String
+  title: String
+}
+
+input UpdateSlackChannelConfigInput {
+  autoGenerateTitle: Boolean
+  id: String!
+  isNotificationChannel: Boolean
+  threadSyncEnabled: Boolean
+}
+
+type UpdateWorkspacesResponse {
+  workspaces: [Workspace!]
+}
+
+input UpsertSlackChannelConfigInput {
+  mode: SlackChannelMode!
+  slackChannelId: String!
+}
+
+type UrlAgentConfig {
+  scrapeMode: String
+  url: String
+}
+
+input UrlAgentConfigInput {
+  url: String!
+}
+
+input UrlSourceConfigInput {
+  label: String
+  url: String!
+}
+
+type Workspace {
+  createdAt: DateTime
+  deletedAt: DateTime
+  description: String
+  id: String
+  isDefault: Boolean
+  logoUrl: String
+  missionStatement: String
+  name: String
+  onboardingStatus: String
+  organisationId: String
+  settings: String
+  slug: String
+  updatedAt: DateTime
+}
+
+input WorkspaceCreateInput {
+  description: String
+  isDefault: Boolean
+  missionStatement: String
+  name: String!
+  organisationId: String!
+  slug: String!
+}
+
+enum WorkspaceMutationType {
+  CREATED
+  DELETED
+  UPDATED
+}
+
+input WorkspaceSort {
+  createdAt: SortDirection
+  isDefault: SortDirection
+  name: SortDirection
+}
+
+type WorkspaceSubscriptionPayload {
+  mutationType: WorkspaceMutationType
+
+  """
+  Session ID of the client that triggered the change.
+  """
+  sourceSessionId: String
+  workspace: Workspace
+  workspaceId: String
+}
+
+input WorkspaceUpdateInput {
+  deletedAt: DateTimeSet
+  description: String
+  isDefault: Boolean
+
+  """
+  An https:// URL or a `data:image/...;base64,...` data URL. Pass null to clear.
+  """
+  logoUrl: String
+  missionStatement: String
+  name: String
+  onboardingStatus: String
+  settings: String
+  slug: String
+}
+
+input WorkspaceWhere {
+  id: StringFilter
+  organisationId: StringFilter
+  slug: StringFilter
+}

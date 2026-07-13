@@ -252,3 +252,14 @@ MIT
 - [MCP Specification](https://modelcontextprotocol.io)
 - [Claude Desktop](https://claude.ai/download)
 - [Issue Tracker](https://github.com/the-basilisk-ai/squad-mcp/issues)
+
+## GraphQL codegen (v4)
+
+Backend access is typed via GraphQL Code Generator. `schema.graphql` is a
+committed snapshot of the Squad platform API schema; `src/gql/` is generated
+from it plus the operation documents in `src/graphql/`.
+
+- Refresh the snapshot: copy `packages/graphql/src/schema/generated.graphql`
+  from the API repo over `schema.graphql` (or set `SQUAD_GRAPHQL_URL` to
+  introspect a live endpoint), then run `yarn codegen`.
+- CI runs `yarn codegen:check` and fails when `src/gql/` is stale.

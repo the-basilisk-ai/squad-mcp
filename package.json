@@ -13,21 +13,27 @@
     "test": "vitest run",
     "prepare": "husky",
     "format": "biome check .",
-    "format:fix": "biome check --write ."
+    "format:fix": "biome check --write .",
+    "codegen": "graphql-codegen --config codegen.ts",
+    "codegen:check": "graphql-codegen --config codegen.ts --check"
   },
   "files": [
     "dist"
   ],
   "dependencies": {
+    "@graphql-typed-document-node/core": "^3.2.0",
     "@mcp-use/inspector": "^6.0.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@propelauth/node": "^2.1.35",
     "dotenv": "^17.4.2",
+    "graphql": "^17.0.2",
     "mcp-use": "^1.33.0",
     "zod": "4.4.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.1",
+    "@graphql-codegen/cli": "^7.2.0",
+    "@graphql-codegen/client-preset": "^6.1.0",
     "@types/node": "^25.9.3",
     "husky": "^9.1.7",
     "tsx": "^4.22.4",

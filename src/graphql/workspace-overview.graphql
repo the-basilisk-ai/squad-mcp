@@ -1,0 +1,38 @@
+query WorkspaceOverview($workspaceId: String!, $days: Int) {
+  workspaces(where: { id: { eq: $workspaceId } }, limit: 1) {
+    id
+    name
+    description
+    missionStatement
+    slug
+    organisationId
+    onboardingStatus
+  }
+  goalList(limit: 5) {
+    id
+    displayId
+    title
+    importance
+  }
+  signalActivitySummary(days: $days) {
+    source
+    count
+  }
+  chainHealth {
+    signalCount
+    activeSignalCount
+    staleSignalCount
+    insightCount
+    sourceCount
+    signalHealthPercent
+  }
+  openActions: actions(statuses: [suggested, in_progress], limit: 50) {
+    id
+  }
+  pendingBriefs: onePagerList(
+    filters: { onePagerStatus: [building, draft, in_review] }
+    limit: 50
+  ) {
+    id
+  }
+}
