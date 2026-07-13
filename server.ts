@@ -12,10 +12,14 @@ import { introspectToken } from "./src/helpers/oauth.js";
 import { connectRedis } from "./src/helpers/redis.js";
 import { logger } from "./src/lib/logger.js";
 import { registerActionReadTools } from "./src/tools/actions-read.js";
+import { registerActionWriteTools } from "./src/tools/actions-write.js";
 import { registerEvidenceTools } from "./src/tools/evidence.js";
 import { registerEntityTools } from "./src/tools/get-entity.js";
+import { registerIngestTools } from "./src/tools/ingest.js";
+import { registerResearchWriteTools } from "./src/tools/research-write.js";
 import { registerSearchTools } from "./src/tools/search.js";
 import { registerStrategyReadTools } from "./src/tools/strategy-read.js";
+import { registerStrategyWriteTools } from "./src/tools/strategy-write.js";
 import { registerWorkspaceTools } from "./src/tools/workspace.js";
 
 config();
@@ -120,6 +124,10 @@ registerEntityTools(server);
 registerEvidenceTools(server);
 registerActionReadTools(server);
 registerStrategyReadTools(server);
+registerIngestTools(server);
+registerActionWriteTools(server);
+registerStrategyWriteTools(server);
+registerResearchWriteTools(server);
 
 // mcp-use build imports this file for type generation — skip env validation during build
 if (!process.argv.includes("build")) {

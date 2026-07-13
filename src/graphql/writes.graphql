@@ -1,0 +1,131 @@
+fragment ActionEcho on Action {
+  id
+  displayId
+  title
+  status
+  priority
+  category
+  effort
+  notes
+  snoozedUntil
+  assignee {
+    userId
+    displayName
+  }
+}
+
+mutation StartAction($id: String!) {
+  startAction(id: $id) {
+    ...ActionEcho
+  }
+}
+
+mutation MarkActionDone($id: String!) {
+  markActionDone(id: $id) {
+    ...ActionEcho
+  }
+}
+
+mutation DismissAction($actionId: String!) {
+  dismissAction(actionId: $actionId) {
+    ...ActionEcho
+  }
+}
+
+mutation SnoozeAction($actionId: String!) {
+  snoozeAction(actionId: $actionId) {
+    ...ActionEcho
+  }
+}
+
+mutation AssignAction($actionId: String!, $assigneeUserId: String) {
+  assignAction(actionId: $actionId, assigneeUserId: $assigneeUserId) {
+    ...ActionEcho
+  }
+}
+
+mutation UpdateActionNotes($actionId: String!, $notes: String!) {
+  updateActionNotes(actionId: $actionId, notes: $notes) {
+    ...ActionEcho
+  }
+}
+
+mutation UpdateActionMeta($actionId: String!, $input: UpdateActionInput!) {
+  updateAction(actionId: $actionId, input: $input) {
+    ...ActionEcho
+  }
+}
+
+mutation LinkAction($actionId: String!, $target: ActionLinkTargetInput!) {
+  linkAction(actionId: $actionId, target: $target) {
+    ...ActionEcho
+  }
+}
+
+mutation CreateGoal($input: CreateGoalInput!) {
+  createGoal(input: $input) {
+    id
+    displayId
+    title
+    content
+    importance
+  }
+}
+
+mutation UpdateGoal($id: String!, $input: UpdateGoalInput!) {
+  updateGoal(id: $id, input: $input) {
+    id
+    displayId
+    title
+    content
+    importance
+  }
+}
+
+mutation UpdateInsightMeta($id: String!, $input: UpdateInsightInput!) {
+  updateInsight(id: $id, input: $input) {
+    id
+    displayId
+    title
+    category
+    status
+  }
+}
+
+mutation LinkEntities($input: LinkEntitiesInput!) {
+  linkEntities(input: $input) {
+    success
+    error
+  }
+}
+
+mutation UnlinkEntities($input: UnlinkEntitiesInput!) {
+  unlinkEntities(input: $input) {
+    success
+    error
+  }
+}
+
+mutation DeleteSignal($id: String!) {
+  deleteSignal(id: $id)
+}
+
+mutation CreateResearchQuestion(
+  $question: String!
+  $goalId: String
+  $category: String
+  $rationale: String
+) {
+  createResearchQuestion(
+    question: $question
+    goalId: $goalId
+    category: $category
+    rationale: $rationale
+  ) {
+    id
+    displayId
+    question
+    category
+    sufficiencyStatus
+  }
+}
