@@ -1,0 +1,123 @@
+query ListActions(
+  $limit: Int
+  $offset: Int
+  $statuses: [ActionStatus!]
+  $assigneeUserId: String
+  $includeSnoozed: Boolean
+  $priority: [String!]
+) {
+  actions(
+    limit: $limit
+    offset: $offset
+    statuses: $statuses
+    assigneeUserId: $assigneeUserId
+    includeSnoozed: $includeSnoozed
+    priority: $priority
+  ) {
+    id
+    displayId
+    title
+    status
+    priority
+    category
+    effort
+    dueAt
+    snoozedUntil
+    assignee {
+      userId
+      displayName
+    }
+    insight {
+      id
+      displayId
+      title
+    }
+  }
+}
+
+query ListActionsForInsight(
+  $insightId: String
+  $limit: Int
+  $offset: Int
+  $status: [ActionStatus!]
+  $includeSnoozed: Boolean
+) {
+  actionList(
+    insightId: $insightId
+    limit: $limit
+    offset: $offset
+    status: $status
+    includeSnoozed: $includeSnoozed
+  ) {
+    id
+    displayId
+    title
+    status
+    priority
+    category
+    effort
+    dueAt
+    snoozedUntil
+    assignee {
+      userId
+      displayName
+    }
+    insight {
+      id
+      displayId
+      title
+    }
+  }
+}
+
+query ActionContext($id: String!) {
+  action(id: $id) {
+    id
+    displayId
+    title
+    body
+    rationale
+    notes
+    status
+    priority
+    category
+    effort
+    dueAt
+    createdAt
+    assignee {
+      userId
+      displayName
+    }
+    outputDocument {
+      id
+      displayId
+      title
+    }
+    insight {
+      id
+      displayId
+      title
+      description
+      category
+      combinedScore
+      evidenceCount
+      goals {
+        id
+        displayId
+        title
+        importance
+      }
+      signals {
+        id
+        displayId
+        contentSummary
+        content
+        source
+        createdAt
+        externalSource {
+          sourceUri
+        }
+      }
+    }
+  }
+}
