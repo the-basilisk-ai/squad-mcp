@@ -1,0 +1,91 @@
+query DocumentList($limit: Int, $offset: Int) {
+  documentList(limit: $limit, offset: $offset) {
+    id
+    displayId
+    title
+    kind
+    path
+    tags
+    updatedAt
+    onePagerStatus
+    onePagerType
+  }
+}
+
+query OnePagerList($filters: OnePagerListFilters, $limit: Int, $offset: Int) {
+  onePagerList(filters: $filters, limit: $limit, offset: $offset) {
+    id
+    displayId
+    title
+    onePagerStatus
+    onePagerType
+    decisionRecommendation
+    updatedAt
+    sourceInsight {
+      id
+      displayId
+      title
+    }
+    sourceAction {
+      id
+      displayId
+      title
+    }
+  }
+}
+
+mutation CreateDocument($input: CreateDocumentInput!) {
+  createDocument(input: $input) {
+    id
+    displayId
+    title
+    path
+  }
+}
+
+mutation UpdateDocument($id: String!, $input: UpdateDocumentInput!) {
+  updateDocument(id: $id, input: $input) {
+    id
+    displayId
+    title
+    updatedAt
+  }
+}
+
+mutation AddDocumentTag($id: String!, $tag: String!) {
+  addDocumentTag(id: $id, tag: $tag) {
+    id
+    tags
+  }
+}
+
+mutation RemoveDocumentTag($id: String!, $tag: String!) {
+  removeDocumentTag(id: $id, tag: $tag) {
+    id
+    tags
+  }
+}
+
+mutation GenerateOnePagerFromAction($actionId: String!, $type: OnePagerType) {
+  generateOnePagerFromAction(actionId: $actionId, type: $type) {
+    onePagerId
+    onePagerDisplayId
+  }
+}
+
+mutation GenerateOnePagerFromInsight($insightId: String!, $type: OnePagerType) {
+  generateOnePagerFromInsight(insightId: $insightId, type: $type) {
+    id
+    displayId
+    title
+    onePagerStatus
+  }
+}
+
+mutation RetryOnePagerGeneration($onePagerId: String!) {
+  retryOnePagerGeneration(onePagerId: $onePagerId) {
+    id
+    displayId
+    onePagerStatus
+  }
+}

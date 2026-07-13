@@ -16,6 +16,7 @@ import { registerActionWriteTools } from "./src/tools/actions-write.js";
 import { registerEvidenceTools } from "./src/tools/evidence.js";
 import { registerEntityTools } from "./src/tools/get-entity.js";
 import { registerIngestTools } from "./src/tools/ingest.js";
+import { registerKnowledgeTools } from "./src/tools/knowledge.js";
 import { registerResearchWriteTools } from "./src/tools/research-write.js";
 import { registerSearchTools } from "./src/tools/search.js";
 import { registerStrategyReadTools } from "./src/tools/strategy-read.js";
@@ -128,6 +129,7 @@ registerIngestTools(server);
 registerActionWriteTools(server);
 registerStrategyWriteTools(server);
 registerResearchWriteTools(server);
+registerKnowledgeTools(server);
 
 // mcp-use build imports this file for type generation — skip env validation during build
 if (!process.argv.includes("build")) {
