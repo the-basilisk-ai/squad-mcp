@@ -50,7 +50,7 @@
     "@hono/node-server": "^1.19.13",
     "minimatch": "^10.2.3",
     "ajv": "^8.18.0",
-    "basic-ftp": "^5.2.2",
+    "basic-ftp": "^5.3.1",
     "picomatch": "^4.0.4",
     "@nestjs/core": "^11.1.18",
     "tar": "^7.5.12",
