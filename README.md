@@ -1,5 +1,7 @@
 # Squad MCP Server
 
+[![smithery badge](https://smithery.ai/badge/squadai/squad)](https://smithery.ai/servers/squadai/squad)
+
 A remote MCP server that brings [Squad](https://meetsquad.ai) — the AI-powered product discovery and strategy platform — directly into your AI workflows. Connect Squad to Claude, ChatGPT, or any MCP-compatible AI assistant to research, ideate, and plan products without context switching.
 
 ## 🚀 Quick Start
