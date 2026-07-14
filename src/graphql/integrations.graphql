@@ -1,0 +1,16 @@
+query IntegrationList {
+  integrationList {
+    id
+    name
+    provider
+    status
+    updatedAt
+    triggers {
+      id
+      sourceName
+      status
+      lastSyncedAt
+      syncTotal
+    }
+  }
+}

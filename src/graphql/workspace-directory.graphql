@@ -13,3 +13,11 @@ query WorkspaceDirectory {
     isDefault
   }
 }
+
+query OrgMemberList {
+  orgMemberList {
+    userId
+    displayName
+    email
+  }
+}

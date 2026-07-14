@@ -125,17 +125,17 @@ export function registerActionReadTools(server: OAuthServer) {
     description:
       "Everything needed to execute an action in one call: the action, why it exists (parent insight), the customer evidence behind it (top signals with source links), and the goals it serves. Call this before implementing or deciding on an action.",
     schema: z.object({
-      actionId: z.string().describe("AC-N display ID or UUID"),
+      id: z.string().describe("AC-N display ID or UUID"),
     }),
     scope: "read",
-    handler: async ({ actionId }, tool) => {
+    handler: async ({ id }, tool) => {
       const ctx = await tool.getContext();
-      const data = await execute(ActionContextDocument, { id: actionId }, ctx);
+      const data = await execute(ActionContextDocument, { id }, ctx);
 
       const action = data.action;
       if (!action) {
         return toolError(
-          `Action "${actionId}" not found in this workspace. Find actions with list_actions.`,
+          `Action "${id}" not found in this workspace. Find actions with list_actions.`,
         );
       }
 

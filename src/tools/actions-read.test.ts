@@ -108,7 +108,7 @@ describe("get_action_context", () => {
     });
 
     const parsed = parse(
-      await tools.get("get_action_context")!({ actionId: "AC-12" }, authCtx),
+      await tools.get("get_action_context")!({ id: "AC-12" }, authCtx),
     );
 
     expect(parsed.action.displayId).toBe("AC-12");
@@ -127,7 +127,7 @@ describe("get_action_context", () => {
     });
 
     const parsed = parse(
-      await tools.get("get_action_context")!({ actionId: "AC-13" }, authCtx),
+      await tools.get("get_action_context")!({ id: "AC-13" }, authCtx),
     );
     expect(parsed.why.note).toContain("stands alone");
     expect(parsed.evidence.note).toBeDefined();
