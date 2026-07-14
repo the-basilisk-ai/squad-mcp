@@ -217,3 +217,30 @@ describe("update_workspace", () => {
     expect(parsed.link).toBe("https://app.meetsquad.ai/acme/main/settings");
   });
 });
+
+describe("list_members", () => {
+  it("returns members with their user IDs for assignment", async () => {
+    mockExecute.mockResolvedValue({
+      orgMemberList: [
+        { userId: "u1", displayName: "Ada Lovelace", email: "ada@acme.dev" },
+        { userId: "u2", displayName: null, email: "grace@acme.dev" },
+      ],
+    });
+
+    const parsed = parse(await tools.get("list_members")!({}, authCtx));
+
+    expect(parsed.items).toHaveLength(2);
+    expect(parsed.items[0].id).toBe("u1");
+    expect(parsed.items[0].title).toBe("Ada Lovelace");
+    expect(parsed.items[1].title).toBe("grace@acme.dev");
+    expect(parsed.items[1].extra.email).toBe("grace@acme.dev");
+  });
+
+  it("guides the user when the org has no members", async () => {
+    mockExecute.mockResolvedValue({ orgMemberList: [] });
+
+    const parsed = parse(await tools.get("list_members")!({}, authCtx));
+
+    expect(parsed.message).toContain("No members found");
+  });
+});

@@ -1,5 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { authCtx, captureTools, opName, parse, userCtx } from "./test-utils.js";
+import {
+  authCtx,
+  byOperation,
+  captureTools,
+  opName,
+  parse,
+  userCtx,
+} from "./test-utils.js";
 
 const mockExecute = vi.fn();
 const mockGetUserContext = vi.fn();
@@ -216,5 +223,51 @@ describe("generate_one_pager", () => {
     );
     expect(parsed.displayId).toBe("OP-10");
     expect(parsed.status).toBe("building");
+  });
+});
+
+describe("update_one_pager_status", () => {
+  it("resolves OP-N then sets the status via setOnePagerStatus", async () => {
+    byOperation(mockExecute, {
+      GetOnePager: (vars: unknown) => {
+        expect((vars as { displayId: string }).displayId).toBe("OP-3");
+        return {
+          onePager: { id: "op-uuid-3", displayId: 3, title: "Ship SSO" },
+        };
+      },
+      SetOnePagerStatus: (vars: unknown) => {
+        expect(vars).toEqual({ onePagerId: "op-uuid-3", status: "finalised" });
+        return {
+          setOnePagerStatus: {
+            id: "op-uuid-3",
+            displayId: 3,
+            title: "Ship SSO",
+            onePagerStatus: "finalised",
+          },
+        };
+      },
+    });
+
+    const parsed = parse(
+      await tools.get("update_one_pager_status")!(
+        { onePagerId: "OP-3", status: "finalised" },
+        authCtx,
+      ),
+    );
+
+    expect(parsed.onePager.displayId).toBe("OP-3");
+    expect(parsed.onePager.status).toBe("finalised");
+  });
+
+  it("errors when the brief is not found", async () => {
+    byOperation(mockExecute, { GetOnePager: { onePager: null } });
+
+    const result = await tools.get("update_one_pager_status")!(
+      { onePagerId: "OP-99", status: "draft" },
+      authCtx,
+    );
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("not found");
   });
 });

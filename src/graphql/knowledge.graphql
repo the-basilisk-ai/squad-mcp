@@ -89,3 +89,12 @@ mutation RetryOnePagerGeneration($onePagerId: String!) {
     onePagerStatus
   }
 }
+
+mutation SetOnePagerStatus($onePagerId: String!, $status: OnePagerStatus!) {
+  setOnePagerStatus(onePagerId: $onePagerId, status: $status) {
+    id
+    displayId
+    title
+    onePagerStatus
+  }
+}

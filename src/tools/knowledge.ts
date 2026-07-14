@@ -9,9 +9,11 @@ import {
   GetActionDocument,
   GetDocumentMetaDocument,
   GetInsightDocument,
+  GetOnePagerDocument,
   OnePagerListDocument,
   RemoveDocumentTagDocument,
   RetryOnePagerGenerationDocument,
+  SetOnePagerStatusDocument,
   UpdateDocumentDocument,
 } from "../gql/graphql.js";
 import { decodeOffsetCursor, encodeOffsetCursor } from "../helpers/cursor.js";
@@ -440,6 +442,64 @@ export function registerKnowledgeTools(server: OAuthServer) {
         status: doc.onePagerStatus ?? "building",
         note: "Generation takes a little while; poll with get_entity.",
       });
+    },
+  });
+
+  registerTool(server, {
+    name: "update_one_pager_status",
+    title: "Update Decision Brief Status",
+    description:
+      "Move a decision brief (OP-N) through its review lifecycle: draft, in_review, or finalised. Finalising records the decision. The building and failed states are managed by generation and can't be set here.",
+    schema: z.object({
+      onePagerId: z.string().describe("OP-N display ID or UUID"),
+      status: z
+        .enum(["draft", "in_review", "finalised"])
+        .describe("The review status to move the brief to"),
+    }),
+    scope: "write",
+    handler: async ({ onePagerId, status }, tool) => {
+      const ctx = await tool.getContext();
+      const ref = parseEntityRef(onePagerId);
+      const existing = (
+        await execute(
+          GetOnePagerDocument,
+          { displayId: ref.kind === "display" ? ref.formatted : onePagerId },
+          ctx,
+        )
+      ).onePager;
+      if (!existing?.id) {
+        return toolError(
+          `Decision brief "${onePagerId}" not found. Find briefs with list_one_pagers.`,
+        );
+      }
+
+      const updated = (
+        await execute(
+          SetOnePagerStatusDocument,
+          { onePagerId: existing.id, status },
+          ctx,
+        )
+      ).setOnePagerStatus;
+      if (!updated) {
+        return toolError(
+          "The status change was not applied — check the brief with get_entity.",
+        );
+      }
+
+      return entityResponse(
+        {
+          message: `Decision brief moved to ${status}.`,
+          onePager: {
+            displayId:
+              updated.displayId != null
+                ? formatDisplayId("one_pager", updated.displayId)
+                : updated.id,
+            title: updated.title,
+            status: updated.onePagerStatus,
+          },
+        },
+        { link: appLink(ctx.orgSlug, ctx.workspaceSlug, "documents") },
+      );
     },
   });
 }

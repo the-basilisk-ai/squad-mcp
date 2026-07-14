@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  OrgMemberListDocument,
   UpdateWorkspaceDocument,
   WorkspaceOverviewDocument,
 } from "../gql/graphql.js";
@@ -9,7 +10,12 @@ import {
   listUserOrganisations,
   setWorkspaceSelection,
 } from "../helpers/getUser.js";
-import { appLink, entityResponse } from "../helpers/responses.js";
+import {
+  appLink,
+  emptyResponse,
+  entityResponse,
+  listResponse,
+} from "../helpers/responses.js";
 import { execute } from "../lib/squad-api-client.js";
 import { toolError, toolSuccess } from "./helpers.js";
 import { type OAuthServer, registerTool } from "./registry.js";
@@ -203,6 +209,35 @@ export function registerWorkspaceTools(server: OAuthServer) {
           },
         },
         { link: appLink(ctx.orgSlug, ctx.workspaceSlug, "settings") },
+      );
+    },
+  });
+
+  registerTool(server, {
+    name: "list_members",
+    title: "List Members",
+    description:
+      "People in the current organisation with their user IDs. Use it to resolve who to assign an action to — pass a returned userId as update_action's assignee.",
+    schema: z.object({}),
+    scope: "read",
+    handler: async (_params, tool) => {
+      const ctx = await tool.getContext();
+      const data = await execute(OrgMemberListDocument, {}, ctx);
+      const rows = data.orgMemberList ?? [];
+
+      if (rows.length === 0) {
+        return emptyResponse(
+          "No members found for this organisation.",
+          "Invite teammates in the Squad app.",
+        );
+      }
+
+      return listResponse(
+        rows.map(m => ({
+          id: m.userId ?? "",
+          title: m.displayName ?? m.email ?? "(unknown member)",
+          extra: { email: m.email ?? null },
+        })),
       );
     },
   });
