@@ -11,10 +11,10 @@ import { captureToolCall } from "../lib/telemetry.js";
 import {
   type AuthInfo,
   formatApiError,
-  formatWorkspaceSelectionError,
   getUserId,
   type OAuthServer,
   toolError,
+  toolSelectionRequired,
   WorkspaceSelectionRequired,
 } from "./helpers.js";
 
@@ -122,15 +122,23 @@ export function registerTool<S extends z.ZodType>(
         telemetry(!result.isError);
         return result;
       } catch (error) {
+        if (error instanceof WorkspaceSelectionRequired) {
+          // Expected control flow: the user belongs to multiple workspaces and
+          // must pick one. Record the call as ok and return guidance the agent
+          // acts on, so it never surfaces as a fault in error tracking.
+          logger.debug(
+            { tool: def.name, ms: Date.now() - started },
+            "workspace selection required",
+          );
+          telemetry(true);
+          return toolSelectionRequired(error);
+        }
+
         logger.debug(
           { err: error, tool: def.name, ms: Date.now() - started },
           "tool call failed",
         );
         telemetry(false, { error });
-
-        if (error instanceof WorkspaceSelectionRequired) {
-          return toolError(formatWorkspaceSelectionError(error));
-        }
 
         if (error instanceof SquadApiError && error.status === 403) {
           const stored = await getWorkspaceSelection(userId);

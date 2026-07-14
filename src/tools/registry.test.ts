@@ -20,6 +20,11 @@ vi.mock("../lib/logger.js", () => ({
   logger: { debug: vi.fn(), warn: vi.fn(), info: vi.fn(), error: vi.fn() },
 }));
 
+const mockCaptureToolCall = vi.fn();
+vi.mock("../lib/telemetry.js", () => ({
+  captureToolCall: mockCaptureToolCall,
+}));
+
 const { WorkspaceSelectionRequired } = await import("../helpers/getUser.js");
 const { registerTool } = await import("./registry.js");
 
@@ -60,6 +65,7 @@ beforeEach(() => {
   mockGetUserContext.mockReset();
   mockGetWorkspaceSelection.mockReset();
   mockClearWorkspaceSelection.mockReset();
+  mockCaptureToolCall.mockReset();
 });
 
 describe("registerTool", () => {
@@ -104,7 +110,7 @@ describe("registerTool", () => {
     expect(handler).not.toHaveBeenCalled();
   });
 
-  it("formats WorkspaceSelectionRequired with the available options", async () => {
+  it("returns WorkspaceSelectionRequired as a non-error result recorded as ok", async () => {
     const { server, captured } = fakeServer();
     registerTool(server as never, {
       name: "read_thing",
@@ -131,9 +137,14 @@ describe("registerTool", () => {
     });
 
     const result = await captured[0].handler({}, authCtx());
-    expect(result.isError).toBe(true);
+    // Expected control flow, not a fault: no isError, and recorded as ok so it
+    // never surfaces in error tracking.
+    expect(result.isError).toBeUndefined();
     expect(result.content[0].text).toContain("Acme (org-1)");
     expect(result.content[0].text).toContain("Main (ws-1)");
+    expect(mockCaptureToolCall).toHaveBeenCalledWith(
+      expect.objectContaining({ ok: true }),
+    );
   });
 
   it("clears a stale selection on backend 403 and instructs recovery", async () => {

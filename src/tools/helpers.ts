@@ -84,5 +84,22 @@ export function formatWorkspaceSelectionError(
   return message;
 }
 
+/**
+ * Result returned when a tool can't proceed until the user picks a workspace.
+ *
+ * This is expected control flow, not a failure — the user simply belongs to
+ * more than one workspace — so it is returned as a normal (non-error) tool
+ * result. The agent reads the guidance and calls `select_workspace`. Modelling
+ * it as a tool error (`isError: true`) would surface it to error tracking as a
+ * fault, which it is not.
+ */
+export function toolSelectionRequired(error: WorkspaceSelectionRequired): {
+  content: { type: "text"; text: string }[];
+} {
+  return {
+    content: [{ type: "text", text: formatWorkspaceSelectionError(error) }],
+  };
+}
+
 // Re-export for convenience
 export { WorkspaceSelectionRequired };
