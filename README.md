@@ -2,7 +2,9 @@
 
 [![smithery badge](https://smithery.ai/badge/squadai/squad)](https://smithery.ai/servers/squadai/squad)
 
-A remote MCP server that brings [Squad](https://meetsquad.ai) — the AI-powered product discovery and strategy platform — directly into your AI workflows. Connect Squad to Claude, ChatGPT, or any MCP-compatible AI assistant to research, ideate, and plan products without context switching.
+A remote MCP server that brings [Squad](https://meetsquad.ai) — the AI product feedback intelligence platform — directly into your AI workflows. Connect Squad to Claude, ChatGPT, or any MCP-compatible AI assistant to turn raw user feedback into signals, insights, actions, and decision briefs without context switching.
+
+Squad continuously ingests feedback, clusters it into **signals**, distils it into **insights**, and links it to the **actions** and **goals** that move your product forward. The MCP server exposes that same intelligence — read the evidence behind a decision, capture new feedback, and generate decision briefs from your assistant.
 
 ## 🚀 Quick Start
 
@@ -18,55 +20,68 @@ claude mcp add --transport http squad https://mcp.meetsquad.ai/mcp
 
 On first use, you'll be prompted to authenticate via OAuth in your browser.
 
-**Claude Connectors:**
-
-- Coming soon to the Claude MCP directory
-
-**ChatGPT:**
-
-- Coming soon to the ChatGPT plugin store
-
 **Other MCP Clients:**
 
-Connect using `https://mcp.meetsquad.ai/mcp` - OAuth configuration is automatically discovered via the server's `.well-known/oauth-authorization-server` endpoint.
+Connect using `https://mcp.meetsquad.ai/mcp` — OAuth configuration is automatically discovered via the server's `.well-known/oauth-protected-resource` metadata (which points clients at PropelAuth as the authorization server).
 
 ## 📖 Usage Examples
 
-See **[USAGE_EXAMPLES.md](./USAGE_EXAMPLES.md)** for detailed real-world examples including:
+See **[USAGE_EXAMPLES.md](./USAGE_EXAMPLES.md)** for detailed real-world examples. A few things you can ask:
 
-- **Discover opportunities** - "What opportunities are in my workspace?"
-- **Explore solutions** - "Show me solutions for [opportunity] with pros/cons"
-- **Strategic alignment** - "How do my solutions map to business goals?" (OST view)
-- **Generate ideas** - "Generate solution ideas for [opportunity]"
-- **Search everything** - "Find all content related to compliance"
-- **Create opportunities** - "Create a new opportunity for [customer pain point]"
+- **Triage feedback** — "Capture this support ticket in Squad and tell me if it's a known theme."
+- **Weekly review** — "Run my weekly product review: what changed and what needs deciding?"
+- **Ground the evidence** — "Show me the customer signals behind insight IN-42."
+- **Draft a decision brief** — "Generate a decision brief for action AC-12."
+- **Search everything** — "Find all feedback related to onboarding friction."
+- **Ground a ticket** — "Pull the customer evidence behind AC-7 before I build it."
 
-Each example shows the actual user prompt, which tools get called behind the scenes, and the expected output based on real Squad data.
+Squad entities are referenced by short **display IDs** so the assistant can cite its evidence:
+
+| Prefix | Entity          | Prefix | Entity            |
+| ------ | --------------- | ------ | ----------------- |
+| `SI-`  | Signal          | `GL-`  | Goal              |
+| `CL-`  | Cluster         | `RQ-`  | Research question |
+| `IN-`  | Insight         | `OP-`  | Decision brief    |
+| `AC-`  | Action          | `DC-`  | Document          |
 
 ## ✨ Available Tools
 
-The Squad MCP server provides 30+ tools across 9 categories:
+The server exposes ~35 tools. Write tools require a token minted with the `write:workspace` scope; read tools only need `read:workspace`.
 
-| Category          | Tools                                                                                                                                             | Purpose                                      |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| **Opportunities** | `list_opportunities`, `get_opportunity`, `create_opportunity`, `update_opportunity`, `delete_opportunity`, `generate_solutions`, `manage_opportunity_relationships` | Discover and refine product opportunities |
-| **Solutions**     | `list_solutions`, `get_solution`, `create_solution`, `update_solution`, `delete_solution`, `manage_solution_relationships`, `prioritise_solutions` | Generate and iterate on solution ideas       |
-| **Goals**         | `list_goals`, `get_goal`, `create_goal`, `update_goal`, `delete_goal`, `manage_goal_relationships`                                                | Define and track business objectives         |
-| **Knowledge**     | `list_knowledge`, `get_knowledge`, `create_knowledge`, `delete_knowledge`                                                                         | Store research, references, and insights     |
-| **Feedback**      | `list_feedback`, `get_feedback`, `create_feedback`, `delete_feedback`                                                                             | Manage customer and stakeholder feedback     |
-| **Insights**      | `list_insights`, `get_insight`, `create_insight`, `delete_insight`                                                                                | Track customer insights and feature requests |
-| **Workspace**     | `list_workspaces`, `select_workspace`, `get_workspace`, `update_workspace`                                                                        | Configure workspace settings                 |
-| **Search**        | `similarity_search`                                                                                                                               | Semantic search across all entities          |
-| **Views**         | `view_strategy_context`, `view_roadmap`                                                                                                           | Rich visual strategy and roadmap widgets     |
+| Category         | Tools                                                                                                          | Purpose                                          |
+| ---------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| **Workspace**    | `list_workspaces`, `select_workspace`, `get_workspace_overview`, `update_workspace`, `list_members`            | Orient in and configure a workspace              |
+| **Search**       | `search`, `get_entity`                                                                                          | Semantic search and fetch any entity by ID       |
+| **Evidence**     | `list_signals`, `find_similar_signals`, `list_clusters`, `get_cluster`, `list_insights`                        | Explore signals, clusters, and insights          |
+| **Actions**      | `list_actions`, `get_action_context`, `update_action`, `update_action_status`                                  | Track and update product work                    |
+| **Strategy**     | `list_goals`, `create_goal`, `update_goal`, `list_research_questions`, `create_research_question`, `update_insight`, `dismiss_signal`, `get_activity` | Manage goals, research questions, and activity   |
+| **Knowledge**    | `list_documents`, `create_document`, `update_document`                                                          | Store research, references, and notes            |
+| **Decision briefs** | `list_one_pagers`, `generate_one_pager`, `update_one_pager_status`                                           | Generate and manage one-page decision briefs     |
+| **Ingest**       | `ingest_signal`                                                                                                 | Capture new feedback as a signal (with dedup)    |
+| **Integrations** | `list_integrations`                                                                                             | See connected feedback sources                   |
+
+### Prompts
+
+Ready-made workflows exposed as MCP prompts:
+
+- **`triage-feedback`** — check for duplicates, ingest a piece of feedback, and report where it landed.
+- **`weekly-product-review`** — what changed, what the evidence says, and what needs deciding.
+- **`draft-decision-brief`** — generate a decision brief from an action or insight and walk it to a readable draft.
+- **`ground-this-ticket`** — for coding agents: pull the customer evidence behind a piece of work before building it.
+
+### Resources
+
+Pin these so strategy questions need no tool calls:
+
+- **`squad://workspace/context`** — the current workspace's mission and product context.
+- **`squad://goals`** — the workspace's strategic goals with importance rankings.
 
 ### Tool Capabilities
 
-All tools include:
-
-- ✅ Safety annotations (`readOnlyHint` / `destructiveHint`)
-- ✅ Structured JSON schemas for inputs/outputs
-- ✅ User-isolated data access via OAuth
-- ✅ Relationship management between entities
+- ✅ Safety annotations (`readOnlyHint` / `destructiveHint`) on every tool
+- ✅ Structured Zod input schemas
+- ✅ User- and workspace-isolated data access via OAuth
+- ✅ Scope-gated writes (`write:workspace`)
 
 ## 🏗️ Architecture
 
@@ -79,44 +94,24 @@ All tools include:
        │ HTTPS + Bearer Token
        ▼
 ┌──────────────────────────────────────────────┐
-│  Squad MCP Server                            │
+│  Squad MCP Server (mcp-use)                  │
 │  ┌────────────────────────────────────────┐  │
-│  │  OAuth Middleware → Validate Token     │  │
-│  │  JWT Minting → Service Credentials    │  │
-│  │  Session Store → Manage State          │  │
-│  │  MCP Handler → Execute Tools           │  │
+│  │  OAuth → introspect + verify token     │  │
+│  │  JWT minting → service credentials     │  │
+│  │  Redis → sessions + stream state       │  │
+│  │  MCP handler → tools / prompts / res.  │  │
+│  │  PostHog → tool-call telemetry         │  │
 │  └────────────────────────────────────────┘  │
 └──────────────────────────────────────────────┘
        │
-       │ Squad API Calls (minted JWT)
+       │ GraphQL (minted JWT)
        ▼
 ┌──────────────┐
 │  Squad API   │
 └──────────────┘
 ```
 
-## 📦 NPM Package
-
-For programmatic access to Squad tools in your Node.js applications:
-
-```bash
-npm install @squadai/tools
-```
-
-```typescript
-import { tools as squadTools } from "@squadai/tools";
-
-// Use with Vercel AI SDK
-const result = await generateText({
-  model: anthropic("claude-3-5-sonnet-20241022"),
-  tools: squadTools({
-    jwt: "YOUR_JWT_TOKEN",
-    orgId: "org-123",
-    workspaceId: "ws-456",
-  }),
-  prompt: "List my current product opportunities",
-});
-```
+The server is built on [`mcp-use`](https://github.com/mcp-use/mcp-use) and talks to the Squad platform API over **GraphQL**. Sessions and stream state are backed by **Redis** so the deployment is horizontally scalable. Backend types are generated from a committed GraphQL schema snapshot (see [GraphQL codegen](#graphql-codegen)).
 
 ## 🛠️ Development
 
@@ -124,11 +119,11 @@ This repository contains the source code for the Squad MCP remote server.
 
 ### Prerequisites
 
-- Node.js 22.22+
+- Node.js 22+
 - Yarn
-- Nix (optional, for reproducible dev environment via `flake.nix`)
-- PropelAuth account (for OAuth2)
-- Squad API credentials
+- Nix (optional, for a reproducible dev environment via `flake.nix`)
+- PropelAuth credentials (OAuth 2.1 client + backend API key)
+- Redis (optional locally; falls back to in-memory sessions)
 
 ### Local Setup
 
@@ -142,7 +137,7 @@ yarn install
 
 # Configure environment
 cp .env.example .env
-# Edit .env with your PropelAuth credentials
+# Edit .env with your PropelAuth credentials (and SQUAD_ENV=dev to target the dev platform)
 
 # Start development server with hot reload
 yarn dev
@@ -150,17 +145,31 @@ yarn dev
 # Server available at http://localhost:3232
 ```
 
+### Environment Variables
+
+| Variable                                                          | Required | Purpose                                                        |
+| ----------------------------------------------------------------- | -------- | -------------------------------------------------------------- |
+| `PROPELAUTH_CLIENT_ID` / `PROPELAUTH_CLIENT_SECRET`               | ✅       | OAuth 2.1 client credentials for token introspection           |
+| `PROPELAUTH_API_KEY`                                              | ✅       | Backend integration key for minting service JWTs               |
+| `SQUAD_ENV`                                                       |          | `dev` or `production` (default `production`) — selects auth/API/app URLs |
+| `PORT` / `MCP_URL` / `BASE_URI`                                   |          | Server port and externally-advertised base URL                 |
+| `REDIS_URL`                                                       |          | Redis connection for deploy-safe sessions (in-memory if unset) |
+| `SQUAD_GRAPHQL_URL`                                               |          | Override the Squad GraphQL endpoint (also used by codegen)     |
+| `POSTHOG_API_KEY` / `POSTHOG_HOST`                                |          | Enable tool-call telemetry                                     |
+| `LOG_LEVEL`                                                       |          | Logger verbosity                                               |
+
 ### Available Commands
 
 ```bash
-yarn build              # Compile TypeScript
-yarn dev                # Start dev server with hot reload
-yarn start              # Start production server
+yarn dev                # Start dev server with hot reload (mcp-use)
+yarn build              # Build the server (mcp-use)
+yarn start              # Start the built server
+yarn deploy             # Deploy via mcp-use
 yarn test               # Run unit tests (vitest)
-yarn format             # Lint with biome
-yarn format:fix         # Auto-fix lint issues
-yarn openapi:squad      # Regenerate API client from OpenAPI spec
-yarn storybook          # Run Storybook for widget development
+yarn format             # Lint/format check (biome)
+yarn format:fix         # Auto-fix lint/format issues
+yarn codegen            # Regenerate GraphQL types from schema.graphql
+yarn codegen:check      # Fail if generated GraphQL types are stale
 ```
 
 ### Testing the Server
@@ -170,57 +179,54 @@ yarn storybook          # Run Storybook for widget development
 curl http://localhost:3232/health
 
 # Check OAuth discovery
-curl http://localhost:3232/.well-known/oauth-authorization-server
+curl http://localhost:3232/.well-known/oauth-protected-resource
 
-# Test with MCP Inspector
-npx @modelcontextprotocol/inspector
-# Then connect to http://localhost:3232/mcp
+# Test with the built-in inspector
+yarn dev   # then open the inspector and connect to http://localhost:3232/mcp
 ```
 
 ### Project Structure
 
 ```
 squad-mcp/
-├── index.ts                    # MCP server entry point with OAuth
-├── server.json                 # MCP registry metadata
+├── server.ts                   # MCP server entry point (OAuth, Redis, tool/prompt/resource registration)
+├── server.json                 # MCP registry metadata (see MCP_REGISTRY.md)
+├── schema.graphql              # Committed snapshot of the Squad platform GraphQL schema
+├── codegen.ts                  # GraphQL Code Generator config
 ├── src/
-│   ├── client.ts               # MCP client export
-│   ├── helpers/
-│   │   ├── config.ts           # Environment configuration
-│   │   ├── getUser.ts          # OAuth context + workspace selection
-│   │   └── mintToken.ts        # JWT minting + per-user cache
-│   ├── lib/
-│   │   ├── logger.ts           # Structured logging
-│   │   └── clients/
-│   │       ├── squad.ts        # Squad API client factory
-│   │       └── middleware/     # Bearer token middleware
-│   └── tools/                  # Tool implementations
-│       ├── opportunity.ts
-│       ├── solution.ts
-│       ├── goal.ts
-│       ├── knowledge.ts
-│       ├── feedback.ts
-│       ├── insight.ts
-│       ├── workspace.ts
-│       ├── search.ts
-│       ├── views.ts
-│       └── helpers.ts
-├── resources/                  # React widget components
-│   ├── view-strategy-context/
-│   └── view-roadmap/
+│   ├── tools/                  # Tool implementations, grouped by surface
+│   │   ├── registry.ts         # Single registration path (annotations, errors, telemetry)
+│   │   ├── workspace.ts        # list/select workspaces, overview, members
+│   │   ├── search.ts           # semantic search
+│   │   ├── get-entity.ts       # fetch any entity by display ID / UUID
+│   │   ├── evidence.ts         # signals, clusters, insights
+│   │   ├── actions-read.ts     # list actions, action context
+│   │   ├── actions-write.ts    # update actions + status
+│   │   ├── strategy-read.ts    # goals, research questions, activity
+│   │   ├── strategy-write.ts   # create/update goals, insights, dismiss signals
+│   │   ├── research-write.ts   # create research questions
+│   │   ├── knowledge.ts        # documents + decision briefs (one-pagers)
+│   │   ├── ingest.ts           # ingest new signals
+│   │   └── integrations.ts     # list connected sources
+│   ├── prompts/                # MCP prompt workflows
+│   ├── resources/              # MCP resources (workspace context, goals)
+│   ├── gql/                    # Generated GraphQL types (yarn codegen)
+│   ├── graphql/                # GraphQL operation documents
+│   ├── helpers/                # OAuth, token minting, workspace selection, KV/Redis
+│   └── lib/                    # Squad API client, logger, telemetry
 ├── railway.toml                # Railway deployment config
 └── .env.example                # Environment template
 ```
 
 ## 🏭 Production Deployment
 
-This is a hosted service maintained by Squad. Users connect via OAuth - no self-hosting required.
+This is a hosted service maintained by Squad. Users connect via OAuth — no self-hosting required.
 
-**Architecture Notes (for contributors):**
+**Architecture notes (for contributors):**
 
-- Single-instance deployment on Railway
-- Follows [MCP specification](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports) for stateful HTTP sessions
-- In-memory transport storage (standard per MCP spec)
+- Deployed on Railway with a `/health` readiness check
+- Redis-backed sessions and stream state for horizontal scalability
+- Follows the [MCP specification](https://modelcontextprotocol.io/specification) for streamable HTTP transport
 
 ## 💬 Support
 
@@ -228,19 +234,20 @@ Need help with the Squad MCP server?
 
 - **Email:** support@meetsquad.ai
 - **Documentation:**
-  - [Squad MCP Guide](https://docs.meetsquad.ai/guides/squad-mcp) - Complete setup and integration guide
-  - [USAGE_EXAMPLES.md](./USAGE_EXAMPLES.md) - Real-world usage examples
-- **Issues:** [GitHub Issues](https://github.com/the-basilisk-ai/squad-mcp/issues) - Bug reports and feature requests
+  - [Squad MCP Guide](https://docs.meetsquad.ai/guides/squad-mcp) — complete setup and integration guide
+  - [USAGE_EXAMPLES.md](./USAGE_EXAMPLES.md) — real-world usage examples
+- **Issues:** [GitHub Issues](https://github.com/the-basilisk-ai/squad-mcp/issues) — bug reports and feature requests
 - **Privacy Policy:** [meetsquad.ai/privacy-policy](https://meetsquad.ai/privacy-policy)
-- **Squad Platform:** [meetsquad.ai](https://meetsquad.ai) - Learn about Opportunity Solution Trees
+- **Squad Platform:** [meetsquad.ai](https://meetsquad.ai)
 
 ## 🤝 Contributing
 
-Contributions welcome! Pre-commit hooks run biome lint and vitest automatically. Please ensure:
+Contributions welcome! Pre-commit hooks run biome and vitest automatically. Please ensure:
 
-- `yarn format` passes (biome lint)
+- `yarn format` passes (biome)
 - `yarn build` compiles without errors
 - `yarn test` passes
+- `yarn codegen:check` passes if you touched GraphQL operations
 - All tools include safety annotations
 
 ## 📄 License
@@ -249,13 +256,12 @@ MIT
 
 ## 🔗 Links
 
-- [Squad MCP Documentation](https://docs.meetsquad.ai/guides/squad-mcp) - Complete setup and integration guide
+- [Squad MCP Documentation](https://docs.meetsquad.ai/guides/squad-mcp) — complete setup and integration guide
 - [Squad Platform](https://meetsquad.ai)
 - [MCP Specification](https://modelcontextprotocol.io)
-- [Claude Desktop](https://claude.ai/download)
 - [Issue Tracker](https://github.com/the-basilisk-ai/squad-mcp/issues)
 
-## GraphQL codegen (v4)
+## GraphQL codegen
 
 Backend access is typed via GraphQL Code Generator. `schema.graphql` is a
 committed snapshot of the Squad platform API schema; `src/gql/` is generated
