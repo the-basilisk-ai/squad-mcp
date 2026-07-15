@@ -94,7 +94,7 @@ Pin these so strategy questions need no tool calls:
        │ HTTPS + Bearer Token
        ▼
 ┌──────────────────────────────────────────────┐
-│  Squad MCP Server (mcp-use)                  │
+│  Squad MCP Server                            │
 │  ┌────────────────────────────────────────┐  │
 │  │  OAuth → introspect + verify token     │  │
 │  │  JWT minting → service credentials     │  │
