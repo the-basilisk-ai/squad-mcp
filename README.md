@@ -104,7 +104,7 @@ Pin these so strategy questions need no tool calls:
 │  └────────────────────────────────────────┘  │
 └──────────────────────────────────────────────┘
        │
-       │ GraphQL (minted JWT)
+       │ Squad API Calls (minted JWT)
        ▼
 ┌──────────────┐
 │  Squad API   │
