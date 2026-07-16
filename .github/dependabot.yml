@@ -7,6 +7,11 @@ updates:
     open-pull-requests-limit: 10
     labels:
       - dependencies
+    ignore:
+      # @types/node major tracks the Node.js release line; keep it pinned to
+      # our runtime (Node 24 LTS) rather than chasing newer, unreleased majors.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     groups:
       npm-minor-patch:
         patterns:

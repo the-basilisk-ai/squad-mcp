@@ -14,7 +14,7 @@
       {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            nodejs_22
+            nodejs_24
             nodePackages.yarn
             nodePackages.typescript
             nodePackages.typescript-language-server

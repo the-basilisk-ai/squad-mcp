@@ -2,9 +2,11 @@
   "name": "@squadai/tools",
   "version": "4.0.0",
   "main": "./dist/server.js",
-  "types": "./dist/server.d.ts",
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "build": "mcp-use build",
     "dev": "mcp-use dev",
@@ -17,9 +19,6 @@
     "codegen": "graphql-codegen --config codegen.ts",
     "codegen:check": "graphql-codegen --config codegen.ts --check"
   },
-  "files": [
-    "dist"
-  ],
   "dependencies": {
     "@graphql-typed-document-node/core": "^3.2.0",
     "@mcp-use/inspector": "^6.0.0",
@@ -36,7 +35,7 @@
     "@biomejs/biome": "^2.5.1",
     "@graphql-codegen/cli": "^7.2.0",
     "@graphql-codegen/client-preset": "^6.1.0",
-    "@types/node": "^25.9.3",
+    "@types/node": "^24",
     "husky": "^9.1.7",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
