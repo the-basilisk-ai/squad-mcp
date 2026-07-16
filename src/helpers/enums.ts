@@ -1,12 +1,17 @@
 /**
- * Tool-facing enums mirrored from the Squad platform's GraphQL/pgEnum
- * definitions. The backend rejects values outside these sets, so constraining
- * the tool schemas here surfaces the valid options to the agent and fails fast
- * client-side instead of on a round-trip. Keep in sync with the platform
- * (packages/db/src/schema/tables.ts and the GraphQL schema).
+ * Tool-facing enum value sets mirrored from the Squad platform. Constraining
+ * the tool schemas surfaces the valid options to the agent and validates
+ * client-side. Keep in sync with the platform (packages/db/src/schema/tables.ts
+ * and the GraphQL schema).
+ *
+ * INSIGHT_CATEGORIES / INSIGHT_STATUSES map to real pgEnums
+ * (insight_category / insight_status) — the platform hard-rejects values
+ * outside these. SIGNAL_SOURCES / SIGNAL_TYPES mirror the GraphQL SignalSource /
+ * SignalType enums used for filtering; note signal source is stored free-form
+ * (varchar) at ingest, so these are the canonical filter set, not a hard limit.
  */
 
-/** SignalSource — where a signal came from. */
+/** SignalSource — the canonical set of signal sources (used for filtering). */
 export const SIGNAL_SOURCES = [
   "agent",
   "amplitude",
