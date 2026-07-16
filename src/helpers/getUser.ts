@@ -33,7 +33,7 @@ export type WorkspaceDirectory = {
   workspaces: WorkspaceInfo[];
 };
 
-const SELECTION_TTL_SECONDS = 24 * 60 * 60;
+const SELECTION_TTL_SECONDS = 30 * 24 * 60 * 60;
 
 const selectionKey = (userId: string) => `mcp:selection:${userId}`;
 
