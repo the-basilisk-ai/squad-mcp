@@ -8,34 +8,6 @@ query GoalList($limit: Int, $offset: Int, $minImportance: Int) {
   }
 }
 
-query ResearchQuestionList($limit: Int, $sufficiencyStatus: String) {
-  researchQuestionList(limit: $limit, sufficiencyStatus: $sufficiencyStatus) {
-    id
-    displayId
-    question
-    category
-    rationale
-    sufficiencyStatus
-    signalCount
-    sourceTypeCount
-    createdAt
-  }
-}
-
-query ResearchQuestionsByGoal($goalId: String!) {
-  researchQuestionsByGoal(goalId: $goalId) {
-    id
-    displayId
-    question
-    category
-    rationale
-    sufficiencyStatus
-    signalCount
-    sourceTypeCount
-    createdAt
-  }
-}
-
 query ActivityStream(
   $first: Int
   $after: String

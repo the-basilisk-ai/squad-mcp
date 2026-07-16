@@ -1,20 +1,13 @@
 import { z } from "zod";
-import {
-  ActivityStreamDocument,
-  GoalListDocument,
-  ResearchQuestionListDocument,
-  ResearchQuestionsByGoalDocument,
-} from "../gql/graphql.js";
+import { ActivityStreamDocument, GoalListDocument } from "../gql/graphql.js";
 import { decodeOffsetCursor, encodeOffsetCursor } from "../helpers/cursor.js";
 import { formatDisplayId } from "../helpers/display-id.js";
 import {
   clampLimit,
   emptyResponse,
-  type ListItem,
   listResponse,
 } from "../helpers/responses.js";
 import { execute } from "../lib/squad-api-client.js";
-import { toolError } from "./helpers.js";
 import { type OAuthServer, registerTool } from "./registry.js";
 
 export function registerStrategyReadTools(server: OAuthServer) {
@@ -22,7 +15,7 @@ export function registerStrategyReadTools(server: OAuthServer) {
     name: "list_goals",
     title: "List Goals",
     description:
-      "Strategic goals ordered by importance. Use get_entity(GL-N) for a goal's supporting insights and research questions.",
+      "Strategic goals ordered by importance. Use get_entity(GL-N) for a goal's supporting insights.",
     schema: z.object({
       minImportance: z.number().int().optional(),
       limit: z.number().int().optional(),
@@ -68,66 +61,6 @@ export function registerStrategyReadTools(server: OAuthServer) {
               : undefined,
         },
       );
-    },
-  });
-
-  registerTool(server, {
-    name: "list_research_questions",
-    title: "List Research Questions",
-    description:
-      "Open knowledge gaps and how well-evidenced they are (sufficiencyStatus). Filter by goal or sufficiency to find what the team still doesn't know.",
-    schema: z.object({
-      goalId: z.string().optional().describe("GL-N or UUID to scope by goal"),
-      sufficiency: z
-        .string()
-        .optional()
-        .describe("Filter by sufficiency status, e.g. insufficient"),
-      limit: z.number().int().optional(),
-    }),
-    scope: "read",
-    handler: async (params, tool) => {
-      const ctx = await tool.getContext();
-      const limit = clampLimit(params.limit);
-
-      const rows = params.goalId
-        ? ((
-            await execute(
-              ResearchQuestionsByGoalDocument,
-              { goalId: params.goalId },
-              ctx,
-            )
-          ).researchQuestionsByGoal ?? [])
-        : ((
-            await execute(
-              ResearchQuestionListDocument,
-              { limit, sufficiencyStatus: params.sufficiency },
-              ctx,
-            )
-          ).researchQuestionList ?? []);
-
-      if (rows.length === 0) {
-        return emptyResponse(
-          "No research questions match.",
-          "Research questions capture knowledge gaps; they can be created once write tools ship.",
-        );
-      }
-
-      const items: ListItem[] = rows.slice(0, limit).map(rq => ({
-        id: rq.id ?? "",
-        displayId:
-          rq.displayId != null
-            ? formatDisplayId("research_question", rq.displayId)
-            : undefined,
-        title: rq.question ?? "(no question)",
-        status: rq.sufficiencyStatus ?? undefined,
-        type: rq.category ?? undefined,
-        counts: {
-          signals: rq.signalCount ?? 0,
-          sourceTypes: rq.sourceTypeCount ?? 0,
-        },
-      }));
-
-      return listResponse(items);
     },
   });
 

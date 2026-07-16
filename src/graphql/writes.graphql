@@ -109,23 +109,3 @@ mutation UnlinkEntities($input: UnlinkEntitiesInput!) {
 mutation DeleteSignal($id: String!) {
   deleteSignal(id: $id)
 }
-
-mutation CreateResearchQuestion(
-  $question: String!
-  $goalId: String
-  $category: String
-  $rationale: String
-) {
-  createResearchQuestion(
-    question: $question
-    goalId: $goalId
-    category: $category
-    rationale: $rationale
-  ) {
-    id
-    displayId
-    question
-    category
-    sufficiencyStatus
-  }
-}

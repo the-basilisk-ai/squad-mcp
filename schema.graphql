@@ -1017,7 +1017,6 @@ type Goal {
   insights: [Insight!]
   lastModifiedBy: LastModifier
   referencedBy: [Document!]
-  researchQuestions: [ResearchQuestion!]
   title: String
   updatedAt: DateTime
 }
@@ -1262,12 +1261,6 @@ type Mutation {
     input: CreateIntegrationSourceInput!
   ): IntegrationTrigger
   createNotionPageConfig(input: CreateNotionPageConfigInput!): NotionPageConfig
-  createResearchQuestion(
-    category: String
-    goalId: String
-    question: String!
-    rationale: String
-  ): ResearchQuestion
   createWorkspaces(input: [WorkspaceCreateInput!]!): CreateWorkspacesResponse
   deleteConversation(id: String!): Boolean
   deleteDirectory(id: String!): DeleteDirectoryResponse
@@ -1281,7 +1274,6 @@ type Mutation {
   """
   deleteNotionPageConfig(id: String!): Boolean
   deleteOnePager(onePagerId: String!): DeleteOnePagerPayload
-  deleteResearchQuestion(id: String!): Boolean
   deleteSignal(id: String!): Boolean
   disconnectIntegration(id: String!): Boolean
   dismissAction(actionId: String!, surface: ActionSurface): Action
@@ -1697,11 +1689,6 @@ type Query {
   providerCategories: [String!]
   report(id: String!): Report
   reportList(agentId: String!, limit: Int = 20, offset: Int = 0): [Report!]
-  researchQuestionList(
-    limit: Int = 50
-    sufficiencyStatus: String
-  ): [ResearchQuestion!]
-  researchQuestionsByGoal(goalId: String!): [ResearchQuestion!]
 
   """
   Get documents that are not in any directory
@@ -1825,21 +1812,6 @@ type ResearchAgentConfig {
 
 input ResearchAgentConfigInput {
   prompt: String!
-}
-
-type ResearchQuestion {
-  category: String
-  confidenceAggregate: Float
-  createdAt: DateTime
-  createdBy: String
-  displayId: Int
-  id: String
-  question: String
-  rationale: String
-  signalCount: Int
-  sourceTypeCount: Int
-  sufficiencyStatus: String
-  updatedAt: DateTime
 }
 
 input ScheduleTriggerConfigInput {

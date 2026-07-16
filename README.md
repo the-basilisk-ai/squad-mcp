@@ -40,9 +40,9 @@ Squad entities are referenced by short **display IDs** so the assistant can cite
 | Prefix | Entity          | Prefix | Entity            |
 | ------ | --------------- | ------ | ----------------- |
 | `SI-`  | Signal          | `GL-`  | Goal              |
-| `CL-`  | Cluster         | `RQ-`  | Research question |
 | `IN-`  | Insight         | `OP-`  | Decision brief    |
 | `AC-`  | Action          | `DC-`  | Document          |
+| `CL-`  | Cluster         |        |                   |
 
 ## ✨ Available Tools
 
@@ -54,7 +54,7 @@ The server exposes ~35 tools. Write tools require a token minted with the `write
 | **Search**       | `search`, `get_entity`                                                                                          | Semantic search and fetch any entity by ID       |
 | **Evidence**     | `list_signals`, `find_similar_signals`, `list_clusters`, `get_cluster`, `list_insights`                        | Explore signals, clusters, and insights          |
 | **Actions**      | `list_actions`, `get_action_context`, `update_action`, `update_action_status`                                  | Track and update product work                    |
-| **Strategy**     | `list_goals`, `create_goal`, `update_goal`, `list_research_questions`, `create_research_question`, `update_insight`, `dismiss_signal`, `get_activity` | Manage goals, research questions, and activity   |
+| **Strategy**     | `list_goals`, `create_goal`, `update_goal`, `update_insight`, `dismiss_signal`, `get_activity` | Manage goals, insights, and activity   |
 | **Knowledge**    | `list_documents`, `create_document`, `update_document`                                                          | Store research, references, and notes            |
 | **Decision briefs** | `list_one_pagers`, `generate_one_pager`, `update_one_pager_status`                                           | Generate and manage one-page decision briefs     |
 | **Ingest**       | `ingest_signal`                                                                                                 | Capture new feedback as a signal (with dedup)    |
@@ -202,9 +202,8 @@ squad-mcp/
 │   │   ├── evidence.ts         # signals, clusters, insights
 │   │   ├── actions-read.ts     # list actions, action context
 │   │   ├── actions-write.ts    # update actions + status
-│   │   ├── strategy-read.ts    # goals, research questions, activity
+│   │   ├── strategy-read.ts    # goals, activity
 │   │   ├── strategy-write.ts   # create/update goals, insights, dismiss signals
-│   │   ├── research-write.ts   # create research questions
 │   │   ├── knowledge.ts        # documents + decision briefs (one-pagers)
 │   │   ├── ingest.ts           # ingest new signals
 │   │   └── integrations.ts     # list connected sources

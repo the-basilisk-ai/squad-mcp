@@ -11,7 +11,6 @@ export type EntityType =
   | "goal"
   | "one_pager"
   | "document"
-  | "research_question"
   | "cluster";
 
 const PREFIX_TO_TYPE: Record<string, EntityType> = {
@@ -21,7 +20,6 @@ const PREFIX_TO_TYPE: Record<string, EntityType> = {
   GL: "goal",
   OP: "one_pager",
   DC: "document",
-  RQ: "research_question",
   CL: "cluster",
 };
 
@@ -43,7 +41,7 @@ export class InvalidEntityIdError extends Error {
     super(
       `"${input}" is not a valid entity ID. Pass a UUID or a display ID such as ` +
         `SI-1 (signal), IN-1 (insight), AC-1 (action), GL-1 (goal), OP-1 (decision brief), ` +
-        `DC-1 (document), RQ-1 (research question) or CL-1 (cluster).`,
+        `DC-1 (document) or CL-1 (cluster).`,
     );
     this.name = "InvalidEntityIdError";
   }

@@ -136,12 +136,6 @@ query GetGoal($id: String!) {
       title
       combinedScore
     }
-    researchQuestions {
-      id
-      displayId
-      question
-      sufficiencyStatus
-    }
   }
 }
 

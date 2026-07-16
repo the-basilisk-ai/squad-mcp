@@ -20,9 +20,6 @@ const { registerActionWriteTools } = await import("../tools/actions-write.js");
 const { registerStrategyWriteTools } = await import(
   "../tools/strategy-write.js"
 );
-const { registerResearchWriteTools } = await import(
-  "../tools/research-write.js"
-);
 const { registerKnowledgeTools } = await import("../tools/knowledge.js");
 
 const registeredTools = new Set(
@@ -36,7 +33,6 @@ const registeredTools = new Set(
     registerIngestTools,
     registerActionWriteTools,
     registerStrategyWriteTools,
-    registerResearchWriteTools,
     registerKnowledgeTools,
   ].flatMap(register => [...captureTools(register).keys()]),
 );
