@@ -11,23 +11,12 @@ import {
   UpdateInsightMetaDocument,
 } from "../gql/graphql.js";
 import { formatDisplayId } from "../helpers/display-id.js";
+import { INSIGHT_CATEGORIES, INSIGHT_STATUSES } from "../helpers/enums.js";
 import type { UserContext } from "../helpers/getUser.js";
 import { appLink, entityResponse } from "../helpers/responses.js";
 import { execute } from "../lib/squad-api-client.js";
 import { toolError } from "./helpers.js";
 import { type OAuthServer, registerTool } from "./registry.js";
-
-// Mirrors the backend insight_category / insight_status pgEnums
-// (packages/db/src/schema/tables.ts). Keep in sync — the platform rejects
-// values outside these sets with "Invalid insight category/status".
-const INSIGHT_CATEGORIES = [
-  "pain_point",
-  "feature_request",
-  "positive_signal",
-  "trend",
-  "risk",
-] as const;
-const INSIGHT_STATUSES = ["active", "stale", "archived", "resolved"] as const;
 
 async function resolveGoalUuid(
   goalId: string,

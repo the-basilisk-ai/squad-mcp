@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SIGNAL_SOURCES } from "../helpers/enums.js";
 import { entityResponse } from "../helpers/responses.js";
 import { type IngestItem, ingestSignals } from "../lib/ingest-client.js";
 import { type OAuthServer, registerTool } from "./registry.js";
@@ -11,7 +12,7 @@ const SignalInput = z.object({
     .min(1)
     .describe("The feedback verbatim or a faithful summary"),
   source: z
-    .string()
+    .enum(SIGNAL_SOURCES)
     .optional()
     .describe(
       "Where it came from, e.g. zendesk, intercom, slack, gong, manual (default: api)",

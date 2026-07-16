@@ -10,6 +10,12 @@ import {
 import { decodeOffsetCursor, encodeOffsetCursor } from "../helpers/cursor.js";
 import { formatDisplayId } from "../helpers/display-id.js";
 import {
+  INSIGHT_CATEGORIES,
+  INSIGHT_STATUSES,
+  SIGNAL_SOURCES,
+  SIGNAL_TYPES,
+} from "../helpers/enums.js";
+import {
   appLink,
   clampLimit,
   emptyResponse,
@@ -20,45 +26,6 @@ import {
 import { execute } from "../lib/squad-api-client.js";
 import { toolError } from "./helpers.js";
 import { type OAuthServer, registerTool } from "./registry.js";
-
-const SIGNAL_SOURCES = [
-  "agent",
-  "amplitude",
-  "api",
-  "app_store",
-  "capterra",
-  "document",
-  "file_upload",
-  "g2",
-  "github",
-  "gong",
-  "google_play",
-  "google_reviews",
-  "intercom",
-  "jira",
-  "linear",
-  "manual",
-  "notion",
-  "posthog",
-  "research",
-  "salesforce",
-  "slack",
-  "trustpilot",
-  "typeform",
-  "webhook",
-  "website",
-  "zendesk",
-] as const;
-
-const SIGNAL_TYPES = [
-  "agent_insight",
-  "bug_report",
-  "churn_risk",
-  "competitive_intel",
-  "feature_request",
-  "pain_point",
-  "praise",
-] as const;
 
 export function registerEvidenceTools(server: OAuthServer) {
   registerTool(server, {
@@ -300,9 +267,17 @@ export function registerEvidenceTools(server: OAuthServer) {
       'Browse distilled insights ranked by combined score, with category/score/status filters or scoped to a goal. Use get_entity(IN-N, include: ["evidence"]) for the supporting signals.',
     schema: z.object({
       goalId: z.string().optional().describe("GL-N or UUID to scope by goal"),
-      category: z.string().optional(),
+      category: z
+        .enum(INSIGHT_CATEGORIES)
+        .optional()
+        .describe(
+          "Filter by category: pain_point, feature_request, positive_signal, trend, or risk",
+        ),
       minScore: z.number().optional().describe("Minimum combined score"),
-      status: z.string().optional(),
+      status: z
+        .enum(INSIGHT_STATUSES)
+        .optional()
+        .describe("Filter by status: active, stale, archived, or resolved"),
       limit: z.number().int().optional(),
       cursor: z.string().optional(),
     }),
