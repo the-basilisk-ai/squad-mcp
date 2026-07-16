@@ -17,6 +17,18 @@ import { execute } from "../lib/squad-api-client.js";
 import { toolError } from "./helpers.js";
 import { type OAuthServer, registerTool } from "./registry.js";
 
+// Mirrors the backend insight_category / insight_status pgEnums
+// (packages/db/src/schema/tables.ts). Keep in sync — the platform rejects
+// values outside these sets with "Invalid insight category/status".
+const INSIGHT_CATEGORIES = [
+  "pain_point",
+  "feature_request",
+  "positive_signal",
+  "trend",
+  "risk",
+] as const;
+const INSIGHT_STATUSES = ["active", "stale", "archived", "resolved"] as const;
+
 async function resolveGoalUuid(
   goalId: string,
   ctx: UserContext,
@@ -135,8 +147,16 @@ export function registerStrategyWriteTools(server: OAuthServer) {
       "Curate an insight: set category or status, and link/unlink the goal it supports. Insight titles and descriptions are pipeline-generated and not editable.",
     schema: z.object({
       insightId: z.string().describe("IN-N display ID or UUID"),
-      category: z.string().optional(),
-      status: z.string().optional(),
+      category: z
+        .enum(INSIGHT_CATEGORIES)
+        .optional()
+        .describe(
+          "Insight category: pain_point, feature_request, positive_signal, trend, or risk",
+        ),
+      status: z
+        .enum(INSIGHT_STATUSES)
+        .optional()
+        .describe("Insight status: active, stale, archived, or resolved"),
       linkGoalId: z
         .string()
         .optional()
