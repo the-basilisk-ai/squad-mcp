@@ -54,22 +54,23 @@ describe("prompts", () => {
     ]);
   });
 
-  it.each(
-    PROMPTS.map(p => [p.name, p] as const),
-  )("%s references only tools that exist", (_name, prompt) => {
-    const text = prompt.build({
-      feedback_text: "x",
-      source: "slack",
-      since: "2026-07-01",
-      id: "AC-1",
-      topic_or_id: "AC-1",
-    });
-    const referenced = text.match(TOOL_REFERENCE) ?? [];
-    expect(referenced.length).toBeGreaterThan(0);
-    for (const tool of referenced) {
-      expect(registeredTools).toContain(tool);
-    }
-  });
+  it.each(PROMPTS.map(p => [p.name, p] as const))(
+    "%s references only tools that exist",
+    (_name, prompt) => {
+      const text = prompt.build({
+        feedback_text: "x",
+        source: "slack",
+        since: "2026-07-01",
+        id: "AC-1",
+        topic_or_id: "AC-1",
+      });
+      const referenced = text.match(TOOL_REFERENCE) ?? [];
+      expect(referenced.length).toBeGreaterThan(0);
+      for (const tool of referenced) {
+        expect(registeredTools).toContain(tool);
+      }
+    },
+  );
 
   it("interpolates arguments into the message", () => {
     const text = PROMPTS[0].build({
