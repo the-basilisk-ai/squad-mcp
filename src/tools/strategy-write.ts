@@ -69,12 +69,7 @@ export function registerStrategyWriteTools(server: OAuthServer) {
             importance: goal.importance,
           },
         },
-        {
-          link: appLink(ctx.orgSlug, ctx.workspaceSlug, "goals"),
-          suggestedNextTools: [
-            "create_research_question — capture what we don't know yet about this goal",
-          ],
-        },
+        { link: appLink(ctx.orgSlug, ctx.workspaceSlug, "goals") },
       );
     },
   });

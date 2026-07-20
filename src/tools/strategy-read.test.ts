@@ -31,50 +31,6 @@ beforeEach(() => {
   mockGetUserContext.mockResolvedValue(userCtx);
 });
 
-describe("list_research_questions", () => {
-  it("filters by sufficiency via researchQuestionList", async () => {
-    byOperation(mockExecute, {
-      ResearchQuestionList: (vars: unknown) => {
-        expect((vars as { sufficiencyStatus: string }).sufficiencyStatus).toBe(
-          "insufficient",
-        );
-        return {
-          researchQuestionList: [
-            {
-              id: "rq1",
-              displayId: 6,
-              question: "Why churn at step 3?",
-              sufficiencyStatus: "insufficient",
-              signalCount: 2,
-              sourceTypeCount: 1,
-            },
-          ],
-        };
-      },
-    });
-
-    const parsed = parse(
-      await tools.get("list_research_questions")!(
-        { sufficiency: "insufficient" },
-        authCtx,
-      ),
-    );
-    expect(parsed.items[0].displayId).toBe("RQ-6");
-    expect(parsed.items[0].status).toBe("insufficient");
-  });
-
-  it("scopes by goal via researchQuestionsByGoal", async () => {
-    byOperation(mockExecute, {
-      ResearchQuestionsByGoal: { researchQuestionsByGoal: [] },
-    });
-
-    const parsed = parse(
-      await tools.get("list_research_questions")!({ goalId: "GL-2" }, authCtx),
-    );
-    expect(parsed.items).toEqual([]);
-  });
-});
-
 describe("get_activity", () => {
   it("maps filters onto activityStream and passes the native cursor through", async () => {
     byOperation(mockExecute, {

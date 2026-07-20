@@ -13,7 +13,6 @@ describe("parseEntityRef", () => {
     ["GL-3", "goal", 3],
     ["OP-9", "one_pager", 9],
     ["DC-2", "document", 2],
-    ["RQ-5", "research_question", 5],
     ["CL-11", "cluster", 11],
   ])("routes %s to %s", (input, type, num) => {
     expect(parseEntityRef(input)).toEqual({

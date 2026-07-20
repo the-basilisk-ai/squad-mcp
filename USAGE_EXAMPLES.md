@@ -209,7 +209,7 @@ Started decision brief **OP-7** (status: building) from AC-31…
 *Recommendation:* Ship streaming exports next sprint.
 *Evidence:* 11 signals across zendesk/intercom/gong (SI-214, SI-198, SI-176 …),
 tied to GL-3. Support ticket volume from exports is trending up 3× this month.
-*Gaps:* No data on export sizes above 100k rows — worth a research question.
+*Gaps:* No data on export sizes above 100k rows — worth investigating.
 
 Moved to in_review so the team can sign off. Open it: OP-7 → decision brief.
 ```

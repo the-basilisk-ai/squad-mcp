@@ -71,7 +71,7 @@ Steps:
 1. If ${args.id} is an action, call get_action_context to understand it and its evidence; if it is an insight, call get_entity with include ["evidence"].
 2. Call generate_one_pager for ${args.id}.
 3. Poll get_entity on the returned OP- ID until its status moves past building (wait a moment between polls).
-4. Read the finished brief and present: the recommendation, the strongest evidence behind it (quoted, with SI- citations), and any gaps worth a research question (create_research_question if the user agrees).
+4. Read the finished brief and present: the recommendation, the strongest evidence behind it (quoted, with SI- citations), and any evidence gaps worth flagging.
 
 Include the OP- ID and deep link so the user can open it in Squad.`,
   },
