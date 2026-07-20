@@ -1086,12 +1086,12 @@
     ws "^8.19.0"
     zod "4.3.5"
 
-"@mcp-use/cli@3.6.4":
-  version "3.6.4"
-  resolved "https://registry.yarnpkg.com/@mcp-use/cli/-/cli-3.6.4.tgz#4a921efef052a66c08c0c30bfc47b1d736840844"
-  integrity sha512-eF+c3k67sCW+Q3/ljH6Q+DMJhEh4LaeOfFP9Dyg1ZfB7d/t4aC/NIDrug/fq1+pMzn7WrnpDus3IrcwFmjnrrg==
+"@mcp-use/cli@3.6.5":
+  version "3.6.5"
+  resolved "https://registry.yarnpkg.com/@mcp-use/cli/-/cli-3.6.5.tgz#b2f9949c87d95767d43fa2aea47df3882aa3ce9c"
+  integrity sha512-RXgMMtu7iGj8cqhVZxPuZSiFuOSpn4Dmv/TM1Hrih4IOVUv69Uq9M84aglbruxQHf9HyV30U0XBAnJ78FDe5dA==
   dependencies:
-    "@mcp-use/inspector" "12.0.3"
+    "@mcp-use/inspector" "12.0.4"
     "@tailwindcss/vite" "^4.2.0"
     "@vitejs/plugin-react" "^6.0.0"
     chalk "^5.6.2"
@@ -1099,7 +1099,7 @@
     commander "^14.0.2"
     dotenv "^17.3.1"
     esbuild "0.28.1"
-    mcp-use "1.34.3"
+    mcp-use "1.34.4"
     open "^11.0.0"
     tar "^7.5.16"
     tsx "^4.21.0"
@@ -1108,10 +1108,10 @@
     ws "^8.19.0"
     zod "4.3.5"
 
-"@mcp-use/inspector@12.0.3":
-  version "12.0.3"
-  resolved "https://registry.yarnpkg.com/@mcp-use/inspector/-/inspector-12.0.3.tgz#69364908112c3261681298fee1c2fb1c84b5ad83"
-  integrity sha512-X/oTEo+ut95861YxAolgNS41imd+WuMn2SjURi/ibpd7D25+f1cxe6VgnIqNd/OlV9QwdFzAZMm8Zg4Ohu8qYw==
+"@mcp-use/inspector@12.0.4":
+  version "12.0.4"
+  resolved "https://registry.yarnpkg.com/@mcp-use/inspector/-/inspector-12.0.4.tgz#4b936c2d1974cfa40d6fc90cf1c71b7a0a979164"
+  integrity sha512-j72GMzP0i9ED26Gp6UO+52wnMvf1bWo+qZPeYpfJSkjPAyAhlsvifZbYsGfjfnqUiAgo7N+utIz/W79mDYRp2Q==
   dependencies:
     "@hono/node-server" "^1.19.13"
     "@modelcontextprotocol/ext-apps" "^1.0.1"
@@ -1136,7 +1136,7 @@
     hono "^4.12.12"
     lucide-react "^0.562.0"
     markdown-to-jsx "^9.7.4"
-    mcp-use "1.34.3"
+    mcp-use "1.34.4"
     motion "^12.34.2"
     next-themes "^0.4.6"
     open "^11.0.0"
@@ -4139,15 +4139,15 @@ mcp-use@1.28.0:
     cli-highlight "^2.1.11"
     redis "^5.10.0"
 
-mcp-use@1.34.3, mcp-use@^1.34.3:
-  version "1.34.3"
-  resolved "https://registry.yarnpkg.com/mcp-use/-/mcp-use-1.34.3.tgz#f187207bb2c83f8c31179ab21f6fcb93c09fd4bd"
-  integrity sha512-2AnEvvgmrjP130Vc3ZthX5+hrRwPm/BcodZd0nWfKVtm8A/JOu2sIq8bPtF1O7Yt6tc8mC5ud3Zsm/eGU1mbsQ==
+mcp-use@1.34.4, mcp-use@^1.34.4:
+  version "1.34.4"
+  resolved "https://registry.yarnpkg.com/mcp-use/-/mcp-use-1.34.4.tgz#aa430ef3ff7815d344bafadeba09b2efb4355e21"
+  integrity sha512-F8F4Pvqowellax6tyRRbG3DWXAJzv2knnk6GeLTgcyFyWUo1ltXLNGv+SBdLJQQRh4Kc/ISqtm/byI4/mpshGA==
   dependencies:
     "@hono/node-server" "1.19.13"
     "@mcp-ui/server" "6.1.0"
-    "@mcp-use/cli" "3.6.4"
-    "@mcp-use/inspector" "12.0.3"
+    "@mcp-use/cli" "3.6.5"
+    "@mcp-use/inspector" "12.0.4"
     "@modelcontextprotocol/ext-apps" "1.0.1"
     "@modelcontextprotocol/sdk" "1.26.0"
     chalk "4.1.2"
