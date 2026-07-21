@@ -1,0 +1,10 @@
+# Wait 7 days before resolving a newly published version, so a compromised
+# fresh release can't be pulled in before it's caught. Only affects resolving
+# new versions; frozen-lockfile installs are unaffected.
+minimumReleaseAge: 10080
+
+# Reject transitive dependencies resolved from non-registry (git/tarball/etc.)
+# sources, and block updates that would downgrade these security settings.
+# Require pnpm >=10.26 / >=10.21 respectively — older pnpm silently ignores them.
+blockExoticSubdeps: true
+trustPolicy: no-downgrade
