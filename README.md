@@ -120,7 +120,7 @@ This repository contains the source code for the Squad MCP remote server.
 ### Prerequisites
 
 - Node.js 22+
-- Yarn
+- pnpm
 - Nix (optional, for a reproducible dev environment via `flake.nix`)
 - PropelAuth credentials (OAuth 2.1 client + backend API key)
 - Redis (optional locally; falls back to in-memory sessions)
@@ -133,14 +133,14 @@ git clone https://github.com/the-basilisk-ai/squad-mcp.git
 cd squad-mcp
 
 # Install dependencies
-yarn install
+pnpm install
 
 # Configure environment
 cp .env.example .env
 # Edit .env with your PropelAuth credentials (and SQUAD_ENV=dev to target the dev platform)
 
 # Start development server with hot reload
-yarn dev
+pnpm dev
 
 # Server available at http://localhost:3232
 ```
@@ -161,15 +161,15 @@ yarn dev
 ### Available Commands
 
 ```bash
-yarn dev                # Start dev server with hot reload (mcp-use)
-yarn build              # Build the server (mcp-use)
-yarn start              # Start the built server
-yarn deploy             # Deploy via mcp-use
-yarn test               # Run unit tests (vitest)
-yarn format             # Lint/format check (biome)
-yarn format:fix         # Auto-fix lint/format issues
-yarn codegen            # Regenerate GraphQL types from schema.graphql
-yarn codegen:check      # Fail if generated GraphQL types are stale
+pnpm dev                # Start dev server with hot reload (mcp-use)
+pnpm build              # Build the server (mcp-use)
+pnpm start              # Start the built server
+pnpm deploy             # Deploy via mcp-use
+pnpm test               # Run unit tests (vitest)
+pnpm format             # Lint/format check (biome)
+pnpm format:fix         # Auto-fix lint/format issues
+pnpm codegen            # Regenerate GraphQL types from schema.graphql
+pnpm codegen:check      # Fail if generated GraphQL types are stale
 ```
 
 ### Testing the Server
@@ -182,7 +182,7 @@ curl http://localhost:3232/health
 curl http://localhost:3232/.well-known/oauth-protected-resource
 
 # Test with the built-in inspector
-yarn dev   # then open the inspector and connect to http://localhost:3232/mcp
+pnpm dev   # then open the inspector and connect to http://localhost:3232/mcp
 ```
 
 ### Project Structure
@@ -209,7 +209,7 @@ squad-mcp/
 │   │   └── integrations.ts     # list connected sources
 │   ├── prompts/                # MCP prompt workflows
 │   ├── resources/              # MCP resources (workspace context, goals)
-│   ├── gql/                    # Generated GraphQL types (yarn codegen)
+│   ├── gql/                    # Generated GraphQL types (pnpm codegen)
 │   ├── graphql/                # GraphQL operation documents
 │   ├── helpers/                # OAuth, token minting, workspace selection, KV/Redis
 │   └── lib/                    # Squad API client, logger, telemetry
@@ -243,10 +243,10 @@ Need help with the Squad MCP server?
 
 Contributions welcome! Pre-commit hooks run biome and vitest automatically. Please ensure:
 
-- `yarn format` passes (biome)
-- `yarn build` compiles without errors
-- `yarn test` passes
-- `yarn codegen:check` passes if you touched GraphQL operations
+- `pnpm format` passes (biome)
+- `pnpm build` compiles without errors
+- `pnpm test` passes
+- `pnpm codegen:check` passes if you touched GraphQL operations
 - All tools include safety annotations
 
 ## 📄 License
@@ -268,5 +268,5 @@ from it plus the operation documents in `src/graphql/`.
 
 - Refresh the snapshot: copy `packages/graphql/src/schema/generated.graphql`
   from the API repo over `schema.graphql` (or set `SQUAD_GRAPHQL_URL` to
-  introspect a live endpoint), then run `yarn codegen`.
-- CI runs `yarn codegen:check` and fails when `src/gql/` is stale.
+  introspect a live endpoint), then run `pnpm codegen`.
+- CI runs `pnpm codegen:check` and fails when `src/gql/` is stale.
