@@ -10,7 +10,7 @@ overrides:
   qs: ^6.14.2
   axios: ^1.18.1
   hono: ^4.12.25
-  '@hono/node-server': ^2.0.5
+  '@hono/node-server': ^2.0.10
   fast-uri: ^3.1.3
   minimatch: ^10.2.3
   ajv: ^8.18.0
@@ -667,8 +667,8 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
 
-  '@hono/node-server@2.0.9':
-    resolution: {integrity: sha512-cNMw3ziCdDcx0+ldta60zvUL5XO0OLt521n2hjPp0PB0ugczDCEczXsf33qQbkKIXWGFQ03f0LC85u6YK8pCLA==}
+  '@hono/node-server@2.0.10':
+    resolution: {integrity: sha512-ZcnNVhKTmyDJeg0UlnZjvM73JBsTAuhrH/J4fjwGOw59PwOW51r4J+p6CsKZWXdKSme4MFqU62CZMOsdDrU4CA==}
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4.12.25
@@ -4730,7 +4730,7 @@ snapshots:
     dependencies:
       graphql: 17.0.2
 
-  '@hono/node-server@2.0.9(hono@4.12.27)':
+  '@hono/node-server@2.0.10(hono@4.12.27)':
     dependencies:
       hono: 4.12.27
 
@@ -4958,7 +4958,7 @@ snapshots:
 
   '@mcp-use/inspector@12.0.5(@types/react@19.2.17)(express@5.2.1)(mcp-use@1.34.5(@types/node@24.13.3)(@types/react@19.2.17)(jiti@2.7.0)(react-dom@19.2.7(react@19.2.7))(react-router-dom@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-router@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(rollup@4.62.2)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))(yaml@2.9.0)(zod@4.4.3))(react-dom@19.2.7(react@19.2.7))(react-router@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))':
     dependencies:
-      '@hono/node-server': 2.0.9(hono@4.12.27)
+      '@hono/node-server': 2.0.10(hono@4.12.27)
       '@modelcontextprotocol/ext-apps': 1.0.1(@modelcontextprotocol/sdk@1.29.0(zod@4.4.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.3.5)
       '@modelcontextprotocol/sdk': 1.29.0(zod@4.3.5)
       '@paper-design/shaders-react': 0.0.72(@types/react@19.2.17)(react@19.2.7)
@@ -5010,7 +5010,7 @@ snapshots:
 
   '@mcp-use/inspector@6.0.0(@types/react@19.2.17)(express@5.2.1)(mcp-use@1.34.5(@types/node@24.13.3)(@types/react@19.2.17)(jiti@2.7.0)(react-dom@19.2.7(react@19.2.7))(react-router-dom@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-router@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(rollup@4.62.2)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))(yaml@2.9.0)(zod@4.4.3))(react-dom@19.2.7(react@19.2.7))(react-router@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))':
     dependencies:
-      '@hono/node-server': 2.0.9(hono@4.12.27)
+      '@hono/node-server': 2.0.10(hono@4.12.27)
       '@modelcontextprotocol/ext-apps': 1.0.1(@modelcontextprotocol/sdk@1.29.0(zod@4.4.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.3.5)
       '@modelcontextprotocol/sdk': 1.29.0(zod@4.3.5)
       '@paper-design/shaders-react': 0.0.72(@types/react@19.2.17)(react@19.2.7)
@@ -5162,7 +5162,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.29.0(zod@4.3.5)':
     dependencies:
-      '@hono/node-server': 2.0.9(hono@4.12.27)
+      '@hono/node-server': 2.0.10(hono@4.12.27)
       ajv: 8.18.0
       ajv-formats: 3.0.1(ajv@8.18.0)
       content-type: 1.0.5
@@ -5184,7 +5184,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.29.0(zod@4.4.3)':
     dependencies:
-      '@hono/node-server': 2.0.9(hono@4.12.27)
+      '@hono/node-server': 2.0.10(hono@4.12.27)
       ajv: 8.18.0
       ajv-formats: 3.0.1(ajv@8.18.0)
       content-type: 1.0.5
@@ -7078,7 +7078,7 @@ snapshots:
 
   mcp-use@1.34.5(@types/node@24.13.3)(@types/react@19.2.17)(jiti@2.7.0)(react-dom@19.2.7(react@19.2.7))(react-router-dom@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-router@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(rollup@4.62.2)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))(yaml@2.9.0)(zod@4.3.5):
     dependencies:
-      '@hono/node-server': 2.0.9(hono@4.12.27)
+      '@hono/node-server': 2.0.10(hono@4.12.27)
       '@mcp-ui/server': 6.1.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.3.5)
       '@mcp-use/cli': 3.6.6(@types/node@24.13.3)(@types/react@19.2.17)(express@5.2.1)(jiti@2.7.0)(react-dom@19.2.7(react@19.2.7))(react-router-dom@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-router@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(rollup@4.62.2)(yaml@2.9.0)
       '@mcp-use/inspector': 12.0.5(@types/react@19.2.17)(express@5.2.1)(mcp-use@1.34.5(@types/node@24.13.3)(@types/react@19.2.17)(jiti@2.7.0)(react-dom@19.2.7(react@19.2.7))(react-router-dom@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-router@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(rollup@4.62.2)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))(yaml@2.9.0)(zod@4.4.3))(react-dom@19.2.7(react@19.2.7))(react-router@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))
@@ -7129,7 +7129,7 @@ snapshots:
 
   mcp-use@1.34.5(@types/node@24.13.3)(@types/react@19.2.17)(jiti@2.7.0)(react-dom@19.2.7(react@19.2.7))(react-router-dom@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-router@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(rollup@4.62.2)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))(yaml@2.9.0)(zod@4.4.3):
     dependencies:
-      '@hono/node-server': 2.0.9(hono@4.12.27)
+      '@hono/node-server': 2.0.10(hono@4.12.27)
       '@mcp-ui/server': 6.1.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.4.3)
       '@mcp-use/cli': 3.6.6(@types/node@24.13.3)(@types/react@19.2.17)(express@5.2.1)(jiti@2.7.0)(react-dom@19.2.7(react@19.2.7))(react-router-dom@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-router@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(rollup@4.62.2)(yaml@2.9.0)
       '@mcp-use/inspector': 12.0.5(@types/react@19.2.17)(express@5.2.1)(mcp-use@1.34.5(@types/node@24.13.3)(@types/react@19.2.17)(jiti@2.7.0)(react-dom@19.2.7(react@19.2.7))(react-router-dom@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-router@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(rollup@4.62.2)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))(yaml@2.9.0)(zod@4.4.3))(react-dom@19.2.7(react@19.2.7))(react-router@7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))
