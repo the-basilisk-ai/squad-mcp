@@ -1,7 +1,9 @@
-# Wait 7 days before resolving a newly published version, so a compromised
-# fresh release can't be pulled in before it's caught. Only affects resolving
-# new versions; frozen-lockfile installs are unaffected.
-minimumReleaseAge: 10080
+# Wait 3 days before resolving a newly published version, so a compromised
+# fresh release can't be pulled in before it's caught (most npm supply-chain
+# compromises are detected and yanked within ~48h, so 3 days covers the bulk of
+# that window while minimising delay to security patches). Only affects
+# resolving new versions; frozen-lockfile installs are unaffected.
+minimumReleaseAge: 4320
 
 # Reject transitive dependencies resolved from non-registry (git/tarball/etc.)
 # sources, and block updates that would downgrade these security settings.
