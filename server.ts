@@ -11,6 +11,7 @@ import { initKv } from "./src/helpers/kv.js";
 import { introspectToken } from "./src/helpers/oauth.js";
 import { connectRedis } from "./src/helpers/redis.js";
 import { logger } from "./src/lib/logger.js";
+import { securityHeaders } from "./src/lib/security-headers.js";
 import { initTelemetry, shutdownTelemetry } from "./src/lib/telemetry.js";
 import { registerPrompts } from "./src/prompts/index.js";
 import { registerResources } from "./src/resources/index.js";
@@ -86,6 +87,9 @@ const server = new MCPServer({
     },
   }),
 });
+
+// Railway's edge adds neither header, so they are set here for every route.
+server.app.use("*", securityHeaders);
 
 // Populate AsyncLocalStorage so tool callbacks can access the Hono context (including auth).
 // mountMcp() doesn't wrap transport.handleRequest() in runWithContext(), so without this
