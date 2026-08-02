@@ -20,6 +20,7 @@
             nodePackages.typescript-language-server
             railway
             jdk
+            gitleaks
           ];
         };
       }

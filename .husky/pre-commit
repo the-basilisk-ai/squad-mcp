@@ -1,2 +1,8 @@
 node_modules/.bin/biome check --staged --no-errors-on-unmatched
 node_modules/.bin/vitest run
+
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks git --staged --no-banner --redact=100 --ignore-gitleaks-allow
+else
+  echo "gitleaks not installed, skipping the local secret scan. Run 'nix develop' to get it. CI enforces the same scan."
+fi

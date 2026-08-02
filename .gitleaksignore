@@ -1,0 +1,24 @@
+# gitleaks allowlist. One fingerprint per line, in the form
+# <commit>:<file>:<rule-id>:<line> as printed by the Secret Scan job summary.
+#
+# Two kinds of entry are valid and nothing else:
+#   1. A confirmed false positive: the value is not a credential, or cannot
+#      authenticate to anything.
+#   2. A credential confirmed dead, where a named person decided on a named date
+#      to accept it in history rather than rewrite.
+#
+# Either way the entry carries a comment above it giving the name, the date and the
+# reasoning. An entry without one is not valid and should be rejected in review.
+#
+# A fingerprint pins one rule to one line of one commit, so an entry cannot hide
+# a different finding. Do not add path or regex allowlists to suppress noise in
+# bulk. A live credential is rotated, never suppressed.
+# See docs/security/secret-scanning.md.
+
+# steven 2026-08-02, category 2: PropelAuth access token committed 2025-04-01 in
+# src/opportunity.ts, a file no longer present at HEAD. Issued by a PropelAuth test
+# tenant with a 30-minute expiry, so it is dead and there is nothing to rotate.
+# Accepted in history rather than rewritten, which would break every existing clone.
+# The JWT body still carries a name, an email address and organisation metadata, and
+# this repository is public.
+846cb8870cb36763f4e5e9a9e7adc308e29905f4:src/opportunity.ts:jwt:39
