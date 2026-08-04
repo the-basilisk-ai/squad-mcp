@@ -8,13 +8,18 @@ The `server.json` file contains metadata published to the registry. It is not us
 
 ## Publishing manually
 
-1. Install the CLI: `brew install mcp-publisher`
-2. Retrieve the signing key from 1Password: `op document get "MCP Registry - meetsquad.ai signing key" --out-file key.pem`
-3. Authenticate:
+1. Bump the version in `server.json` — the registry rejects duplicate versions
+2. Paste this:
+
     ```bash
-    PRIVATE_KEY="$(openssl pkey -in key.pem -noout -text | grep -A3 "priv:" | tail -n +2 | tr -d ' :\n')"
+    mcp-publisher() { go run github.com/modelcontextprotocol/registry/cmd/publisher@v1.8.0 "$@"; }
+
+    PRIVATE_KEY="$(op item get "MCP Registry - meetsquad.ai signing key" \
+      --fields private_key --format json --reveal | jq -r .value \
+      | openssl pkey -outform DER | tail -c 32 | xxd -p -c 64)"
     mcp-publisher login dns --domain "meetsquad.ai" --private-key "${PRIVATE_KEY}"
-    rm key.pem
+
+    mcp-publisher validate && mcp-publisher publish
     ```
-4. Update the version in `server.json`
-5. Publish: `mcp-publisher publish`
+
+Needs Go and jq, or `brew install mcp-publisher`. Run `mcp-publisher logout` when you're done.
