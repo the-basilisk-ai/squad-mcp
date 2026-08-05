@@ -1,7 +1,9 @@
 [build]
 builder = "RAILPACK"
-buildCommand = "MCP_URL= pnpm build"
 
+# Railpack runs the `build` script on its own. startCommand stays: without a
+# custom start command Railpack falls back to serving build output with Caddy
+# instead of running the server.
 [deploy]
 startCommand = "pnpm start"
 healthcheckPath = "/health"

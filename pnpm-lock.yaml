@@ -32,9 +32,6 @@ importers:
       '@graphql-typed-document-node/core':
         specifier: ^3.2.0
         version: 3.2.0(graphql@17.0.2)
-      '@modelcontextprotocol/sdk':
-        specifier: ^1.29.0
-        version: 1.29.0(zod@4.4.3)
       '@posthog/mcp':
         specifier: ^0.9.1
         version: 0.9.1(@modelcontextprotocol/sdk@1.29.0(zod@4.4.3))(posthog-node@5.45.2)

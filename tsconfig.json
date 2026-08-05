@@ -1,15 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "jsx": "react-jsx",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowJs": true,
     "strict": true,
-    "declaration": true,
-    "declarationMap": true,
-    "outDir": "./dist",
-    "sourceMap": true,
+    "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -17,5 +12,5 @@
     "resolveJsonModule": true
   },
   "include": ["server.ts", "src/**/*", "mcp-env.d.ts"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", ".mcp-use"]
 }
