@@ -96,6 +96,19 @@ Everything in the context block must trace to a cited display ID.`,
   },
 ];
 
+// Prompt arguments arrive on the wire as strings and each spec's schema
+// validates them as such, but the framework types the callback's params as
+// `unknown` values, so drop anything that isn't a string.
+function stringArgs(
+  params: Record<string, unknown> | undefined,
+): Record<string, string | undefined> {
+  const args: Record<string, string | undefined> = {};
+  for (const [key, value] of Object.entries(params ?? {})) {
+    if (typeof value === "string") args[key] = value;
+  }
+  return args;
+}
+
 export function registerPrompts(server: OAuthServer) {
   for (const spec of PROMPTS) {
     server.prompt(
@@ -104,11 +117,14 @@ export function registerPrompts(server: OAuthServer) {
         description: spec.description,
         schema: spec.schema,
       },
-      async (params: Record<string, string | undefined>) => ({
+      async params => ({
         messages: [
           {
             role: "user" as const,
-            content: { type: "text" as const, text: spec.build(params ?? {}) },
+            content: {
+              type: "text" as const,
+              text: spec.build(stringArgs(params)),
+            },
           },
         ],
       }),

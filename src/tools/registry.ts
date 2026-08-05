@@ -44,6 +44,7 @@ export type ToolDefinition<S extends z.ZodType> = {
 };
 
 function extractScopes(auth: AuthInfo): string[] | undefined {
+  if (auth.scopes) return auth.scopes;
   const scope = auth.payload?.scope;
   if (typeof scope === "string") return scope.split(/\s+/).filter(Boolean);
   if (Array.isArray(scope)) return scope.filter(s => typeof s === "string");
@@ -63,7 +64,7 @@ export function registerTool<S extends z.ZodType>(
       name: def.name,
       title: def.title,
       description: def.description,
-      schema: def.schema,
+      inputSchema: def.schema,
       annotations: {
         readOnlyHint: def.scope === "read",
         destructiveHint: def.destructive ?? false,

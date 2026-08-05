@@ -47,8 +47,8 @@ export function registerResources(server: OAuthServer) {
         "The current workspace's mission and product context — pin this so strategy questions need no tool calls.",
       mimeType: "text/markdown",
     },
-    async (ctx: { auth: AuthInfo }) =>
-      withContext("squad://workspace/context", ctx.auth, async userCtx => {
+    async (uri, ctx) =>
+      withContext(uri.href, ctx.auth, async userCtx => {
         const data = await execute(
           WorkspaceOverviewDocument,
           { workspaceId: userCtx.workspaceId, days: 7 },
@@ -81,8 +81,8 @@ ${goals || "No goals defined yet."}
       description: "The workspace's strategic goals with importance rankings.",
       mimeType: "text/markdown",
     },
-    async (ctx: { auth: AuthInfo }) =>
-      withContext("squad://goals", ctx.auth, async userCtx => {
+    async (uri, ctx) =>
+      withContext(uri.href, ctx.auth, async userCtx => {
         const data = await execute(
           GoalListDocument,
           { limit: 50, offset: 0 },

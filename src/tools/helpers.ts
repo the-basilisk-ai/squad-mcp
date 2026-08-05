@@ -1,10 +1,18 @@
-import type { McpServerInstance } from "mcp-use/server";
+import type { MCPServer } from "mcp-use";
 import { WorkspaceSelectionRequired } from "../helpers/getUser.js";
+
+/**
+ * The authenticated user the OAuth provider maps onto every callback context.
+ */
+export type SquadUser = {
+  id: string;
+  email?: string;
+};
 
 /**
  * Type alias for the server with OAuth enabled
  */
-export type OAuthServer = McpServerInstance<true>;
+export type OAuthServer = MCPServer<SquadUser>;
 
 /**
  * Auth info from mcp-use OAuth context
@@ -12,6 +20,8 @@ export type OAuthServer = McpServerInstance<true>;
 export type AuthInfo = {
   accessToken: string;
   payload: Record<string, unknown>;
+  /** Scopes the SDK verified on the access token. */
+  scopes?: string[];
 };
 
 /**

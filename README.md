@@ -98,7 +98,7 @@ Pin these so strategy questions need no tool calls:
 │  ┌────────────────────────────────────────┐  │
 │  │  OAuth → introspect + verify token     │  │
 │  │  JWT minting → service credentials     │  │
-│  │  Redis → sessions + stream state       │  │
+│  │  Redis → workspace selection + tokens  │  │
 │  │  MCP handler → tools / prompts / res.  │  │
 │  │  PostHog → tool-call telemetry         │  │
 │  └────────────────────────────────────────┘  │
@@ -111,7 +111,7 @@ Pin these so strategy questions need no tool calls:
 └──────────────┘
 ```
 
-The server is built on [`mcp-use`](https://github.com/mcp-use/mcp-use) and talks to the Squad platform API over **GraphQL**. Sessions and stream state are backed by **Redis** so the deployment is horizontally scalable. Backend types are generated from a committed GraphQL schema snapshot (see [GraphQL codegen](#graphql-codegen)).
+The server is built on [`mcp-use`](https://github.com/mcp-use/mcp-use) v2 and talks to the Squad platform API over **GraphQL**. Each request is served statelessly: the MCP layer holds no session, and every call re-introspects its own bearer token. **Redis** stores the durable per-user state (workspace selection and minted-token cache), so any instance can serve any request. Backend types are generated from a committed GraphQL schema snapshot (see [GraphQL codegen](#graphql-codegen)).
 
 ## 🛠️ Development
 
@@ -123,7 +123,7 @@ This repository contains the source code for the Squad MCP remote server.
 - pnpm
 - Nix (optional, for a reproducible dev environment via `flake.nix`)
 - PropelAuth credentials (OAuth 2.1 client + backend API key)
-- Redis (optional locally; falls back to in-memory sessions)
+- Redis (optional locally; workspace selection falls back to in-memory)
 
 ### Local Setup
 
@@ -153,7 +153,7 @@ pnpm dev
 | `PROPELAUTH_API_KEY`                                              | ✅       | Backend integration key for minting service JWTs               |
 | `SQUAD_ENV`                                                       |          | `dev` or `production` (default `production`) — selects auth/API/app URLs |
 | `PORT` / `MCP_URL` / `BASE_URI`                                   |          | Server port and externally-advertised base URL                 |
-| `REDIS_URL`                                                       |          | Redis connection for deploy-safe sessions (in-memory if unset) |
+| `REDIS_URL`                                                       |          | Redis connection for deploy-safe workspace selection and token cache (in-memory if unset) |
 | `SQUAD_GRAPHQL_URL`                                               |          | Override the Squad GraphQL endpoint (also used by codegen)     |
 | `POSTHOG_API_KEY` / `POSTHOG_HOST`                                |          | Enable tool-call telemetry                                     |
 | `LOG_LEVEL`                                                       |          | Logger verbosity                                               |
@@ -189,7 +189,7 @@ pnpm dev   # then open the inspector and connect to http://localhost:3232/mcp
 
 ```
 squad-mcp/
-├── server.ts                   # MCP server entry point (OAuth, Redis, tool/prompt/resource registration)
+├── server.ts                   # MCP server entry point (OAuth, tool/prompt/resource registration)
 ├── server.json                 # MCP registry metadata (see MCP_REGISTRY.md)
 ├── schema.graphql              # Committed snapshot of the Squad platform GraphQL schema
 ├── codegen.ts                  # GraphQL Code Generator config
@@ -211,7 +211,7 @@ squad-mcp/
 │   ├── resources/              # MCP resources (workspace context, goals)
 │   ├── gql/                    # Generated GraphQL types (pnpm codegen)
 │   ├── graphql/                # GraphQL operation documents
-│   ├── helpers/                # OAuth, token minting, workspace selection, KV/Redis
+│   ├── helpers/                # OAuth provider, token minting, workspace selection, KV/Redis
 │   └── lib/                    # Squad API client, logger, telemetry
 ├── railway.toml                # Railway deployment config
 └── .env.example                # Environment template
@@ -224,7 +224,7 @@ This is a hosted service maintained by Squad. Users connect via OAuth — no sel
 **Architecture notes (for contributors):**
 
 - Deployed on Railway with a `/health` readiness check
-- Redis-backed sessions and stream state for horizontal scalability
+- Stateless request handling, with Redis holding the per-user workspace selection and token cache, so instances scale horizontally
 - Follows the [MCP specification](https://modelcontextprotocol.io/specification) for streamable HTTP transport
 
 ## 💬 Support
