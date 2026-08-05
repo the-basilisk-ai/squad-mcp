@@ -2,12 +2,12 @@ import { z } from "zod";
 import {
   ClusterListDocument,
   GetActionDocument,
+  GetBriefDocument,
   GetClusterDocument,
   GetDocumentMarkdownDocument,
   GetDocumentMetaDocument,
   GetGoalDocument,
   GetInsightDocument,
-  GetOnePagerDocument,
   GetSignalDocument,
 } from "../gql/graphql.js";
 import {
@@ -83,10 +83,10 @@ async function fetchByType(
         },
       };
     }
-    case "one_pager": {
-      const data = await execute(GetOnePagerDocument, { displayId: id }, ctx);
-      return data.onePager
-        ? { type, data: data.onePager as Record<string, unknown> }
+    case "brief": {
+      const data = await execute(GetBriefDocument, { displayId: id }, ctx);
+      return data.brief
+        ? { type, data: data.brief as Record<string, unknown> }
         : null;
     }
     case "cluster": {
@@ -152,7 +152,7 @@ function shape(found: NonNullable<Fetched>, ctx: UserContext) {
     action: "actions",
     goal: "goals",
     document: "documents",
-    one_pager: "one-pagers",
+    brief: "briefs",
     cluster: "signals",
   };
 
@@ -187,7 +187,7 @@ export function registerEntityTools(server: OAuthServer) {
     name: "get_entity",
     title: "Get Entity",
     description:
-      'Fetch any workspace entity by display ID (SI-1 signal, IN-1 insight, AC-1 action, GL-1 goal, OP-1 decision brief, DC-1 document, CL-1 cluster) or UUID. Documents return markdown. Pass include: ["evidence"] on insights for supporting signals with source links. Also the way to check on async work (brief generation, research).',
+      'Fetch any workspace entity by display ID (SI-1 signal, IN-1 insight, AC-1 action, GL-1 goal, BR-1 brief, DC-1 document, CL-1 cluster) or UUID. Documents return markdown. Pass include: ["evidence"] on insights for supporting signals with source links. Also the way to check on async work (brief generation, research).',
     schema: z.object({
       id: z.string().describe("Display ID (e.g. AC-12) or UUID of the entity"),
       include: z

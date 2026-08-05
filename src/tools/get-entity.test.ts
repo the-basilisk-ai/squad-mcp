@@ -63,16 +63,28 @@ describe("get_entity routing", () => {
     expect(parsed.blockNoteJson).toBeUndefined();
   });
 
-  it("resolves one-pagers via the formatted display ID", async () => {
+  it("resolves briefs via the formatted display ID", async () => {
     byOperation(mockExecute, {
-      GetOnePager: (vars: unknown) => {
-        expect(vars).toEqual({ displayId: "OP-2" });
-        return { onePager: { id: "op1", displayId: 2, title: "Brief" } };
+      GetBrief: (vars: unknown) => {
+        expect(vars).toEqual({ displayId: "BR-2" });
+        return { brief: { id: "op1", displayId: 2, title: "Brief" } };
+      },
+    });
+
+    const parsed = parse(await getEntity({ id: "br-2" }, authCtx));
+    expect(parsed.displayId).toBe("BR-2");
+  });
+
+  it("resolves legacy OP- brief IDs, normalising them to BR-", async () => {
+    byOperation(mockExecute, {
+      GetBrief: (vars: unknown) => {
+        expect(vars).toEqual({ displayId: "BR-2" });
+        return { brief: { id: "op1", displayId: 2, title: "Brief" } };
       },
     });
 
     const parsed = parse(await getEntity({ id: "op-2" }, authCtx));
-    expect(parsed.displayId).toBe("OP-2");
+    expect(parsed.displayId).toBe("BR-2");
   });
 
   it("probes types in order for UUID input", async () => {

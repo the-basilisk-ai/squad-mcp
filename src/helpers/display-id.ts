@@ -9,7 +9,7 @@ export type EntityType =
   | "insight"
   | "action"
   | "goal"
-  | "one_pager"
+  | "brief"
   | "document"
   | "cluster";
 
@@ -18,9 +18,17 @@ const PREFIX_TO_TYPE: Record<string, EntityType> = {
   IN: "insight",
   AC: "action",
   GL: "goal",
-  OP: "one_pager",
+  BR: "brief",
   DC: "document",
   CL: "cluster",
+};
+
+// Briefs were formerly called "one-pagers" and formatted as OP-N. Old links,
+// agent-written markdown and saved references still carry OP-N, so parsing must
+// keep accepting it — resolving it to the same "brief" entity type. The
+// platform's display-id parser does the same for backwards compatibility.
+const LEGACY_PREFIX_TO_TYPE: Record<string, EntityType> = {
+  OP: "brief",
 };
 
 const UUID_PATTERN =
@@ -40,7 +48,7 @@ export class InvalidEntityIdError extends Error {
   constructor(input: string) {
     super(
       `"${input}" is not a valid entity ID. Pass a UUID or a display ID such as ` +
-        `SI-1 (signal), IN-1 (insight), AC-1 (action), GL-1 (goal), OP-1 (decision brief), ` +
+        `SI-1 (signal), IN-1 (insight), AC-1 (action), GL-1 (goal), BR-1 (brief), ` +
         `DC-1 (document) or CL-1 (cluster).`,
     );
     this.name = "InvalidEntityIdError";
@@ -57,15 +65,18 @@ export function parseEntityRef(input: string): EntityRef {
   const match = DISPLAY_PATTERN.exec(trimmed);
   if (match) {
     const prefix = match[1].toUpperCase();
-    const type = PREFIX_TO_TYPE[prefix];
+    const type = PREFIX_TO_TYPE[prefix] ?? LEGACY_PREFIX_TO_TYPE[prefix];
     if (!type) {
       throw new InvalidEntityIdError(trimmed);
     }
+    const displayId = Number.parseInt(match[2], 10);
     return {
       kind: "display",
       type,
-      displayId: Number.parseInt(match[2], 10),
-      formatted: `${prefix}-${match[2]}`,
+      displayId,
+      // Normalise to the canonical prefix so a legacy OP-N input resolves and
+      // echoes back as BR-N.
+      formatted: formatDisplayId(type, displayId),
     };
   }
 

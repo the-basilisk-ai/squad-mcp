@@ -129,23 +129,23 @@ describe("update_document", () => {
   });
 });
 
-describe("list_one_pagers", () => {
+describe("list_briefs", () => {
   it("maps filters and formats source references", async () => {
     mockExecute.mockImplementation((doc: never, vars: unknown) => {
-      expect(opName(doc)).toBe("OnePagerList");
+      expect(opName(doc)).toBe("BriefList");
       expect((vars as { filters: unknown }).filters).toEqual({
-        onePagerStatus: ["draft"],
-        onePagerType: "decision",
+        briefStatus: ["draft"],
+        briefType: "decision",
         sourceInsightId: undefined,
       });
       return Promise.resolve({
-        onePagerList: [
+        briefList: [
           {
             id: "op1",
             displayId: 2,
             title: "Brief",
-            onePagerStatus: "draft",
-            onePagerType: "decision",
+            briefStatus: "draft",
+            briefType: "decision",
             decisionRecommendation: "build",
             sourceAction: { id: "a1", displayId: 12, title: "A" },
           },
@@ -154,20 +154,20 @@ describe("list_one_pagers", () => {
     });
 
     const parsed = parse(
-      await tools.get("list_one_pagers")!(
+      await tools.get("list_briefs")!(
         { status: ["draft"], type: "decision" },
         authCtx,
       ),
     );
-    expect(parsed.items[0].displayId).toBe("OP-2");
+    expect(parsed.items[0].displayId).toBe("BR-2");
     expect(parsed.items[0].extra.sourceAction).toBe("AC-12");
     expect(parsed.items[0].extra.recommendation).toBe("build");
   });
 });
 
-describe("generate_one_pager", () => {
+describe("generate_brief", () => {
   it("requires exactly one source", async () => {
-    const result = await tools.get("generate_one_pager")!(
+    const result = await tools.get("generate_brief")!(
       { actionId: "AC-1", insightId: "IN-1" },
       authCtx,
     );
@@ -182,22 +182,22 @@ describe("generate_one_pager", () => {
         return Promise.resolve({
           action: { id: "uuid-a1", displayId: 12, notes: null },
         });
-      expect(name).toBe("GenerateOnePagerFromAction");
+      expect(name).toBe("GenerateBriefFromAction");
       expect(vars).toEqual({ actionId: "uuid-a1", type: undefined });
       return Promise.resolve({
-        generateOnePagerFromAction: {
-          onePagerId: "uuid-op1",
-          onePagerDisplayId: "OP-9",
+        generateBriefFromAction: {
+          briefId: "uuid-op1",
+          briefDisplayId: "BR-9",
         },
       });
     });
 
     const parsed = parse(
-      await tools.get("generate_one_pager")!({ actionId: "AC-12" }, authCtx),
+      await tools.get("generate_brief")!({ actionId: "AC-12" }, authCtx),
     );
     expect(parsed).toMatchObject({
       id: "uuid-op1",
-      displayId: "OP-9",
+      displayId: "BR-9",
       status: "building",
       checkWith: "get_entity",
     });
@@ -208,62 +208,62 @@ describe("generate_one_pager", () => {
       const name = opName(doc);
       if (name === "GetInsight")
         return Promise.resolve({ insight: { id: "uuid-i1", displayId: 4 } });
-      expect(name).toBe("GenerateOnePagerFromInsight");
+      expect(name).toBe("GenerateBriefFromInsight");
       return Promise.resolve({
-        generateOnePagerFromInsight: {
+        generateBriefFromInsight: {
           id: "uuid-op2",
           displayId: 10,
-          onePagerStatus: "building",
+          briefStatus: "building",
         },
       });
     });
 
     const parsed = parse(
-      await tools.get("generate_one_pager")!({ insightId: "IN-4" }, authCtx),
+      await tools.get("generate_brief")!({ insightId: "IN-4" }, authCtx),
     );
-    expect(parsed.displayId).toBe("OP-10");
+    expect(parsed.displayId).toBe("BR-10");
     expect(parsed.status).toBe("building");
   });
 });
 
-describe("update_one_pager_status", () => {
-  it("resolves OP-N then sets the status via setOnePagerStatus", async () => {
+describe("update_brief_status", () => {
+  it("resolves BR-N then sets the status via setBriefStatus", async () => {
     byOperation(mockExecute, {
-      GetOnePager: (vars: unknown) => {
-        expect((vars as { displayId: string }).displayId).toBe("OP-3");
+      GetBrief: (vars: unknown) => {
+        expect((vars as { displayId: string }).displayId).toBe("BR-3");
         return {
-          onePager: { id: "op-uuid-3", displayId: 3, title: "Ship SSO" },
+          brief: { id: "op-uuid-3", displayId: 3, title: "Ship SSO" },
         };
       },
-      SetOnePagerStatus: (vars: unknown) => {
-        expect(vars).toEqual({ onePagerId: "op-uuid-3", status: "finalised" });
+      SetBriefStatus: (vars: unknown) => {
+        expect(vars).toEqual({ briefId: "op-uuid-3", status: "finalised" });
         return {
-          setOnePagerStatus: {
+          setBriefStatus: {
             id: "op-uuid-3",
             displayId: 3,
             title: "Ship SSO",
-            onePagerStatus: "finalised",
+            briefStatus: "finalised",
           },
         };
       },
     });
 
     const parsed = parse(
-      await tools.get("update_one_pager_status")!(
-        { onePagerId: "OP-3", status: "finalised" },
+      await tools.get("update_brief_status")!(
+        { briefId: "BR-3", status: "finalised" },
         authCtx,
       ),
     );
 
-    expect(parsed.onePager.displayId).toBe("OP-3");
-    expect(parsed.onePager.status).toBe("finalised");
+    expect(parsed.brief.displayId).toBe("BR-3");
+    expect(parsed.brief.status).toBe("finalised");
   });
 
   it("errors when the brief is not found", async () => {
-    byOperation(mockExecute, { GetOnePager: { onePager: null } });
+    byOperation(mockExecute, { GetBrief: { brief: null } });
 
-    const result = await tools.get("update_one_pager_status")!(
-      { onePagerId: "OP-99", status: "draft" },
+    const result = await tools.get("update_brief_status")!(
+      { briefId: "BR-99", status: "draft" },
       authCtx,
     );
 

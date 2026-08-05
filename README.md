@@ -2,9 +2,9 @@
 
 [![smithery badge](https://smithery.ai/badge/squadai/squad)](https://smithery.ai/servers/squadai/squad)
 
-A remote MCP server that brings [Squad](https://meetsquad.ai) — the AI product feedback intelligence platform — directly into your AI workflows. Connect Squad to Claude, ChatGPT, or any MCP-compatible AI assistant to turn raw user feedback into signals, insights, actions, and decision briefs without context switching.
+A remote MCP server that brings [Squad](https://meetsquad.ai) — the AI product feedback intelligence platform — directly into your AI workflows. Connect Squad to Claude, ChatGPT, or any MCP-compatible AI assistant to turn raw user feedback into signals, insights, actions, and briefs without context switching.
 
-Squad continuously ingests feedback, clusters it into **signals**, distils it into **insights**, and links it to the **actions** and **goals** that move your product forward. The MCP server exposes that same intelligence — read the evidence behind a decision, capture new feedback, and generate decision briefs from your assistant.
+Squad continuously ingests feedback, clusters it into **signals**, distils it into **insights**, and links it to the **actions** and **goals** that move your product forward. The MCP server exposes that same intelligence — read the evidence behind a decision, capture new feedback, and generate briefs from your assistant.
 
 ## 🚀 Quick Start
 
@@ -31,7 +31,7 @@ See **[USAGE_EXAMPLES.md](./USAGE_EXAMPLES.md)** for detailed real-world example
 - **Triage feedback** — "Capture this support ticket in Squad and tell me if it's a known theme."
 - **Weekly review** — "Run my weekly product review: what changed and what needs deciding?"
 - **Ground the evidence** — "Show me the customer signals behind insight IN-42."
-- **Draft a decision brief** — "Generate a decision brief for action AC-12."
+- **Draft a brief** — "Generate a brief for action AC-12."
 - **Search everything** — "Find all feedback related to onboarding friction."
 - **Ground a ticket** — "Pull the customer evidence behind AC-7 before I build it."
 
@@ -40,7 +40,7 @@ Squad entities are referenced by short **display IDs** so the assistant can cite
 | Prefix | Entity          | Prefix | Entity            |
 | ------ | --------------- | ------ | ----------------- |
 | `SI-`  | Signal          | `GL-`  | Goal              |
-| `IN-`  | Insight         | `OP-`  | Decision brief    |
+| `IN-`  | Insight         | `BR-`  | Brief             |
 | `AC-`  | Action          | `DC-`  | Document          |
 | `CL-`  | Cluster         |        |                   |
 
@@ -56,7 +56,7 @@ The server exposes ~35 tools. Write tools require a token minted with the `write
 | **Actions**      | `list_actions`, `get_action_context`, `update_action`, `update_action_status`                                  | Track and update product work                    |
 | **Strategy**     | `list_goals`, `create_goal`, `update_goal`, `update_insight`, `dismiss_signal`, `get_activity` | Manage goals, insights, and activity   |
 | **Knowledge**    | `list_documents`, `create_document`, `update_document`                                                          | Store research, references, and notes            |
-| **Decision briefs** | `list_one_pagers`, `generate_one_pager`, `update_one_pager_status`                                           | Generate and manage one-page decision briefs     |
+| **Briefs**       | `list_briefs`, `generate_brief`, `update_brief_status`                                                         | Generate and manage briefs                       |
 | **Ingest**       | `ingest_signal`                                                                                                 | Capture new feedback as a signal (with dedup)    |
 | **Integrations** | `list_integrations`                                                                                             | See connected feedback sources                   |
 
@@ -66,7 +66,7 @@ Ready-made workflows exposed as MCP prompts:
 
 - **`triage-feedback`** — check for duplicates, ingest a piece of feedback, and report where it landed.
 - **`weekly-product-review`** — what changed, what the evidence says, and what needs deciding.
-- **`draft-decision-brief`** — generate a decision brief from an action or insight and walk it to a readable draft.
+- **`draft-decision-brief`** — generate a brief from an action or insight and walk it to a readable draft.
 - **`ground-this-ticket`** — for coding agents: pull the customer evidence behind a piece of work before building it.
 
 ### Resources
@@ -204,7 +204,7 @@ squad-mcp/
 │   │   ├── actions-write.ts    # update actions + status
 │   │   ├── strategy-read.ts    # goals, activity
 │   │   ├── strategy-write.ts   # create/update goals, insights, dismiss signals
-│   │   ├── knowledge.ts        # documents + decision briefs (one-pagers)
+│   │   ├── knowledge.ts        # documents + briefs
 │   │   ├── ingest.ts           # ingest new signals
 │   │   └── integrations.ts     # list connected sources
 │   ├── prompts/                # MCP prompt workflows

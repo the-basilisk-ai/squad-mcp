@@ -29,8 +29,8 @@ query WorkspaceOverview($workspaceId: String!, $days: Int) {
   openActions: actions(statuses: [suggested, in_progress], limit: 50) {
     id
   }
-  pendingBriefs: onePagerList(
-    filters: { onePagerStatus: [building, draft, in_review] }
+  pendingBriefs: briefList(
+    filters: { briefStatus: [building, draft, in_review] }
     limit: 50
   ) {
     id

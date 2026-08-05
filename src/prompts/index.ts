@@ -53,8 +53,8 @@ Steps:
 1. get_workspace_overview for the current state (goals, signal activity, chain health, open counts).
 2. get_activity${args.since ? ` with since-aware paging (events newer than ${args.since})` : ""} to see what changed — note what Squad's agents did versus humans.
 3. list_insights sorted by score for the strongest current evidence; for the top 2–3, get_entity with include ["evidence"] to ground them in real quotes.
-4. list_actions for open work, and list_one_pagers with status ["draft", "in_review"] for briefs awaiting a decision.
-5. Synthesise a review with sections: What changed, What the evidence says (with SI-/IN- citations), Decisions waiting (OP- briefs and top actions), and Suggested focus for next week.
+4. list_actions for open work, and list_briefs with status ["draft", "in_review"] for briefs awaiting a decision.
+5. Synthesise a review with sections: What changed, What the evidence says (with SI-/IN- citations), Decisions waiting (BR- briefs and top actions), and Suggested focus for next week.
 
 Keep it under a page. Cite display IDs throughout and include the workspace link.`,
   },
@@ -69,11 +69,11 @@ Keep it under a page. Cite display IDs throughout and include the workspace link
 
 Steps:
 1. If ${args.id} is an action, call get_action_context to understand it and its evidence; if it is an insight, call get_entity with include ["evidence"].
-2. Call generate_one_pager for ${args.id}.
-3. Poll get_entity on the returned OP- ID until its status moves past building (wait a moment between polls).
+2. Call generate_brief for ${args.id}.
+3. Poll get_entity on the returned BR- ID until its status moves past building (wait a moment between polls).
 4. Read the finished brief and present: the recommendation, the strongest evidence behind it (quoted, with SI- citations), and any evidence gaps worth flagging.
 
-Include the OP- ID and deep link so the user can open it in Squad.`,
+Include the BR- ID and deep link so the user can open it in Squad.`,
   },
   {
     name: "ground-this-ticket",

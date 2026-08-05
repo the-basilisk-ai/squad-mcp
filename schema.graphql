@@ -1,3 +1,9 @@
+type AccessPreset {
+  description: String
+  label: String
+  value: String
+}
+
 type Action {
   assignee: ActorUser
   assigneeUserId: String
@@ -11,6 +17,7 @@ type Action {
   id: String
   insight: Insight
   insightId: String
+  linkedInsights: [Insight!]!
   notes: String
   outputDocument: Document
   outputDocumentId: String
@@ -41,11 +48,13 @@ enum ActionEffort {
 }
 
 input ActionLinkTargetInput {
+  briefId: String
   insightId: String
-  onePagerId: String
+  onePagerId: String @deprecated(reason: "Use briefId")
 }
 
 enum ActionMutationType {
+  BRIEF_STATE_CHANGED
   CREATED
   DELETED
   ONE_PAGER_STATE_CHANGED
@@ -76,9 +85,12 @@ enum ActionStatus {
 type ActionSubscriptionPayload {
   action: Action
   actionId: String
+  briefId: String
+  briefStatus: String
+  insightIds: [String!]!
   mutationType: ActionMutationType
-  onePagerId: String
-  onePagerStatus: String
+  onePagerId: String @deprecated(reason: "Use briefId")
+  onePagerStatus: String @deprecated(reason: "Use briefStatus")
 
   """
   Session ID of the client that triggered the change.
@@ -119,17 +131,12 @@ type ActorUser {
   userId: String
 }
 
-input AddGithubRepoInput {
-  defaultBranch: String
-  description: String
-  fullName: String!
-  isPrivate: Boolean
-  language: String
-  name: String!
-  owner: String!
-}
-
 type Agent {
+  """
+  The agent's unified Tools & access list — capability and connection-scope grants, each with its permission.
+  """
+  access: [AgentAccess!]
+
   """
   The action set this agent runs on each tick. Empty list only if the agent is mid-edit; the resource layer rejects creates with zero actions.
   """
@@ -155,17 +162,64 @@ type Agent {
   reports(limit: Int = 20, offset: Int = 0): [Report!]
   researchConfig: ResearchAgentConfig
   runs(limit: Int = 20): [AgentRun!]
-
-  """
-  Where the agent looks for information each run (directed reading).
-  """
-  sources: [AgentSource!]
   startAt: DateTime
   status: AgentStatus
   triggers: [AgentTrigger!]
   type: AgentType
   updatedAt: DateTime
   urlConfig: UrlAgentConfig
+}
+
+"""
+One permission grant in an agent's unified Tools & access list — a built-in capability or a connection scope.
+"""
+type AgentAccess {
+  agentId: String
+  capabilityKey: String
+  consecutiveFailures: Int
+  createdAt: DateTime
+  id: String
+  label: String
+  lastErrorKind: String
+  lastReadAt: DateTime
+  permission: String
+  position: Int
+  provider: String
+  scopeRef: String
+  scopeType: String
+  status: AgentAccessStatus
+  targetKind: AgentAccessTargetKind
+  updatedAt: DateTime
+}
+
+"""
+One Tools & access grant. For a capability set `targetKind: capability` + `capabilityKey`; for a connection set `targetKind: connection_scope` + `provider`/`scopeType`/`scopeRef`. `permission` is validated against the provider-access registry.
+"""
+input AgentAccessInput {
+  capabilityKey: String
+  label: String
+  permission: String!
+  provider: String
+  scopeRef: String
+  scopeType: String
+  targetKind: AgentAccessTargetKind!
+}
+
+"""
+Per-grant status, independent of the parent agent.
+"""
+enum AgentAccessStatus {
+  active
+  error
+  paused
+}
+
+"""
+Whether a grant targets a built-in capability or a connection scope.
+"""
+enum AgentAccessTargetKind {
+  capability
+  connection_scope
 }
 
 """
@@ -234,6 +288,11 @@ input AgentConfigInput {
 
 input AgentCreateInput {
   """
+  Tools & access grants created with the agent (capabilities + connections).
+  """
+  access: [AgentAccessInput!]
+
+  """
   Must contain at least one action.
   """
   actions: [AgentActionInput!]!
@@ -250,11 +309,6 @@ input AgentCreateInput {
   """
   instructions: String
   name: String!
-
-  """
-  Sources created with the agent — where it looks for information each run.
-  """
-  sources: [AgentSourceConfigInput!]
   startAt: DateTime
 
   """
@@ -384,8 +438,8 @@ type AgentRunSourceOutcome {
   contentChars: Int
   errorKind: String
   outcome: String
+  scopeType: String
   sourceId: String
-  type: AgentSourceType
 }
 
 """
@@ -429,70 +483,6 @@ type AgentRunTriggerContext {
 }
 
 """
-Where an agent looks for information each run — directed reading, not a boundary.
-"""
-type AgentSource {
-  agentId: String
-  consecutiveFailures: Int
-  createdAt: DateTime
-  id: String
-  label: String
-  lastErrorKind: String
-  lastReadAt: DateTime
-  notionDatabaseId: String
-  notionDatabaseKind: String
-  notionPageId: String
-  slackChannelId: String
-  status: AgentSourceStatus
-  type: AgentSourceType
-  updatedAt: DateTime
-  url: String
-}
-
-"""
-Discriminated source config. Provide exactly one of `url`, `notionPage`, `notionDatabase`, or `slackChannel`.
-"""
-input AgentSourceConfigInput {
-  notionDatabase: NotionDatabaseSourceConfigInput
-  notionPage: NotionPageSourceConfigInput
-  slackChannel: SlackChannelSourceConfigInput
-  url: UrlSourceConfigInput
-}
-
-input AgentSourceCreateInput {
-  agentId: String!
-  config: AgentSourceConfigInput!
-}
-
-"""
-Per-source status, independent of the parent agent. `error` = structurally dead (e.g. page left the sync scope).
-"""
-enum AgentSourceStatus {
-  active
-  error
-  paused
-}
-
-"""
-What kind of place an agent source points at.
-"""
-enum AgentSourceType {
-  notion_database
-  notion_page
-  slack_channel
-  url
-}
-
-"""
-Update a source's config, label, and/or status.
-"""
-input AgentSourceUpdateInput {
-  config: AgentSourceConfigInput
-  label: String
-  status: AgentSourceStatus
-}
-
-"""
 Top-level lifecycle status of an agent.
 """
 enum AgentStatus {
@@ -520,7 +510,6 @@ type AgentTrigger {
   integrationId: String
   integrationNotionPageId: String
   integrationProvider: String
-  integrationRepoFullName: String
   integrationSlackChannelId: String
   integrationSourceLabel: String
   integrationTriggerType: String
@@ -639,6 +628,50 @@ type BlockSourceStat {
   signalCount: Int
 }
 
+type BriefActivityPayload {
+  """
+  ISO timestamp of the activity.
+  """
+  at: String
+  briefId: String
+
+  """
+  Human-readable live status, e.g. "Fetching signals…".
+  """
+  label: String
+  toolName: String
+}
+
+input BriefListFilters {
+  briefStatus: [BriefStatus!]
+  briefType: BriefType
+  createdAfter: DateTime
+  createdBefore: DateTime
+  sourceInsightId: String
+}
+
+enum BriefStatus {
+  building
+  draft
+  failed
+  finalised
+  in_review
+}
+
+type BriefTemplate {
+  briefType: BriefType
+  content: String
+  description: String
+  id: String
+  title: String
+  typeTag: String
+}
+
+enum BriefType {
+  decision
+  prd
+}
+
 type ChainHealth {
   activeSignalCount: Int
   insightCount: Int
@@ -690,6 +723,33 @@ type CommandSearchEntity {
   type: String!
 }
 
+type ConnectField {
+  help: String
+  label: String
+  name: String
+  options: [ConnectFieldOption!]
+  placeholder: String
+  required: Boolean
+  type: String
+}
+
+type ConnectFieldOption {
+  label: String
+  value: String
+}
+
+type ConnectSpec {
+  fields: [ConnectField!]
+  instructions: [String!]
+  providerDocsUrl: String
+  setupGuideUrl: String
+}
+
+type ConnectionContextEntry {
+  key: String
+  value: String
+}
+
 type ContentVersion {
   blockNoteJson: String
   content: String
@@ -700,6 +760,75 @@ type ContentVersion {
   source: String
   title: String
   version: Int
+}
+
+type ContextHealth {
+  categories: [ContextHealthCategory!]
+  components: [ContextHealthComponent!]
+  isColdStart: Boolean
+  recommendations: [ContextHealthRecommendation!]
+  saturationScore: Float
+  score: Int
+  status: ContextHealthStatus
+  supplyScore: Float
+}
+
+type ContextHealthCategory {
+  configured: Boolean
+  key: String
+  label: String
+  lastDataAt: DateTime
+  score: Float
+  state: ContextHealthCategoryState
+  supported: Boolean
+}
+
+enum ContextHealthCategoryState {
+  coming_soon
+  fresh
+  missing
+  partial
+  quiet
+  stale
+}
+
+type ContextHealthComponent {
+  key: String
+  parts: JSON
+  score: Float
+}
+
+type ContextHealthRecommendation {
+  categoryKey: String
+  kind: ContextRecommendationKind
+  providerKeys: [String!]
+  reason: String
+  severity: ContextRecommendationSeverity
+}
+
+enum ContextHealthStatus {
+  bloated
+  flooded
+  healthy
+  lean
+  starved
+}
+
+enum ContextRecommendationKind {
+  check_integration
+  compact_knowledge
+  connect_integration
+  create_agent
+  define_strategy
+  process_backlog
+  refresh_agents
+  review_unread
+}
+
+enum ContextRecommendationSeverity {
+  info
+  suggested
+  urgent
 }
 
 type Conversation {
@@ -734,6 +863,11 @@ type ConversationSubscriptionPayload {
   Session ID of the client that triggered the change.
   """
   sourceSessionId: String
+}
+
+input CreateBriefFromTemplateInput {
+  templateId: String!
+  title: String
 }
 
 type CreateDirectoryResponse {
@@ -771,13 +905,9 @@ input CreateIntegrationSourceInput {
   triggerType: String!
 }
 
-input CreateNotionPageConfigInput {
-  includeChildren: Boolean
-  includeDatabases: Boolean
-  integrationSourceId: String!
-  maxDepth: Int
-  rootDataSourceId: String
-  rootPageId: String
+input CreateOnePagerFromTemplateInput {
+  templateId: String!
+  title: String
 }
 
 type CreateWorkspacesResponse {
@@ -794,6 +924,11 @@ enum DecisionRecommendation {
   build
   defer
   research
+}
+
+type DeleteBriefPayload {
+  briefId: String
+  success: Boolean
 }
 
 type DeleteDirectoryResponse {
@@ -852,8 +987,15 @@ input DirectoryUpdateInput {
   parentId: String
 }
 
+type DisplayIdentity {
+  label: String
+  value: String
+}
+
 type Document {
   blockNoteJson: String
+  briefStatus: BriefStatus
+  briefType: BriefType
   confidenceAtDraft: String
   content: String
   counterEvidenceCountAtDraft: Int
@@ -869,15 +1011,16 @@ type Document {
   kind: DocumentKind
   lastModifiedBy: LastModifier
   linkedInsights: [Insight!]
-  onePagerStatus: OnePagerStatus
-  onePagerType: OnePagerType
+  onePagerStatus: OnePagerStatus @deprecated(reason: "Use briefStatus")
+  onePagerType: OnePagerType @deprecated(reason: "Use briefType")
   path: String
   referencedBy: [Document!]
   referencedDocuments: [Document!]
   referencedGoals: [Goal!]
   referencedInsights: [Insight!]
   referencedSignals: [Signal!]
-  relatedOnePagers: [Document!]
+  relatedBriefs: [Document!]
+  relatedOnePagers: [Document!] @deprecated(reason: "Use relatedBriefs")
   slug: String
   sourceAction: Action
   sourceActionId: String
@@ -902,6 +1045,7 @@ type DocumentBlockProvenance {
 }
 
 enum DocumentKind {
+  brief
   knowledge
   one_pager
 }
@@ -948,6 +1092,70 @@ enum EntityType {
   Insight
 }
 
+type ExportBriefToLinearPayload {
+  briefId: String
+  onePagerId: String @deprecated(reason: "Use briefId")
+  parentIdentifier: String
+  parentUrl: String
+  subIssueCount: Int
+}
+
+type ExportOnePagerToLinearPayload {
+  briefId: String @deprecated(reason: "Use exportBriefToLinear")
+  onePagerId: String
+  parentIdentifier: String
+  parentUrl: String
+  subIssueCount: Int
+}
+
+type ExternalEntityLink {
+  actionId: String
+  createdAt: DateTime
+  documentId: String
+  entityType: String
+  externalId: String
+  externalIdentifier: String
+  externalUrl: String
+  id: String
+  lastSyncedAt: DateTime
+  linkRole: String
+  provider: String
+  syncedStatus: String
+  updatedAt: DateTime
+}
+
+enum ExternalEntityLinkMutationType {
+  CREATED
+  DELETED
+  UPDATED
+}
+
+type ExternalEntityLinkSubscriptionPayload {
+  actionId: String
+  documentId: String
+  link: ExternalEntityLink
+  linkId: String
+  mutationType: ExternalEntityLinkMutationType
+
+  """
+  Session ID of the client that triggered the change.
+  """
+  sourceSessionId: String
+}
+
+enum ExternalLinkEntityType {
+  linear_issue
+}
+
+enum ExternalLinkProvider {
+  linear
+}
+
+enum ExternalLinkRole {
+  published_to
+  tracks
+}
+
 type ExternalSource {
   contentHash: String
   createdAt: DateTime
@@ -976,35 +1184,6 @@ input GenerateReportActionConfigInput {
   inquiry: String!
   onUnchanged: Boolean = false
   title: String
-}
-
-type GithubRepo {
-  createdAt: DateTime
-  defaultBranch: String
-  description: String
-  directoryId: String
-  fullName: String
-  id: String
-  isPrivate: Boolean
-  language: String
-  lastScannedAt: DateTime
-  name: String
-  owner: String
-  scanError: String
-  scanStatus: String
-  updatedAt: DateTime
-}
-
-type GithubRepoInfo {
-  defaultBranch: String
-  description: String
-  fullName: String
-  isPrivate: Boolean
-  isTracked: Boolean
-  language: String
-  name: String
-  owner: String
-  starCount: Int
 }
 
 type Goal {
@@ -1116,24 +1295,29 @@ input InsightsDeliveryConfigInput {
 }
 
 type Integration {
-  availableTriggerTypes: [TriggerTypeInfo!]
+  connectionContext: [ConnectionContextEntry!]
+  connectionKind: String
   createdAt: DateTime
+  displayIdentity: DisplayIdentity
   id: String
   name: String
   provider: String
+  routingIdentities: [RoutingIdentity!]
   status: String
   triggers: [IntegrationTrigger!]
   updatedAt: DateTime
+  webhookRoutingIdentityType: String
+  webhookUrl: String
 }
 
 """
-Integration trigger config (ADR-006). Per-source scope is provider-grain: at most one of `notionPageId` (Notion page), `slackChannelId` (Slack channel), or `repoFullName` (GitHub repo); Gong and generic Composio scope to the connection only.
+Integration trigger config (ADR-006). Per-source scope is provider-grain: at most one of `notionPageId` (Notion page) or `slackChannelId` (Slack channel); Gong and generic webhook providers scope to the connection only.
 """
 input IntegrationEventTriggerConfigInput {
   integrationId: String
+  jiraProjectIds: [String!]
   notionPageId: String
   provider: String!
-  repoFullName: String
   slackChannelId: String
   sourceLabel: String
   triggerType: String!
@@ -1157,6 +1341,27 @@ type IntegrationTrigger {
 
 scalar JSON
 
+type JiraProjectOption {
+  id: String
+  isServiceDesk: Boolean
+  key: String
+  name: String
+}
+
+type JiraSetupOptions {
+  projects: [JiraProjectOption!]
+  selectedCloudId: String
+  selectedProjectIds: [String!]
+  sites: [JiraSiteOption!]
+}
+
+type JiraSiteOption {
+  avatarUrl: String
+  cloudId: String
+  name: String
+  url: String
+}
+
 type KnowledgeDeliveryConfig implements AgentDeliveryConfig {
   channel: AgentDeliveryChannel
 
@@ -1177,6 +1382,26 @@ type LastModifier {
   actorType: String
   actorUser: ActorUser
   at: DateTime
+}
+
+type LinearIssue {
+  id: String
+  identifier: String
+  state: String
+  team: String
+  title: String
+  url: String
+}
+
+type LinearTeam {
+  id: String
+  key: String
+  name: String
+}
+
+input LinkBriefTargetInput {
+  briefId: String
+  insightId: String
 }
 
 input LinkEntitiesInput {
@@ -1212,7 +1437,12 @@ type MoonUnlock {
 type Mutation {
   addDirectoryTag(id: String!, tag: String!): Directory
   addDocumentTag(id: String!, tag: String!): Document
-  addGithubRepo(input: AddGithubRepoInput!): GithubRepo
+  agentAccessRemove(id: String!): Boolean
+
+  """
+  Upsert a single Tools & access grant. Setting a connection scope's permission to `none` removes it (returns null).
+  """
+  agentAccessSet(agentId: String!, input: AgentAccessInput!): AgentAccess
 
   """
   Append an action to an existing agent. The discriminated input must match the action type.
@@ -1241,11 +1471,6 @@ type Mutation {
   Force a fresh run now. Bypasses change-detection. Inserts a pending run row and immediately dispatches the `agent.run` event so the handler picks it up without waiting for the hourly cron tick. Rejects with `WORKFLOW_RUN_IN_PROGRESS` (BAD_USER_INPUT) if a pending or running row already exists.
   """
   agentRunNow(agentId: String!): AgentRun
-  agentSourceCreate(input: AgentSourceCreateInput!): AgentSource
-  agentSourceDelete(id: String!): Boolean
-  agentSourcePause(id: String!): AgentSource
-  agentSourceResume(id: String!): AgentSource
-  agentSourceUpdate(id: String!, input: AgentSourceUpdateInput!): AgentSource
   agentTriggerCreate(input: AgentTriggerCreateInput!): AgentTrigger
   agentTriggerDelete(id: String!): Boolean
   agentTriggerPause(id: String!): AgentTrigger
@@ -1253,41 +1478,73 @@ type Mutation {
   agentTriggerUpdate(id: String!, input: AgentTriggerUpdateInput!): AgentTrigger
   agentUpdate(id: String!, input: AgentUpdateInput!): Agent
   assignAction(actionId: String!, assigneeUserId: String): Action
+  cancelBriefGeneration(briefId: String!): Document
   cancelOnePagerGeneration(onePagerId: String!): Document
+    @deprecated(reason: "Use cancelBriefGeneration")
+  createBriefFromTemplate(input: CreateBriefFromTemplateInput!): Document
   createDirectory(input: DirectoryCreateInput!): CreateDirectoryResponse
   createDocument(input: CreateDocumentInput!): Document
   createGoal(input: CreateGoalInput!): Goal
   createIntegrationSource(
     input: CreateIntegrationSourceInput!
   ): IntegrationTrigger
-  createNotionPageConfig(input: CreateNotionPageConfigInput!): NotionPageConfig
+  createOnePagerFromTemplate(input: CreateOnePagerFromTemplateInput!): Document
+    @deprecated(reason: "Use createBriefFromTemplate")
   createWorkspaces(input: [WorkspaceCreateInput!]!): CreateWorkspacesResponse
+  deleteBrief(briefId: String!): DeleteBriefPayload
   deleteConversation(id: String!): Boolean
   deleteDirectory(id: String!): DeleteDirectoryResponse
   deleteDocument(id: String!): Boolean
   deleteGoal(id: String!): Boolean
   deleteInsight(id: String!): Boolean
   deleteIntegrationTrigger(id: String!): Boolean
-
-  """
-  Remove a scope root. Cascade-deletes every synced KB document descended from it so the file explorer stays in sync with the picker.
-  """
-  deleteNotionPageConfig(id: String!): Boolean
   deleteOnePager(onePagerId: String!): DeleteOnePagerPayload
+    @deprecated(reason: "Use deleteBrief")
   deleteSignal(id: String!): Boolean
   disconnectIntegration(id: String!): Boolean
   dismissAction(actionId: String!, surface: ActionSurface): Action
+  exportBriefToLinear(
+    briefId: String!
+
+    """
+    Linear team to create the issues in. `issueCreate` requires one.
+    """
+    teamId: String!
+  ): ExportBriefToLinearPayload
+  exportOnePagerToLinear(
+    onePagerId: String!
+
+    """
+    Linear team to create the issues in. `issueCreate` requires one.
+    """
+    teamId: String!
+  ): ExportOnePagerToLinearPayload
+    @deprecated(reason: "Use exportBriefToLinear")
+  generateBriefFromAction(actionId: String!, type: BriefType): TakeActionPayload
+  generateBriefFromInsight(insightId: String!, type: BriefType): Document
   generateOnePagerFromAction(
     actionId: String!
     type: OnePagerType
-  ): TakeActionPayload
+  ): TakeActionPayload @deprecated(reason: "Use generateBriefFromAction")
   generateOnePagerFromInsight(insightId: String!, type: OnePagerType): Document
+    @deprecated(reason: "Use generateBriefFromInsight")
   linkAction(actionId: String!, target: ActionLinkTargetInput!): Action
+  linkBrief(briefId: String!, target: LinkBriefTargetInput!): LinkResult
   linkEntities(input: LinkEntitiesInput!): LinkResult
+  linkExternalEntity(
+    actionId: String
+    documentId: String
+    linkRole: ExternalLinkRole
+
+    """
+    A Linear issue URL or an identifier like ENG-123.
+    """
+    reference: String!
+  ): ExternalEntityLink
   linkOnePager(
     onePagerId: String!
     target: LinkOnePagerTargetInput!
-  ): LinkResult
+  ): LinkResult @deprecated(reason: "Use linkBrief")
   markActionDone(id: String!, surface: ActionSurface): Action
   markBlockMutated(blockId: String!, documentId: String!): Boolean
   markDocumentAsRead(id: String!): Document
@@ -1300,7 +1557,6 @@ type Mutation {
   ): Document
   removeDirectoryTag(id: String!, tag: String!): Directory
   removeDocumentTag(id: String!, tag: String!): Document
-  removeGithubRepo(id: String!): Boolean
 
   """
   Re-fire a specific delivery for a past report. Knowledge channel is rejected — the document already exists; use `reportRegenerate` or edit it directly.
@@ -1311,10 +1567,22 @@ type Mutation {
   Re-generate the report by re-running the agent with `force=true`. Creates a new pending agent_run row with `triggeredBy='manual'` and immediately dispatches the `agent.run` event. Rejects with `WORKFLOW_RUN_IN_PROGRESS` (BAD_USER_INPUT) if a run is already in flight.
   """
   reportRegenerate(agentId: String!): AgentRun
-  rescanGithubRepo(id: String!): GithubRepo
   restoreVersion(versionId: String!): Boolean
+  retryBriefGeneration(briefId: String!): Document
   retryOnePagerGeneration(onePagerId: String!): Document
+    @deprecated(reason: "Use retryBriefGeneration")
   reviewDocument(documentId: String!): Boolean
+  saveJiraSelection(
+    cloudId: String!
+    integrationId: String!
+    projectIds: [String!]!
+  ): Integration
+  setBriefStatus(
+    briefId: String!
+    recommendation: DecisionRecommendation
+    status: BriefStatus!
+  ): Document
+  setGongWebhookPublicKey(integrationId: String!, publicKey: String!): Boolean
   setIntegrationSourceStatus(
     id: String!
 
@@ -1327,27 +1595,25 @@ type Mutation {
     onePagerId: String!
     recommendation: DecisionRecommendation
     status: OnePagerStatus!
-  ): Document
+  ): Document @deprecated(reason: "Use setBriefStatus")
   snoozeAction(actionId: String!): Action
   startAction(id: String!, surface: ActionSurface): Action
   triggerActionRanking(insightId: String!): TriggerActionRankingPayload
-
-  """
-  Kick off a Notion KB backfill for the workspace's current scope. Fires the `notion.backfill.requested` Inngest event; per-page sync is fanned out from there. Returns false if no Notion integration is active.
-  """
-  triggerNotionBackfill(rootConfigId: String): Boolean
   unlinkAction(actionId: String!, target: ActionLinkTargetInput!): Action
+  unlinkBrief(briefId: String!, target: LinkBriefTargetInput!): LinkResult
   unlinkEntities(input: UnlinkEntitiesInput!): LinkResult
+  unlinkExternalEntity(id: String!): Boolean
   unlinkOnePager(
     onePagerId: String!
     target: LinkOnePagerTargetInput!
-  ): LinkResult
+  ): LinkResult @deprecated(reason: "Use unlinkBrief")
   updateAction(
     actionId: String!
     input: UpdateActionInput!
     surface: ActionSurface
   ): Action
   updateActionNotes(actionId: String!, notes: String!): Action
+  updateBrief(briefId: String!, input: UpdateBriefInput!): Document
   updateConversationTitle(id: String!, title: String!): Conversation
   updateDirectory(
     id: String!
@@ -1368,6 +1634,7 @@ type Mutation {
     input: UpdateNotificationSubscriptionInput!
   ): NotificationSubscription
   updateOnePager(input: UpdateOnePagerInput!, onePagerId: String!): Document
+    @deprecated(reason: "Use updateBrief")
   updateSlackChannelConfig(
     input: UpdateSlackChannelConfigInput!
   ): SlackChannelConfig
@@ -1398,45 +1665,6 @@ type NotificationSubscriptionChangedPayload {
   workspaceId: String
 }
 
-input NotionDatabaseSourceConfigInput {
-  kind: String!
-  label: String!
-  notionId: String!
-}
-
-type NotionPageConfig {
-  createdAt: DateTime!
-  firstIngestCompletedAt: DateTime
-  id: String!
-  includeChildren: Boolean!
-  includeDatabases: Boolean!
-  integrationSourceId: String!
-  lastCrawlAt: DateTime
-  maxDepth: Int
-  rootDataSourceId: String
-  rootPageId: String
-  updatedAt: DateTime!
-}
-
-type NotionPageLink {
-  archived: Boolean!
-  id: String!
-  inTrash: Boolean!
-  isKbIncluded: Boolean!
-  kbDocumentId: String
-  lastEditedTime: DateTime!
-  notionDataSourceId: String
-  notionPageId: String!
-  parentDatabaseId: String
-  parentPageId: String
-  rootConfigId: String
-}
-
-input NotionPageSourceConfigInput {
-  label: String!
-  notionPageId: String!
-}
-
 type NotionTreeNode {
   id: String!
   object: String!
@@ -1447,14 +1675,7 @@ type NotionTreeNode {
 }
 
 type OnePagerActivityPayload {
-  """
-  ISO timestamp of the activity.
-  """
   at: String
-
-  """
-  Human-readable live status, e.g. "Fetching signals…".
-  """
   label: String
   onePagerId: String
   toolName: String
@@ -1476,6 +1697,15 @@ enum OnePagerStatus {
   in_review
 }
 
+type OnePagerTemplate {
+  content: String
+  description: String
+  id: String
+  onePagerType: OnePagerType
+  title: String
+  typeTag: String
+}
+
 enum OnePagerType {
   decision
   prd
@@ -1488,11 +1718,22 @@ type Organisation {
   slug: String
 }
 
+type ProductCapability {
+  key: String
+  kind: String
+  label: String
+  presets: [AccessPreset!]
+}
+
 type ProviderInfo {
+  accessVocabulary: [AccessPreset!]
+  agentSourceKinds: [SourceKindInfo!]
+  agentToolModes: [String!]
+  agentTools: ProviderTools
   agentTriggerTypes: [TriggerTypeInfo!]
   authType: String
-  availableTriggers: [TriggerTypeInfo!]
   category: String
+  connectSpec: ConnectSpec
   connected: Boolean
   description: String
   iconUrl: String
@@ -1501,6 +1742,11 @@ type ProviderInfo {
   name: String
   requiresSetup: Boolean
   status: String
+}
+
+type ProviderTools {
+  read: [String!]
+  write: [String!]
 }
 
 type Query {
@@ -1556,6 +1802,14 @@ type Query {
   """
   availableProviders: [ProviderInfo!]
   blockSourceStats(documentId: String!): [BlockSourceStat!]
+  brief(displayId: String!): Document
+  briefLatestActivity(briefId: String!): BriefActivityPayload
+  briefList(
+    filters: BriefListFilters
+    limit: Int = 50
+    offset: Int = 0
+  ): [Document!]
+  briefTemplates: [BriefTemplate!]
   chainHealth: ChainHealth
   cluster(id: String!): Cluster
   clusterList(
@@ -1574,6 +1828,7 @@ type Query {
     entityType: String!
     limit: Int = 20
   ): [ContentVersion!]
+  contextHealth: ContextHealth
   conversation(id: String!): Conversation
   conversationList(limit: Int = 50, offset: Int = 0): [Conversation!]
 
@@ -1592,21 +1847,15 @@ type Query {
   documentMarkdownExport(documentId: String!): String
   documentProvenance(documentId: String!): [DocumentBlockProvenance!]
   documentSearch(limit: Int = 20, search: String): [Document!]!
+  externalEntityLinks(
+    actionId: String
+    documentId: String
+  ): [ExternalEntityLink!]
   externalSources(
     limit: Int = 50
     offset: Int = 0
     source: String
   ): [ExternalSource!]
-
-  """
-  List repositories from the connected GitHub account
-  """
-  githubAvailableRepos: [GithubRepoInfo!]
-
-  """
-  List tracked GitHub repositories for the current workspace
-  """
-  githubTrackedRepos: [GithubRepo!]
   goal(id: String!): Goal
   goalList(
     limit: Int = 50
@@ -1633,6 +1882,10 @@ type Query {
   """
   integrationList: [Integration!]
   integrationTriggerList(integrationId: String!): [IntegrationTrigger!]
+  jiraMonitoredSpaces(integrationId: String!): [JiraProjectOption!]
+  jiraSetupOptions(cloudId: String, integrationId: String!): JiraSetupOptions
+  linearIssues(limit: Int = 25, query: String): [LinearIssue!]
+  linearTeams: [LinearTeam!]
   mentionSearchDirectories(limit: Int = 20, search: String): [Directory!]
   mentionSearchDocuments(limit: Int = 20, search: String): [Document!]
   mentionSearchGoals(limit: Int = 20, search: String): [Goal!]
@@ -1643,26 +1896,12 @@ type Query {
   notificationSubscriptions(workspaceId: String): [NotificationSubscription!]
 
   """
-  Return the direct child pages + child databases of a Notion page. Backs the expand/collapse UX in the scope picker.
+  Return the direct child pages + child databases of a Notion page. Backs the expand/collapse UX in the pickers.
   """
   notionPageChildren(pageId: String!, pageSize: Int): [NotionTreeNode!]
 
   """
-  List the Notion signal-scope roots for the current workspace.
-  """
-  notionPageConfigList: [NotionPageConfig!]
-
-  """
-  List the Notion page links for the current workspace.
-  """
-  notionPageLinkList(
-    isKbIncluded: Boolean
-    limit: Int
-    rootConfigId: String
-  ): [NotionPageLink!]
-
-  """
-  Search the connected Notion workspace for pages and database data_sources. Drives the scope picker tree. Requires an active Notion integration on the workspace.
+  Search the connected Notion workspace for pages and database data_sources. Drives the page pickers. Requires an active Notion integration on the workspace.
   """
   notionTreeSearch(
     """
@@ -1673,15 +1912,23 @@ type Query {
     query: String
     startCursor: String
   ): [NotionTreeNode!]
-  onePager(displayId: String!): Document
+  onePager(displayId: String!): Document @deprecated(reason: "Use brief")
   onePagerLatestActivity(onePagerId: String!): OnePagerActivityPayload
+    @deprecated(reason: "Use briefLatestActivity")
   onePagerList(
     filters: OnePagerListFilters
     limit: Int = 50
     offset: Int = 0
-  ): [Document!]
+  ): [Document!] @deprecated(reason: "Use briefList")
+  onePagerTemplates: [OnePagerTemplate!]
+    @deprecated(reason: "Use briefTemplates")
   orgMemberList: [ActorUser!]
   organisations: [Organisation!]
+
+  """
+  Built-in product capabilities and their permission vocabularies (registry-driven)
+  """
+  productCapabilities: [ProductCapability!]
 
   """
   List all available provider categories for filtering
@@ -1814,6 +2061,11 @@ input ResearchAgentConfigInput {
   prompt: String!
 }
 
+type RoutingIdentity {
+  externalId: String
+  identityType: String
+}
+
 input ScheduleTriggerConfigInput {
   cadence: AgentCadence!
   startAt: DateTime
@@ -1885,6 +2137,7 @@ enum SignalSource {
   app_store
   capterra
   document
+  fellow
   file_upload
   g2
   github
@@ -1974,12 +2227,6 @@ enum SlackChannelMode {
   off
 }
 
-input SlackChannelSourceConfigInput {
-  integrationId: String!
-  label: String!
-  slackChannelId: String!
-}
-
 type SlackDeliveryConfig implements AgentDeliveryConfig {
   channel: AgentDeliveryChannel
   channelId: String
@@ -2008,6 +2255,12 @@ type SlackVisibleChannel {
 enum SortDirection {
   ASC
   DESC
+}
+
+type SourceKindInfo {
+  kind: String
+  name: String
+  scopeType: String
 }
 
 """
@@ -2052,17 +2305,20 @@ type Subscription {
   New agent runs as they're created/updated for a specific agent. Filters by `agentId` server-side.
   """
   agentRunCreated(agentId: String!): AgentRunSubscriptionPayload
+  briefActivity(briefId: String!): BriefActivityPayload
   clusterChanged: ClusterSubscriptionPayload
   conversationChanged: ConversationSubscriptionPayload
   directoryChanged: DirectorySubscriptionPayload
   documentChanged: DocumentSubscriptionPayload
   documentUpdated(documentId: String!): DocumentSubscriptionPayload
+  externalEntityLinkChanged: ExternalEntityLinkSubscriptionPayload
   goalChanged: GoalSubscriptionPayload
   goalUpdated(goalId: String!): GoalSubscriptionPayload
   insightChanged: InsightSubscriptionPayload
   insightUpdated(insightId: String!): InsightSubscriptionPayload
   notificationSubscriptionChanged: NotificationSubscriptionChangedPayload
   onePagerActivity(onePagerId: String!): OnePagerActivityPayload
+    @deprecated(reason: "Use briefActivity")
 
   """
   New reports for a specific agent.
@@ -2079,8 +2335,10 @@ type Subscription {
 }
 
 type TakeActionPayload {
-  onePagerDisplayId: String
-  onePagerId: String
+  briefDisplayId: String
+  briefId: String
+  onePagerDisplayId: String @deprecated(reason: "Use briefDisplayId")
+  onePagerId: String @deprecated(reason: "Use briefId")
 }
 
 type TriggerActionRankingPayload {
@@ -2107,6 +2365,12 @@ input UpdateActionInput {
   effort: ActionEffort
   priority: ActionPriority
   status: ActionStatus
+}
+
+input UpdateBriefInput {
+  blockNoteJson: String
+  body: String
+  title: String
 }
 
 type UpdateDirectoryResponse {
@@ -2181,11 +2445,6 @@ type UrlAgentConfig {
 }
 
 input UrlAgentConfigInput {
-  url: String!
-}
-
-input UrlSourceConfigInput {
-  label: String
   url: String!
 }
 
