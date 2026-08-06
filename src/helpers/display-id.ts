@@ -23,14 +23,6 @@ const PREFIX_TO_TYPE: Record<string, EntityType> = {
   CL: "cluster",
 };
 
-// Briefs were formerly called "one-pagers" and formatted as OP-N. Old links,
-// agent-written markdown and saved references still carry OP-N, so parsing must
-// keep accepting it — resolving it to the same "brief" entity type. The
-// platform's display-id parser does the same for backwards compatibility.
-const LEGACY_PREFIX_TO_TYPE: Record<string, EntityType> = {
-  OP: "brief",
-};
-
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const DISPLAY_PATTERN = /^([A-Za-z]{2})-(\d+)$/;
@@ -65,7 +57,7 @@ export function parseEntityRef(input: string): EntityRef {
   const match = DISPLAY_PATTERN.exec(trimmed);
   if (match) {
     const prefix = match[1].toUpperCase();
-    const type = PREFIX_TO_TYPE[prefix] ?? LEGACY_PREFIX_TO_TYPE[prefix];
+    const type = PREFIX_TO_TYPE[prefix];
     if (!type) {
       throw new InvalidEntityIdError(trimmed);
     }
@@ -74,8 +66,6 @@ export function parseEntityRef(input: string): EntityRef {
       kind: "display",
       type,
       displayId,
-      // Normalise to the canonical prefix so a legacy OP-N input resolves and
-      // echoes back as BR-N.
       formatted: formatDisplayId(type, displayId),
     };
   }

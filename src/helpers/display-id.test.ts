@@ -32,15 +32,6 @@ describe("parseEntityRef", () => {
     });
   });
 
-  it("still parses the legacy OP- prefix, normalising it to BR-", () => {
-    expect(parseEntityRef("OP-9")).toEqual({
-      kind: "display",
-      type: "brief",
-      displayId: 9,
-      formatted: "BR-9",
-    });
-  });
-
   it("passes UUIDs through", () => {
     const uuid = "6F9619FF-8B86-D011-B42D-00C04FC964FF";
     expect(parseEntityRef(uuid)).toEqual({

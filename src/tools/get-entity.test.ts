@@ -75,18 +75,6 @@ describe("get_entity routing", () => {
     expect(parsed.displayId).toBe("BR-2");
   });
 
-  it("resolves legacy OP- brief IDs, normalising them to BR-", async () => {
-    byOperation(mockExecute, {
-      GetBrief: (vars: unknown) => {
-        expect(vars).toEqual({ displayId: "BR-2" });
-        return { brief: { id: "op1", displayId: 2, title: "Brief" } };
-      },
-    });
-
-    const parsed = parse(await getEntity({ id: "op-2" }, authCtx));
-    expect(parsed.displayId).toBe("BR-2");
-  });
-
   it("probes types in order for UUID input", async () => {
     byOperation(mockExecute, {
       GetAction: { action: null },
