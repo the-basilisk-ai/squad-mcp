@@ -19,8 +19,6 @@ export type ActionEffort =
 export type ActionLinkTargetInput = {
   briefId?: string | null | undefined;
   insightId?: string | null | undefined;
-  /** @deprecated Use briefId */
-  onePagerId?: string | null | undefined;
 };
 
 export type ActionPriority =
@@ -80,8 +78,7 @@ export type DecisionRecommendation =
 
 export type DocumentKind =
   | 'brief'
-  | 'knowledge'
-  | 'one_pager';
+  | 'knowledge';
 
 export type EdgeLabel =
   | 'BELONGS_TO'

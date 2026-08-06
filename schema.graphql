@@ -50,14 +50,12 @@ enum ActionEffort {
 input ActionLinkTargetInput {
   briefId: String
   insightId: String
-  onePagerId: String @deprecated(reason: "Use briefId")
 }
 
 enum ActionMutationType {
   BRIEF_STATE_CHANGED
   CREATED
   DELETED
-  ONE_PAGER_STATE_CHANGED
   UPDATED
 }
 
@@ -89,8 +87,6 @@ type ActionSubscriptionPayload {
   briefStatus: String
   insightIds: [String!]!
   mutationType: ActionMutationType
-  onePagerId: String @deprecated(reason: "Use briefId")
-  onePagerStatus: String @deprecated(reason: "Use briefStatus")
 
   """
   Session ID of the client that triggered the change.
@@ -905,11 +901,6 @@ input CreateIntegrationSourceInput {
   triggerType: String!
 }
 
-input CreateOnePagerFromTemplateInput {
-  templateId: String!
-  title: String
-}
-
 type CreateWorkspacesResponse {
   workspaces: [Workspace!]
 }
@@ -932,11 +923,6 @@ type DeleteBriefPayload {
 }
 
 type DeleteDirectoryResponse {
-  success: Boolean
-}
-
-type DeleteOnePagerPayload {
-  onePagerId: String
   success: Boolean
 }
 
@@ -1011,8 +997,6 @@ type Document {
   kind: DocumentKind
   lastModifiedBy: LastModifier
   linkedInsights: [Insight!]
-  onePagerStatus: OnePagerStatus @deprecated(reason: "Use briefStatus")
-  onePagerType: OnePagerType @deprecated(reason: "Use briefType")
   path: String
   referencedBy: [Document!]
   referencedDocuments: [Document!]
@@ -1020,7 +1004,6 @@ type Document {
   referencedInsights: [Insight!]
   referencedSignals: [Signal!]
   relatedBriefs: [Document!]
-  relatedOnePagers: [Document!] @deprecated(reason: "Use relatedBriefs")
   slug: String
   sourceAction: Action
   sourceActionId: String
@@ -1047,7 +1030,6 @@ type DocumentBlockProvenance {
 enum DocumentKind {
   brief
   knowledge
-  one_pager
 }
 
 enum DocumentMutationType {
@@ -1094,15 +1076,6 @@ enum EntityType {
 
 type ExportBriefToLinearPayload {
   briefId: String
-  onePagerId: String @deprecated(reason: "Use briefId")
-  parentIdentifier: String
-  parentUrl: String
-  subIssueCount: Int
-}
-
-type ExportOnePagerToLinearPayload {
-  briefId: String @deprecated(reason: "Use exportBriefToLinear")
-  onePagerId: String
   parentIdentifier: String
   parentUrl: String
   subIssueCount: Int
@@ -1412,11 +1385,6 @@ input LinkEntitiesInput {
   targetType: EntityType!
 }
 
-input LinkOnePagerTargetInput {
-  insightId: String
-  onePagerId: String
-}
-
 type LinkResult {
   error: String
   success: Boolean
@@ -1479,8 +1447,6 @@ type Mutation {
   agentUpdate(id: String!, input: AgentUpdateInput!): Agent
   assignAction(actionId: String!, assigneeUserId: String): Action
   cancelBriefGeneration(briefId: String!): Document
-  cancelOnePagerGeneration(onePagerId: String!): Document
-    @deprecated(reason: "Use cancelBriefGeneration")
   createBriefFromTemplate(input: CreateBriefFromTemplateInput!): Document
   createDirectory(input: DirectoryCreateInput!): CreateDirectoryResponse
   createDocument(input: CreateDocumentInput!): Document
@@ -1488,8 +1454,6 @@ type Mutation {
   createIntegrationSource(
     input: CreateIntegrationSourceInput!
   ): IntegrationTrigger
-  createOnePagerFromTemplate(input: CreateOnePagerFromTemplateInput!): Document
-    @deprecated(reason: "Use createBriefFromTemplate")
   createWorkspaces(input: [WorkspaceCreateInput!]!): CreateWorkspacesResponse
   deleteBrief(briefId: String!): DeleteBriefPayload
   deleteConversation(id: String!): Boolean
@@ -1498,8 +1462,6 @@ type Mutation {
   deleteGoal(id: String!): Boolean
   deleteInsight(id: String!): Boolean
   deleteIntegrationTrigger(id: String!): Boolean
-  deleteOnePager(onePagerId: String!): DeleteOnePagerPayload
-    @deprecated(reason: "Use deleteBrief")
   deleteSignal(id: String!): Boolean
   disconnectIntegration(id: String!): Boolean
   dismissAction(actionId: String!, surface: ActionSurface): Action
@@ -1511,23 +1473,8 @@ type Mutation {
     """
     teamId: String!
   ): ExportBriefToLinearPayload
-  exportOnePagerToLinear(
-    onePagerId: String!
-
-    """
-    Linear team to create the issues in. `issueCreate` requires one.
-    """
-    teamId: String!
-  ): ExportOnePagerToLinearPayload
-    @deprecated(reason: "Use exportBriefToLinear")
   generateBriefFromAction(actionId: String!, type: BriefType): TakeActionPayload
   generateBriefFromInsight(insightId: String!, type: BriefType): Document
-  generateOnePagerFromAction(
-    actionId: String!
-    type: OnePagerType
-  ): TakeActionPayload @deprecated(reason: "Use generateBriefFromAction")
-  generateOnePagerFromInsight(insightId: String!, type: OnePagerType): Document
-    @deprecated(reason: "Use generateBriefFromInsight")
   linkAction(actionId: String!, target: ActionLinkTargetInput!): Action
   linkBrief(briefId: String!, target: LinkBriefTargetInput!): LinkResult
   linkEntities(input: LinkEntitiesInput!): LinkResult
@@ -1541,10 +1488,6 @@ type Mutation {
     """
     reference: String!
   ): ExternalEntityLink
-  linkOnePager(
-    onePagerId: String!
-    target: LinkOnePagerTargetInput!
-  ): LinkResult @deprecated(reason: "Use linkBrief")
   markActionDone(id: String!, surface: ActionSurface): Action
   markBlockMutated(blockId: String!, documentId: String!): Boolean
   markDocumentAsRead(id: String!): Document
@@ -1569,8 +1512,6 @@ type Mutation {
   reportRegenerate(agentId: String!): AgentRun
   restoreVersion(versionId: String!): Boolean
   retryBriefGeneration(briefId: String!): Document
-  retryOnePagerGeneration(onePagerId: String!): Document
-    @deprecated(reason: "Use retryBriefGeneration")
   reviewDocument(documentId: String!): Boolean
   saveJiraSelection(
     cloudId: String!
@@ -1591,11 +1532,6 @@ type Mutation {
     """
     status: String!
   ): IntegrationTrigger
-  setOnePagerStatus(
-    onePagerId: String!
-    recommendation: DecisionRecommendation
-    status: OnePagerStatus!
-  ): Document @deprecated(reason: "Use setBriefStatus")
   snoozeAction(actionId: String!): Action
   startAction(id: String!, surface: ActionSurface): Action
   triggerActionRanking(insightId: String!): TriggerActionRankingPayload
@@ -1603,10 +1539,6 @@ type Mutation {
   unlinkBrief(briefId: String!, target: LinkBriefTargetInput!): LinkResult
   unlinkEntities(input: UnlinkEntitiesInput!): LinkResult
   unlinkExternalEntity(id: String!): Boolean
-  unlinkOnePager(
-    onePagerId: String!
-    target: LinkOnePagerTargetInput!
-  ): LinkResult @deprecated(reason: "Use unlinkBrief")
   updateAction(
     actionId: String!
     input: UpdateActionInput!
@@ -1633,8 +1565,6 @@ type Mutation {
   updateNotificationSubscription(
     input: UpdateNotificationSubscriptionInput!
   ): NotificationSubscription
-  updateOnePager(input: UpdateOnePagerInput!, onePagerId: String!): Document
-    @deprecated(reason: "Use updateBrief")
   updateSlackChannelConfig(
     input: UpdateSlackChannelConfigInput!
   ): SlackChannelConfig
@@ -1672,43 +1602,6 @@ type NotionTreeNode {
   parentPageId: String
   title: String
   url: String
-}
-
-type OnePagerActivityPayload {
-  at: String
-  label: String
-  onePagerId: String
-  toolName: String
-}
-
-input OnePagerListFilters {
-  createdAfter: DateTime
-  createdBefore: DateTime
-  onePagerStatus: [OnePagerStatus!]
-  onePagerType: OnePagerType
-  sourceInsightId: String
-}
-
-enum OnePagerStatus {
-  building
-  draft
-  failed
-  finalised
-  in_review
-}
-
-type OnePagerTemplate {
-  content: String
-  description: String
-  id: String
-  onePagerType: OnePagerType
-  title: String
-  typeTag: String
-}
-
-enum OnePagerType {
-  decision
-  prd
 }
 
 type Organisation {
@@ -1912,16 +1805,6 @@ type Query {
     query: String
     startCursor: String
   ): [NotionTreeNode!]
-  onePager(displayId: String!): Document @deprecated(reason: "Use brief")
-  onePagerLatestActivity(onePagerId: String!): OnePagerActivityPayload
-    @deprecated(reason: "Use briefLatestActivity")
-  onePagerList(
-    filters: OnePagerListFilters
-    limit: Int = 50
-    offset: Int = 0
-  ): [Document!] @deprecated(reason: "Use briefList")
-  onePagerTemplates: [OnePagerTemplate!]
-    @deprecated(reason: "Use briefTemplates")
   orgMemberList: [ActorUser!]
   organisations: [Organisation!]
 
@@ -2317,8 +2200,6 @@ type Subscription {
   insightChanged: InsightSubscriptionPayload
   insightUpdated(insightId: String!): InsightSubscriptionPayload
   notificationSubscriptionChanged: NotificationSubscriptionChangedPayload
-  onePagerActivity(onePagerId: String!): OnePagerActivityPayload
-    @deprecated(reason: "Use briefActivity")
 
   """
   New reports for a specific agent.
@@ -2337,8 +2218,6 @@ type Subscription {
 type TakeActionPayload {
   briefDisplayId: String
   briefId: String
-  onePagerDisplayId: String @deprecated(reason: "Use briefDisplayId")
-  onePagerId: String @deprecated(reason: "Use briefId")
 }
 
 type TriggerActionRankingPayload {
@@ -2415,12 +2294,6 @@ input UpdateNotificationSubscriptionInput {
   active: Boolean!
   categoryId: String!
   workspaceId: String!
-}
-
-input UpdateOnePagerInput {
-  blockNoteJson: String
-  body: String
-  title: String
 }
 
 input UpdateSlackChannelConfigInput {

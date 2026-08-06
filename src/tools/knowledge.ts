@@ -35,10 +35,8 @@ function normaliseTitle(title: string): string {
   return title.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
-// The platform kept the legacy "one_pager" DocumentKind alongside the new
-// "brief" kind during the rename rollout, so accept either as a brief.
 function isBriefKind(kind: string | null | undefined): boolean {
-  return kind === "brief" || kind === "one_pager";
+  return kind === "brief";
 }
 
 async function resolveDocumentUuid(

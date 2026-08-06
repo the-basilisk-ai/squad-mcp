@@ -73,10 +73,7 @@ async function keywordSearch(
 
   for (const doc of documents?.documentSearch ?? []) {
     if (!doc.id || seen.has(doc.id)) continue;
-    // The platform kept the legacy `one_pager` DocumentKind alongside the new
-    // `brief` kind during the rename rollout, so accept either as a brief.
-    const type =
-      doc.kind === "brief" || doc.kind === "one_pager" ? "brief" : "document";
+    const type = doc.kind === "brief" ? "brief" : "document";
     items.push({
       id: doc.id,
       displayId:
