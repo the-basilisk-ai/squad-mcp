@@ -1,0 +1,34 @@
+name: Publish to MCP Registry
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Publish server.json to registry.modelcontextprotocol.io
+    runs-on: ubuntu-latest
+    steps:
+      # The release tag carries the version release-please wrote into server.json,
+      # so publishing from it is always a version the registry hasn't seen.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
+        with:
+          go-version: "1.26" # publisher v1.8.0's go.mod minimum
+
+      # We own the `ai.meetsquad` namespace via DNS, so auth is a signature from
+      # the meetsquad.ai signing key (raw 32-byte Ed25519 seed, hex-encoded).
+      - name: Publish
+        env:
+          MCP_REGISTRY_PRIVATE_KEY: ${{ secrets.MCP_REGISTRY_PRIVATE_KEY }}
+        run: |
+          mcp_publisher() { go run github.com/modelcontextprotocol/registry/cmd/publisher@v1.8.0 "$@"; }
+          mcp_publisher login dns --domain meetsquad.ai --private-key "$MCP_REGISTRY_PRIVATE_KEY"
+          mcp_publisher validate
+          mcp_publisher publish
