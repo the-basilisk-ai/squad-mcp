@@ -6,6 +6,10 @@ This server is listed on the [MCP Registry](https://registry.modelcontextprotoco
 
 The `server.json` file contains metadata published to the registry. It is not used at runtime.
 
+release-please rewrites this file on every release (it re-serialises the whole
+document to bump `version`), which formats arrays differently to Biome. Biome
+therefore skips it — see the `!server.json` exclusion in `biome.json`.
+
 ## Publishing
 
 Publishing is automatic. Merging a release-please PR tags a release, and
