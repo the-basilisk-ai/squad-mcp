@@ -4,7 +4,6 @@ npm-debug.log*
 pnpm-debug.log*
 
 # Build output
-dist/
 build/
 storybook-static/
 *.tsbuildinfo
@@ -28,6 +27,7 @@ storybook-static/
 # Claude Code settings
 .claude/settings.local.json
 .mcp-use/
+mcp-env.d.ts
 
 # Logs
 logs/

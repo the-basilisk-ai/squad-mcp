@@ -104,6 +104,60 @@ describe("registerTool", () => {
     expect(handler).not.toHaveBeenCalled();
   });
 
+  it("blocks write tools from the scopes the SDK verified on the token", async () => {
+    const { server, captured } = fakeServer();
+    const handler = vi.fn();
+    registerTool(server as never, {
+      name: "update_thing",
+      title: "Update",
+      description: "d",
+      schema: z.object({}),
+      scope: "write",
+      handler,
+    });
+
+    const result = await captured[0].handler(
+      {},
+      {
+        auth: {
+          accessToken: "at",
+          payload: { sub: "user-1", scope: "read:workspace write:workspace" },
+          scopes: ["read:workspace"],
+        },
+      },
+    );
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("write:workspace");
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it("admits write tools when the verified scopes include write:workspace", async () => {
+    const { server, captured } = fakeServer();
+    registerTool(server as never, {
+      name: "update_thing",
+      title: "Update",
+      description: "d",
+      schema: z.object({}),
+      scope: "write",
+      handler: async () => ({ content: [{ type: "text", text: "written" }] }),
+    });
+
+    const result = await captured[0].handler(
+      {},
+      {
+        auth: {
+          accessToken: "at",
+          payload: { sub: "user-1" },
+          scopes: ["read:workspace", "write:workspace"],
+        },
+      },
+    );
+
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toBe("written");
+  });
+
   it("formats WorkspaceSelectionRequired with the available options", async () => {
     const { server, captured } = fakeServer();
     registerTool(server as never, {
