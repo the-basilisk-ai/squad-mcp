@@ -7,11 +7,13 @@
     "url": "https://github.com/the-basilisk-ai/squad-mcp",
     "source": "github"
   },
-  "version": "4.0.2",
+  "version": "4.1.0",
   "icons": [
     {
       "src": "https://assets.meetsquad.ai/images/squad-icon.png",
-      "sizes": ["128x128"]
+      "sizes": [
+        "128x128"
+      ]
     }
   ],
   "remotes": [
