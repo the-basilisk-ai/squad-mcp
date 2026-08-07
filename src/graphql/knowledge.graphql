@@ -7,18 +7,18 @@ query DocumentList($limit: Int, $offset: Int) {
     path
     tags
     updatedAt
-    onePagerStatus
-    onePagerType
+    briefStatus
+    briefType
   }
 }
 
-query OnePagerList($filters: OnePagerListFilters, $limit: Int, $offset: Int) {
-  onePagerList(filters: $filters, limit: $limit, offset: $offset) {
+query BriefList($filters: BriefListFilters, $limit: Int, $offset: Int) {
+  briefList(filters: $filters, limit: $limit, offset: $offset) {
     id
     displayId
     title
-    onePagerStatus
-    onePagerType
+    briefStatus
+    briefType
     decisionRecommendation
     updatedAt
     sourceInsight {
@@ -66,35 +66,35 @@ mutation RemoveDocumentTag($id: String!, $tag: String!) {
   }
 }
 
-mutation GenerateOnePagerFromAction($actionId: String!, $type: OnePagerType) {
-  generateOnePagerFromAction(actionId: $actionId, type: $type) {
-    onePagerId
-    onePagerDisplayId
+mutation GenerateBriefFromAction($actionId: String!, $type: BriefType) {
+  generateBriefFromAction(actionId: $actionId, type: $type) {
+    briefId
+    briefDisplayId
   }
 }
 
-mutation GenerateOnePagerFromInsight($insightId: String!, $type: OnePagerType) {
-  generateOnePagerFromInsight(insightId: $insightId, type: $type) {
+mutation GenerateBriefFromInsight($insightId: String!, $type: BriefType) {
+  generateBriefFromInsight(insightId: $insightId, type: $type) {
     id
     displayId
     title
-    onePagerStatus
+    briefStatus
   }
 }
 
-mutation RetryOnePagerGeneration($onePagerId: String!) {
-  retryOnePagerGeneration(onePagerId: $onePagerId) {
+mutation RetryBriefGeneration($briefId: String!) {
+  retryBriefGeneration(briefId: $briefId) {
     id
     displayId
-    onePagerStatus
+    briefStatus
   }
 }
 
-mutation SetOnePagerStatus($onePagerId: String!, $status: OnePagerStatus!) {
-  setOnePagerStatus(onePagerId: $onePagerId, status: $status) {
+mutation SetBriefStatus($briefId: String!, $status: BriefStatus!) {
+  setBriefStatus(briefId: $briefId, status: $status) {
     id
     displayId
     title
-    onePagerStatus
+    briefStatus
   }
 }

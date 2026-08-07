@@ -11,7 +11,7 @@ describe("parseEntityRef", () => {
     ["IN-42", "insight", 42],
     ["AC-7", "action", 7],
     ["GL-3", "goal", 3],
-    ["OP-9", "one_pager", 9],
+    ["BR-9", "brief", 9],
     ["DC-2", "document", 2],
     ["CL-11", "cluster", 11],
   ])("routes %s to %s", (input, type, num) => {
@@ -52,7 +52,7 @@ describe("parseEntityRef", () => {
 
 describe("formatDisplayId", () => {
   it("round-trips with parseEntityRef", () => {
-    expect(formatDisplayId("one_pager", 4)).toBe("OP-4");
+    expect(formatDisplayId("brief", 4)).toBe("BR-4");
     expect(parseEntityRef(formatDisplayId("signal", 8))).toMatchObject({
       type: "signal",
       displayId: 8,

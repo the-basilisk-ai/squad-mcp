@@ -37,14 +37,14 @@ describe("asyncTriggerResponse", () => {
   it("always tells the agent how to check back", () => {
     const parsed = parse(
       asyncTriggerResponse({
-        id: "op-1",
-        displayId: "OP-1",
+        id: "br-1",
+        displayId: "BR-1",
         status: "building",
       }),
     );
     expect(parsed).toEqual({
-      id: "op-1",
-      displayId: "OP-1",
+      id: "br-1",
+      displayId: "BR-1",
       status: "building",
       checkWith: "get_entity",
     });

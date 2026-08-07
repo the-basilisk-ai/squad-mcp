@@ -65,7 +65,7 @@ describe("search", () => {
       DocumentTextSearch: {
         documentSearch: [
           { id: "d1", displayId: 7, title: "Spec", kind: "knowledge" },
-          { id: "d2", displayId: 9, title: "Brief", kind: "one_pager" },
+          { id: "d2", displayId: 9, title: "Brief", kind: "brief" },
         ],
       },
     });
@@ -75,7 +75,7 @@ describe("search", () => {
     );
     const ids = parsed.items.map((i: { id: string }) => i.id);
     expect(ids).toEqual(["d1", "d2"]);
-    expect(parsed.items[1].displayId).toBe("OP-9");
+    expect(parsed.items[1].displayId).toBe("BR-9");
   });
 
   it("returns the empty state with a browsing suggestion", async () => {

@@ -73,7 +73,7 @@ async function keywordSearch(
 
   for (const doc of documents?.documentSearch ?? []) {
     if (!doc.id || seen.has(doc.id)) continue;
-    const type = doc.kind === "one_pager" ? "one_pager" : "document";
+    const type = doc.kind === "brief" ? "brief" : "document";
     items.push({
       id: doc.id,
       displayId:

@@ -3,8 +3,8 @@ import {
   AssignActionDocument,
   DismissActionDocument,
   GetActionDocument,
+  GetBriefDocument,
   GetInsightDocument,
-  GetOnePagerDocument,
   LinkActionDocument,
   MarkActionDoneDocument,
   SnoozeActionDocument,
@@ -145,7 +145,7 @@ export function registerActionWriteTools(server: OAuthServer) {
     name: "update_action",
     title: "Update Action",
     description:
-      "Edit an action's priority, effort, category or notes; assign it; or link it to an insight or decision brief. notes replaces the whole notes field (use update_action_status's note to append).",
+      "Edit an action's priority, effort, category or notes; assign it; or link it to an insight or brief. notes replaces the whole notes field (use update_action_status's note to append).",
     schema: z.object({
       actionId: z.string().describe("AC-N display ID or UUID"),
       priority: z.enum(["P0", "P1", "P2"]).optional(),
@@ -160,7 +160,7 @@ export function registerActionWriteTools(server: OAuthServer) {
         .optional()
         .describe('User ID, "me", or null to unassign'),
       linkInsightId: z.string().optional().describe("IN-N or UUID to link"),
-      linkOnePagerId: z.string().optional().describe("OP-N to link"),
+      linkBriefId: z.string().optional().describe("BR-N to link"),
     }),
     scope: "write",
     handler: async (params, tool) => {
@@ -220,9 +220,9 @@ export function registerActionWriteTools(server: OAuthServer) {
           ).assignAction ?? last;
       }
 
-      if (params.linkInsightId || params.linkOnePagerId) {
+      if (params.linkInsightId || params.linkBriefId) {
         let insightId: string | undefined;
-        let onePagerId: string | undefined;
+        let briefId: string | undefined;
         if (params.linkInsightId) {
           const insight = (
             await execute(
@@ -236,32 +236,28 @@ export function registerActionWriteTools(server: OAuthServer) {
           }
           insightId = insight.id;
         }
-        if (params.linkOnePagerId) {
-          const ref = parseEntityRef(params.linkOnePagerId);
-          const onePager = (
+        if (params.linkBriefId) {
+          const ref = parseEntityRef(params.linkBriefId);
+          const brief = (
             await execute(
-              GetOnePagerDocument,
+              GetBriefDocument,
               {
                 displayId:
-                  ref.kind === "display"
-                    ? ref.formatted
-                    : params.linkOnePagerId,
+                  ref.kind === "display" ? ref.formatted : params.linkBriefId,
               },
               ctx,
             )
-          ).onePager;
-          if (!onePager?.id) {
-            return toolError(
-              `Decision brief "${params.linkOnePagerId}" not found.`,
-            );
+          ).brief;
+          if (!brief?.id) {
+            return toolError(`Brief "${params.linkBriefId}" not found.`);
           }
-          onePagerId = onePager.id;
+          briefId = brief.id;
         }
         last =
           (
             await execute(
               LinkActionDocument,
-              { actionId: uuid, target: { insightId, onePagerId } },
+              { actionId: uuid, target: { insightId, briefId } },
               ctx,
             )
           ).linkAction ?? last;

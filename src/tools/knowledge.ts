@@ -1,19 +1,19 @@
 import { z } from "zod";
 import {
   AddDocumentTagDocument,
+  BriefListDocument,
   CreateDocumentDocument,
   DocumentListDocument,
   DocumentTextSearchDocument,
-  GenerateOnePagerFromActionDocument,
-  GenerateOnePagerFromInsightDocument,
+  GenerateBriefFromActionDocument,
+  GenerateBriefFromInsightDocument,
   GetActionDocument,
+  GetBriefDocument,
   GetDocumentMetaDocument,
   GetInsightDocument,
-  GetOnePagerDocument,
-  OnePagerListDocument,
   RemoveDocumentTagDocument,
-  RetryOnePagerGenerationDocument,
-  SetOnePagerStatusDocument,
+  RetryBriefGenerationDocument,
+  SetBriefStatusDocument,
   UpdateDocumentDocument,
 } from "../gql/graphql.js";
 import { decodeOffsetCursor, encodeOffsetCursor } from "../helpers/cursor.js";
@@ -35,6 +35,10 @@ function normaliseTitle(title: string): string {
   return title.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
+function isBriefKind(kind: string | null | undefined): boolean {
+  return kind === "brief";
+}
+
 async function resolveDocumentUuid(
   documentId: string,
   ctx: UserContext,
@@ -48,7 +52,7 @@ export function registerKnowledgeTools(server: OAuthServer) {
     name: "list_documents",
     title: "List Documents",
     description:
-      "Browse workspace knowledge documents (and decision briefs) with their paths and tags. Use get_entity(DC-N) to read one as markdown.",
+      "Browse workspace knowledge documents (and briefs) with their paths and tags. Use get_entity(DC-N) to read one as markdown.",
     schema: z.object({
       tag: z.string().optional().describe("Filter this page by tag"),
       limit: z.number().int().optional(),
@@ -88,13 +92,13 @@ export function registerKnowledgeTools(server: OAuthServer) {
           displayId:
             d.displayId != null
               ? formatDisplayId(
-                  d.kind === "one_pager" ? "one_pager" : "document",
+                  isBriefKind(d.kind) ? "brief" : "document",
                   d.displayId,
                 )
               : undefined,
           title: d.title ?? "(untitled)",
           type: d.kind ?? undefined,
-          status: d.onePagerStatus ?? undefined,
+          status: d.briefStatus ?? undefined,
           extra: {
             path: d.path ?? null,
             tags: d.tags?.join(", ") ?? null,
@@ -146,7 +150,7 @@ export function registerKnowledgeTools(server: OAuthServer) {
             displayId:
               duplicate.displayId != null
                 ? formatDisplayId(
-                    duplicate.kind === "one_pager" ? "one_pager" : "document",
+                    isBriefKind(duplicate.kind) ? "brief" : "document",
                     duplicate.displayId,
                   )
                 : duplicate.id,
@@ -251,10 +255,10 @@ export function registerKnowledgeTools(server: OAuthServer) {
   });
 
   registerTool(server, {
-    name: "list_one_pagers",
-    title: "List Decision Briefs",
+    name: "list_briefs",
+    title: "List Briefs",
     description:
-      "Decision briefs (one-pagers) with their status (building/draft/in_review/finalised/failed) and recommendation. Read one with get_entity(OP-N).",
+      "Briefs with their status (building/draft/in_review/finalised/failed) and recommendation. Read one with get_entity(BR-N).",
     schema: z.object({
       status: z
         .array(
@@ -291,24 +295,24 @@ export function registerKnowledgeTools(server: OAuthServer) {
       }
 
       const data = await execute(
-        OnePagerListDocument,
+        BriefListDocument,
         {
           limit: limit + 1,
           offset,
           filters: {
-            onePagerStatus: params.status,
-            onePagerType: params.type,
+            briefStatus: params.status,
+            briefType: params.type,
             sourceInsightId,
           },
         },
         ctx,
       );
 
-      const rows = data.onePagerList ?? [];
+      const rows = data.briefList ?? [];
       if (rows.length === 0) {
         return emptyResponse(
-          "No decision briefs match.",
-          "Generate one from an action or insight with generate_one_pager.",
+          "No briefs match.",
+          "Generate one from an action or insight with generate_brief.",
         );
       }
 
@@ -317,11 +321,11 @@ export function registerKnowledgeTools(server: OAuthServer) {
           id: d.id ?? "",
           displayId:
             d.displayId != null
-              ? formatDisplayId("one_pager", d.displayId)
+              ? formatDisplayId("brief", d.displayId)
               : undefined,
           title: d.title ?? "(untitled)",
-          status: d.onePagerStatus ?? undefined,
-          type: d.onePagerType ?? undefined,
+          status: d.briefStatus ?? undefined,
+          type: d.briefType ?? undefined,
           extra: {
             recommendation: d.decisionRecommendation ?? null,
             sourceInsight:
@@ -346,52 +350,52 @@ export function registerKnowledgeTools(server: OAuthServer) {
   });
 
   registerTool(server, {
-    name: "generate_one_pager",
-    title: "Generate Decision Brief",
+    name: "generate_brief",
+    title: "Generate Brief",
     description:
-      "Kick off AI generation of a decision brief from an action (AC-N) or insight (IN-N) — pass exactly one. Generation is asynchronous: poll the returned OP-N with get_entity until status moves past building. Pass retryOnePagerId instead to retry a failed generation.",
+      "Kick off AI generation of a brief from an action (AC-N) or insight (IN-N) — pass exactly one. Generation is asynchronous: poll the returned BR-N with get_entity until status moves past building. Pass retryBriefId instead to retry a failed generation.",
     schema: z.object({
       actionId: z.string().optional().describe("AC-N or UUID"),
       insightId: z.string().optional().describe("IN-N or UUID"),
       type: z.enum(["decision", "prd"]).optional(),
-      retryOnePagerId: z
+      retryBriefId: z
         .string()
         .optional()
-        .describe("OP-N of a failed brief to retry"),
+        .describe("BR-N of a failed brief to retry"),
     }),
     scope: "write",
-    handler: async ({ actionId, insightId, type, retryOnePagerId }, tool) => {
-      const provided = [actionId, insightId, retryOnePagerId].filter(Boolean);
+    handler: async ({ actionId, insightId, type, retryBriefId }, tool) => {
+      const provided = [actionId, insightId, retryBriefId].filter(Boolean);
       if (provided.length !== 1) {
         return toolError(
-          "Pass exactly one of actionId, insightId or retryOnePagerId.",
+          "Pass exactly one of actionId, insightId or retryBriefId.",
         );
       }
       const ctx = await tool.getContext();
 
-      if (retryOnePagerId) {
+      if (retryBriefId) {
         const meta = await execute(
           GetDocumentMetaDocument,
-          { id: retryOnePagerId },
+          { id: retryBriefId },
           ctx,
         );
         if (!meta.document?.id) {
-          return toolError(`Decision brief "${retryOnePagerId}" not found.`);
+          return toolError(`Brief "${retryBriefId}" not found.`);
         }
         const retried = (
           await execute(
-            RetryOnePagerGenerationDocument,
-            { onePagerId: meta.document.id },
+            RetryBriefGenerationDocument,
+            { briefId: meta.document.id },
             ctx,
           )
-        ).retryOnePagerGeneration;
+        ).retryBriefGeneration;
         return asyncTriggerResponse({
           id: meta.document.id,
           displayId:
             retried?.displayId != null
-              ? formatDisplayId("one_pager", retried.displayId)
+              ? formatDisplayId("brief", retried.displayId)
               : undefined,
-          status: retried?.onePagerStatus ?? "building",
+          status: retried?.briefStatus ?? "building",
         });
       }
 
@@ -401,17 +405,17 @@ export function registerKnowledgeTools(server: OAuthServer) {
         if (!action?.id) return toolError(`Action "${actionId}" not found.`);
         const payload = (
           await execute(
-            GenerateOnePagerFromActionDocument,
+            GenerateBriefFromActionDocument,
             { actionId: action.id, type },
             ctx,
           )
-        ).generateOnePagerFromAction;
-        if (!payload?.onePagerId) {
+        ).generateBriefFromAction;
+        if (!payload?.briefId) {
           return toolError("Brief generation did not start.");
         }
         return asyncTriggerResponse({
-          id: payload.onePagerId,
-          displayId: payload.onePagerDisplayId ?? undefined,
+          id: payload.briefId,
+          displayId: payload.briefDisplayId ?? undefined,
           status: "building",
           note: "Generation takes a little while; poll with get_entity.",
         });
@@ -427,59 +431,59 @@ export function registerKnowledgeTools(server: OAuthServer) {
       if (!insight?.id) return toolError(`Insight "${insightId}" not found.`);
       const doc = (
         await execute(
-          GenerateOnePagerFromInsightDocument,
+          GenerateBriefFromInsightDocument,
           { insightId: insight.id, type },
           ctx,
         )
-      ).generateOnePagerFromInsight;
+      ).generateBriefFromInsight;
       if (!doc?.id) return toolError("Brief generation did not start.");
       return asyncTriggerResponse({
         id: doc.id,
         displayId:
           doc.displayId != null
-            ? formatDisplayId("one_pager", doc.displayId)
+            ? formatDisplayId("brief", doc.displayId)
             : undefined,
-        status: doc.onePagerStatus ?? "building",
+        status: doc.briefStatus ?? "building",
         note: "Generation takes a little while; poll with get_entity.",
       });
     },
   });
 
   registerTool(server, {
-    name: "update_one_pager_status",
-    title: "Update Decision Brief Status",
+    name: "update_brief_status",
+    title: "Update Brief Status",
     description:
-      "Move a decision brief (OP-N) through its review lifecycle: draft, in_review, or finalised. Finalising records the decision. The building and failed states are managed by generation and can't be set here.",
+      "Move a brief (BR-N) through its review lifecycle: draft, in_review, or finalised. Finalising records the decision. The building and failed states are managed by generation and can't be set here.",
     schema: z.object({
-      onePagerId: z.string().describe("OP-N display ID or UUID"),
+      briefId: z.string().describe("BR-N display ID or UUID"),
       status: z
         .enum(["draft", "in_review", "finalised"])
         .describe("The review status to move the brief to"),
     }),
     scope: "write",
-    handler: async ({ onePagerId, status }, tool) => {
+    handler: async ({ briefId, status }, tool) => {
       const ctx = await tool.getContext();
-      const ref = parseEntityRef(onePagerId);
+      const ref = parseEntityRef(briefId);
       const existing = (
         await execute(
-          GetOnePagerDocument,
-          { displayId: ref.kind === "display" ? ref.formatted : onePagerId },
+          GetBriefDocument,
+          { displayId: ref.kind === "display" ? ref.formatted : briefId },
           ctx,
         )
-      ).onePager;
+      ).brief;
       if (!existing?.id) {
         return toolError(
-          `Decision brief "${onePagerId}" not found. Find briefs with list_one_pagers.`,
+          `Brief "${briefId}" not found. Find briefs with list_briefs.`,
         );
       }
 
       const updated = (
         await execute(
-          SetOnePagerStatusDocument,
-          { onePagerId: existing.id, status },
+          SetBriefStatusDocument,
+          { briefId: existing.id, status },
           ctx,
         )
-      ).setOnePagerStatus;
+      ).setBriefStatus;
       if (!updated) {
         return toolError(
           "The status change was not applied — check the brief with get_entity.",
@@ -488,14 +492,14 @@ export function registerKnowledgeTools(server: OAuthServer) {
 
       return entityResponse(
         {
-          message: `Decision brief moved to ${status}.`,
-          onePager: {
+          message: `Brief moved to ${status}.`,
+          brief: {
             displayId:
               updated.displayId != null
-                ? formatDisplayId("one_pager", updated.displayId)
+                ? formatDisplayId("brief", updated.displayId)
                 : updated.id,
             title: updated.title,
-            status: updated.onePagerStatus,
+            status: updated.briefStatus,
           },
         },
         { link: appLink(ctx.orgSlug, ctx.workspaceSlug, "documents") },

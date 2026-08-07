@@ -2,7 +2,7 @@
 
 These examples demonstrate real-world usage of the Squad MCP server with Claude. Each shows the user prompt, the tools that get called behind the scenes, and the expected outcome.
 
-Squad turns raw user feedback into an **evidence chain**: feedback lands as **signals** (`SI-`), which cluster into recurring themes (`CL-`), distil into **insights** (`IN-`), and point at the **actions** (`AC-`) and **goals** (`GL-`) that move the product. From there you can generate **decision briefs** (`OP-`) and store **documents** (`DC-`). Every answer cites these display IDs so you can trace it back to real customer evidence.
+Squad turns raw user feedback into an **evidence chain**: feedback lands as **signals** (`SI-`), which cluster into recurring themes (`CL-`), distil into **insights** (`IN-`), and point at the **actions** (`AC-`) and **goals** (`GL-`) that move the product. From there you can generate **briefs** (`BR-`) and store **documents** (`DC-`). Every answer cites these display IDs so you can trace it back to real customer evidence.
 
 ---
 
@@ -28,7 +28,7 @@ Squad turns raw user feedback into an **evidence chain**: feedback lands as **si
 
 **Chain health:** 6 clusters, 4 insights linked to goals, 2 insights unlinked
 
-**Open work:** 7 open actions · 2 decision briefs pending review
+**Open work:** 7 open actions · 2 briefs pending review
 
 [Open in Squad](https://app.meetsquad.ai/acme/platform)
 ```
@@ -117,7 +117,7 @@ and what needs deciding?"
 1. `get_workspace_overview` for the current state.
 2. `get_activity` to see what changed — including what Squad's agents did versus humans.
 3. `list_insights` sorted by score for the strongest evidence; `get_entity` with `include: ["evidence"]` on the top few to ground them.
-4. `list_actions` for open work and `list_one_pagers` with status `["draft", "in_review"]` for briefs awaiting a decision.
+4. `list_actions` for open work and `list_briefs` with status `["draft", "in_review"]` for briefs awaiting a decision.
 
 ### Actual Output
 ```
@@ -133,15 +133,15 @@ and what needs deciding?"
 - IN-22 "Checklist ignored on mobile" (score 61) — SI-230, SI-231
 
 *Decisions waiting*
-- OP-4 "Stream large exports" — in_review, recommends shipping streaming
+- BR-4 "Stream large exports" — in_review, recommends shipping streaming
 - Top open action: AC-31 (P1) linked to GL-3
 
-*Suggested focus:* finalise OP-4 and scope the mobile checklist fix.
+*Suggested focus:* finalise BR-4 and scope the mobile checklist fix.
 
 [Open in Squad](https://app.meetsquad.ai/acme/platform)
 ```
 
-**Tools Called:** `get_workspace_overview`, `get_activity`, `list_insights`, `get_entity`, `list_actions`, `list_one_pagers`
+**Tools Called:** `get_workspace_overview`, `get_activity`, `list_insights`, `get_entity`, `list_actions`, `list_briefs`
 
 > This flow is also available as the **`weekly-product-review`** prompt — invoke it directly instead of typing the whole request.
 
@@ -188,35 +188,35 @@ note referencing the PR.
 
 ---
 
-## Example 6: Generate a Decision Brief
+## Example 6: Generate a Brief
 
 ### User Prompt
 ```
-"Draft a decision brief for AC-31 so we can decide whether to prioritise it."
+"Draft a brief for AC-31 so we can decide whether to prioritise it."
 ```
 
 ### What Happens Behind the Scenes
-1. Claude calls `generate_one_pager(actionId: "AC-31")` — generation is asynchronous and returns a new `OP-` ID with status `building`.
-2. Claude polls `get_entity(OP-N)` until the status moves past `building`.
-3. Once finalised in review, `update_one_pager_status` moves it to `in_review` or `finalised`.
+1. Claude calls `generate_brief(actionId: "AC-31")` — generation is asynchronous and returns a new `BR-` ID with status `building`.
+2. Claude polls `get_entity(BR-N)` until the status moves past `building`.
+3. Once finalised in review, `update_brief_status` moves it to `in_review` or `finalised`.
 
 ### Actual Output
 ```
-Started decision brief **OP-7** (status: building) from AC-31…
+Started brief **BR-7** (status: building) from AC-31…
 …finished.
 
-**OP-7 — "Stream large exports"**
+**BR-7 — "Stream large exports"**
 *Recommendation:* Ship streaming exports next sprint.
 *Evidence:* 11 signals across zendesk/intercom/gong (SI-214, SI-198, SI-176 …),
 tied to GL-3. Support ticket volume from exports is trending up 3× this month.
 *Gaps:* No data on export sizes above 100k rows — worth investigating.
 
-Moved to in_review so the team can sign off. Open it: OP-7 → decision brief.
+Moved to in_review so the team can sign off. Open it: BR-7 → brief.
 ```
 
-**Tools Called:** `generate_one_pager`, `get_entity` (polling), `update_one_pager_status`
+**Tools Called:** `generate_brief`, `get_entity` (polling), `update_brief_status`
 
-> This is the **`draft-decision-brief`** prompt end to end. You can also generate a brief from an insight (`insightId: "IN-19"`) or retry a failed one (`retryOnePagerId`).
+> This is the **`draft-decision-brief`** prompt end to end. You can also generate a brief from an insight (`insightId: "IN-19"`) or retry a failed one (`retryBriefId`).
 
 **Value Delivered:** A decision-ready, evidence-cited brief produced by Squad's generation pipeline and walked through its review lifecycle — no manual synthesis.
 
@@ -267,9 +267,9 @@ Ask me to open any of these — e.g. "show the evidence behind IN-22".
 | **Capture feedback** | "Log this ticket in Squad" | `search`, `ingest_signal` |
 | **Explore a theme** | "What are people saying about exports?" | `list_insights`, `list_clusters`, `get_cluster` |
 | **See the evidence** | "Show the quotes behind IN-19" | `get_entity` with `include: ["evidence"]` |
-| **Weekly review** | "Run my weekly product review" | `get_activity`, `list_insights`, `list_actions`, `list_one_pagers` |
+| **Weekly review** | "Run my weekly product review" | `get_activity`, `list_insights`, `list_actions`, `list_briefs` |
 | **Ground a ticket** | "Pull the evidence behind AC-31" | `get_action_context` |
-| **Decide** | "Draft a decision brief for AC-31" | `generate_one_pager`, `update_one_pager_status` |
+| **Decide** | "Draft a brief for AC-31" | `generate_brief`, `update_brief_status` |
 | **Search** | "Find everything about onboarding" | `search`, `get_entity` |
 | **Switch context** | "Switch to my other workspace" | `list_workspaces`, `select_workspace` |
 
