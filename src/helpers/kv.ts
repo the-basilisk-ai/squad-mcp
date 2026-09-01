@@ -5,6 +5,11 @@ import { logger } from "../lib/logger.js";
  * Small key-value store for workspace selections and minted-token caching.
  * Redis-backed in deployment; in-memory fallback for local dev and tests.
  */
+/** Keeps idle connections from being reaped. */
+const PING_INTERVAL_MS = 30_000;
+/** node-redis defaults to 5s. */
+const CONNECT_TIMEOUT_MS = 10_000;
+
 export interface KvStore {
   get(key: string): Promise<string | null>;
   set(key: string, value: string, ttlSeconds: number): Promise<void>;
@@ -63,7 +68,14 @@ export async function initKv(redisUrl: string | undefined): Promise<void> {
     store = new MemoryKv();
     return;
   }
-  const client = createClient({ url: redisUrl });
+  const client = createClient({
+    url: redisUrl,
+    pingInterval: PING_INTERVAL_MS,
+    socket: { connectTimeout: CONNECT_TIMEOUT_MS },
+  });
+  // Required before connect(): an 'error' event with no listener kills the
+  // process. node-redis reconnects on its own, so only log here.
+  client.on("error", err => logger.error({ err }, "Redis client error"));
   await client.connect();
   store = new RedisKv(client);
   logger.info("KV store connected to Redis");
