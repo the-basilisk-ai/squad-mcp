@@ -9,4 +9,6 @@ startCommand = "pnpm start"
 healthcheckPath = "/health"
 healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 3
+# Spent retries leave the service down until a manual redeploy; 3 was low
+# enough that one transient crash latched it off.
+restartPolicyMaxRetries = 10
