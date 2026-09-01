@@ -302,6 +302,6 @@ All examples require OAuth authentication on first use. Claude prompts you to lo
 
 ## More Information
 
-- **Full Tool Reference:** See [README.md](./README.md#-available-tools) for the complete tool list, prompts, and resources.
+- **Full Tool Reference:** See [README.md](./README.md#tools) for the complete tool list, prompts, and resources.
 - **Squad Platform:** Visit [meetsquad.ai](https://meetsquad.ai).
 - **Support:** Create an issue at [github.com/the-basilisk-ai/squad-mcp/issues](https://github.com/the-basilisk-ai/squad-mcp/issues).

@@ -44,21 +44,40 @@ Squad entities are referenced by short **display IDs** so the assistant can cite
 | `AC-`  | Action          | `DC-`  | Document          |
 | `CL-`  | Cluster         |        |                   |
 
-## ✨ Available Tools
+## Tools
 
-The server exposes ~35 tools. Write tools require a token minted with the `write:workspace` scope; read tools only need `read:workspace`.
+The server exposes 30 tools. Write tools require a token minted with the `write:workspace` scope; read tools only need `read:workspace`.
 
-| Category         | Tools                                                                                                          | Purpose                                          |
-| ---------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| **Workspace**    | `list_workspaces`, `select_workspace`, `get_workspace_overview`, `update_workspace`, `list_members`            | Orient in and configure a workspace              |
-| **Search**       | `search`, `get_entity`                                                                                          | Semantic search and fetch any entity by ID       |
-| **Evidence**     | `list_signals`, `find_similar_signals`, `list_clusters`, `get_cluster`, `list_insights`                        | Explore signals, clusters, and insights          |
-| **Actions**      | `list_actions`, `get_action_context`, `update_action`, `update_action_status`                                  | Track and update product work                    |
-| **Strategy**     | `list_goals`, `create_goal`, `update_goal`, `update_insight`, `dismiss_signal`, `get_activity` | Manage goals, insights, and activity   |
-| **Knowledge**    | `list_documents`, `create_document`, `update_document`                                                          | Store research, references, and notes            |
-| **Briefs**       | `list_briefs`, `generate_brief`, `update_brief_status`                                                         | Generate and manage briefs                       |
-| **Ingest**       | `ingest_signal`                                                                                                 | Capture new feedback as a signal (with dedup)    |
-| **Integrations** | `list_integrations`                                                                                             | See connected feedback sources                   |
+- `list_workspaces` — List every organisation and workspace you can access, with the current selection marked.
+- `select_workspace` — Select which organisation and workspace subsequent tools operate on.
+- `get_workspace_overview` — One-call orientation: mission and description, top goals, recent signal activity, evidence-chain health, and open work counts.
+- `update_workspace` — Update the current workspace's name, description, mission statement or logo.
+- `list_members` — People in the current organisation with their user IDs.
+- `search` — Keyword search across signals, insights, actions, goals, documents and clusters.
+- `get_entity` — Fetch any entity by display ID (`SI-1`, `IN-1`, `AC-1`, `GL-1`, `BR-1`, `DC-1`, `CL-1`) or UUID. Also how you check on async work.
+- `list_signals` — Browse raw feedback signals with filters for source, type, sentiment, cluster and date range.
+- `find_similar_signals` — Semantically related signals for a given signal — "has anyone else said this?".
+- `list_clusters` — Browse signal clusters (recurring themes in feedback) with sizes and labels.
+- `get_cluster` — A cluster's label, stats, member signals and linked insights.
+- `list_insights` — Browse distilled insights ranked by combined score, with category/score/status filters or scoped to a goal.
+- `list_actions` — Ranked actions (what the evidence says to do next) filtered by status, assignee, priority or parent insight.
+- `get_action_context` — Everything needed to execute an action in one call: the action, the parent insight, the customer evidence behind it, and the goals it serves.
+- `update_action` — Edit an action's priority, effort, category or notes; assign it; or link it to an insight or brief.
+- `update_action_status` — Move an action through its lifecycle: start, complete, dismiss or snooze.
+- `list_goals` — Strategic goals ordered by importance.
+- `create_goal` — Create a strategic goal.
+- `update_goal` — Update a goal's title, description or importance.
+- `update_insight` — Curate an insight: set category or status, and link/unlink the goal it supports.
+- `dismiss_signal` — Permanently remove a signal from the workspace (noise, spam, or mis-ingested content).
+- `get_activity` — The workspace change feed (humans and Squad agents), newest first.
+- `list_documents` — Browse workspace knowledge documents (and briefs) with their paths and tags.
+- `create_document` — Create a knowledge document from markdown (research summaries, meeting notes, analyses).
+- `update_document` — Replace a document's markdown body and/or title, and manage tags.
+- `list_briefs` — Briefs with their status (building/draft/in_review/finalised/failed) and recommendation.
+- `generate_brief` — Kick off AI generation of a brief from an action or insight.
+- `update_brief_status` — Move a brief through its review lifecycle: draft, in_review, or finalised.
+- `ingest_signal` — Pipe user feedback into the evidence chain (1–50 items, deduplicated server-side).
+- `list_integrations` — Connected feedback sources for this workspace and their sync health.
 
 ### Prompts
 
