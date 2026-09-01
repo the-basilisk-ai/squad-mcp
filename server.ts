@@ -1,5 +1,6 @@
 import { config } from "dotenv";
 import { MCPServer } from "mcp-use";
+import { version as VERSION } from "./package.json";
 import { getPropelAuthUrl } from "./src/helpers/config.js";
 import { initKv } from "./src/helpers/kv.js";
 import { squadOAuthProvider } from "./src/helpers/oauth-provider.js";
@@ -37,7 +38,7 @@ await initKv(IS_BUILD ? undefined : process.env.REDIS_URL);
 
 const server = new MCPServer<SquadUser>({
   name: "squad-mcp",
-  version: "4.0.0",
+  version: VERSION,
   description:
     "Squad AI MCP Server - product feedback intelligence: signals, insights, actions, goals, and decision briefs",
   basePath: BASE_PATH,
@@ -62,7 +63,7 @@ const server = new MCPServer<SquadUser>({
 server.app.use("*", securityHeaders);
 
 // Health check (used by Railway for deployment readiness)
-server.app.get("/health", c => c.json({ status: "ok", version: "4.0.0" }));
+server.app.get("/health", c => c.json({ status: "ok", version: VERSION }));
 
 // OpenAI Apps Challenge verification
 server.app.get("/.well-known/openai-apps-challenge", c =>
