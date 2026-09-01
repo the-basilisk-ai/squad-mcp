@@ -1,0 +1,52 @@
+name: Promote to Production
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Tag or SHA to promote (defaults to the current ref)"
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  promote:
+    name: Fast-forward production
+    runs-on: ubuntu-latest
+    steps:
+      # App token so the push can update `production` under branch protection,
+      # and so the push raises events GITHUB_TOKEN would suppress.
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Resolve the commit to promote
+        id: target
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          INPUT_REF: ${{ inputs.ref }}
+        run: |
+          set -euo pipefail
+          if [ -n "${INPUT_REF}" ]; then
+            sha=$(gh api "repos/${{ github.repository }}/commits/${INPUT_REF}" --jq .sha)
+          else
+            sha="${{ github.sha }}"
+          fi
+          echo "sha=${sha}" >> "$GITHUB_OUTPUT"
+          echo "Promoting ${sha}"
+
+      # force=false keeps this fast-forward-only: it can never rewrite
+      # production history. Railway deploys production on push.
+      - name: Fast-forward production
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          gh api -X PATCH "repos/${{ github.repository }}/git/refs/heads/production" \
+            -f sha="${{ steps.target.outputs.sha }}" -F force=false
