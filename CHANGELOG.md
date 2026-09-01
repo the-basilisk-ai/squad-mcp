@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.3](https://github.com/the-basilisk-ai/squad-mcp/compare/v4.1.2...v4.1.3) (2026-09-01)
+
+
+### Bug Fixes
+
+* **health:** report the real version instead of a hardcoded 4.0.0 ([#174](https://github.com/the-basilisk-ai/squad-mcp/issues/174)) ([cdf37f6](https://github.com/the-basilisk-ai/squad-mcp/commit/cdf37f62ba7748b0d9d7758475964abcf103cd04))
+
 ## [4.1.2](https://github.com/the-basilisk-ai/squad-mcp/compare/v4.1.1...v4.1.2) (2026-09-01)
 
 
