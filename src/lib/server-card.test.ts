@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { describe, expect, it, vi } from "vitest";
 import registry from "../../server.json";
-import { registerServerCard } from "./server-card.js";
+import { CORS_ALLOWED_HEADERS, registerServerCard } from "./server-card.js";
 
 vi.mock("../helpers/oauth.js", () => ({ introspectToken: vi.fn() }));
 
@@ -135,7 +135,7 @@ describe("AI catalog", () => {
 });
 
 describe("discovery on a live server", () => {
-  it("serves the card without authentication", async () => {
+  async function buildLiveServer() {
     const { MCPServer } = await import("mcp-use");
     const { squadOAuthProvider } = await import("../helpers/oauth-provider.js");
 
@@ -143,6 +143,7 @@ describe("discovery on a live server", () => {
       name: "squad-mcp-test",
       version: VERSION,
       basePath: BASE_PATH,
+      cors: { origin: "*", allowedHeaders: CORS_ALLOWED_HEADERS },
       oauth: squadOAuthProvider({
         authUrl: "https://auth.test",
         resource: RESOURCE,
@@ -154,12 +155,38 @@ describe("discovery on a live server", () => {
       resource: RESOURCE,
       version: VERSION,
     });
+    return server;
+  }
+
+  it("serves the card without authentication", async () => {
+    const server = await buildLiveServer();
 
     const res = await server.fetch(new Request(`${ORIGIN}${CARD_PATH}`));
 
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toBe(
       "application/mcp-server-card+json",
+    );
+  });
+
+  // The framework answers preflights before any route runs, so a browser
+  // revalidating the card would be refused unless its header is allowed there.
+  it("allows If-None-Match through the CORS preflight", async () => {
+    const server = await buildLiveServer();
+
+    const res = await server.fetch(
+      new Request(`${ORIGIN}${CARD_PATH}`, {
+        method: "OPTIONS",
+        headers: {
+          Origin: "https://example.com",
+          "Access-Control-Request-Method": "GET",
+          "Access-Control-Request-Headers": "if-none-match",
+        },
+      }),
+    );
+
+    expect(res.headers.get("access-control-allow-headers")).toContain(
+      "If-None-Match",
     );
   });
 });

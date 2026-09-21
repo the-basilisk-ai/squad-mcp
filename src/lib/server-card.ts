@@ -36,6 +36,22 @@ const SUPPORTED_PROTOCOL_VERSIONS = [
   "2024-10-07",
 ];
 
+/**
+ * mcp-use answers CORS preflights itself, before any route runs, and its
+ * default allow-list has no `If-None-Match` — which is the one header a
+ * browser revalidating the card sends, and the one that makes it preflight at
+ * all. So the framework's defaults are restated here with that header added,
+ * and `server.ts` hands this to the server's `cors` option.
+ */
+export const CORS_ALLOWED_HEADERS = [
+  "Content-Type",
+  "Authorization",
+  "mcp-protocol-version",
+  "mcp-method",
+  "mcp-name",
+  "If-None-Match",
+];
+
 // Wide-open CORS is what the spec asks for: the documents are public and
 // read-only, and browser clients need ETag to revalidate.
 const DISCOVERY_HEADERS: Record<string, string> = {
