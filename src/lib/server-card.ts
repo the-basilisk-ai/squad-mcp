@@ -3,18 +3,12 @@ import type { Env, Hono } from "hono";
 import registry from "../../server.json";
 
 /**
- * SEP-2127 discovery: an MCP Server Card at the reserved
- * `<streamable-http-url>/server-card` location, advertised by an AI Catalog at
- * the well-known path so a client that only knows the domain can find us.
+ * SEP-2127 discovery: a Server Card at the reserved
+ * `<streamable-http-url>/server-card`, plus an AI Catalog advertising it.
  *
- * Both documents are public, read-only metadata, so they carry wide-open CORS
- * and a cacheable ETag. Identity is taken from `server.json` — the same
- * document the MCP Registry publishes — so the two cannot drift apart.
- *
- * mcp-use has no server-card support. The official TypeScript SDK it sits on
- * does, in an open draft (typescript-sdk#2527, `experimental/server-card`), so
- * this module can be swapped for the SDK's `serverCardResponse` /
- * `aiCatalogResponse` once that lands and mcp-use picks it up.
+ * Identity comes from `server.json` so the card cannot drift from the registry
+ * listing. Replaceable by the SDK's `serverCardResponse` / `aiCatalogResponse`
+ * once typescript-sdk#2527 lands and mcp-use picks it up.
  */
 
 const CARD_SCHEMA =
@@ -25,20 +19,13 @@ const CATALOG_PATH = "/.well-known/ai-catalog.json";
 const CATALOG_MEDIA_TYPE = "application/ai-catalog+json";
 const CATALOG_SPEC_VERSION = "1.0";
 
-// What `server/discover` answers at runtime, which the card must not
-// contradict. The endpoint also still accepts the older revisions through the
-// initialize handshake (2025-11-25 back to 2024-10-07, all verified against a
-// live server), but `server/discover` enumerates only the modern revision, and
-// a card claiming a superset is the disagreement clients are told to reconcile
-// against the live connection. A test holds the two in step.
+// Must match what `server/discover` reports, which SEP-2127 forbids
+// contradicting. Older revisions still negotiate via initialize, unadvertised.
 const SUPPORTED_PROTOCOL_VERSIONS = ["2026-07-28"];
 
 /**
- * mcp-use answers CORS preflights itself, before any route runs, and its
- * default allow-list has no `If-None-Match` — which is the one header a
- * browser revalidating the card sends, and the one that makes it preflight at
- * all. So the framework's defaults are restated here with that header added,
- * and `server.ts` hands this to the server's `cors` option.
+ * mcp-use answers preflights before any route runs, and its default list omits
+ * `If-None-Match`, the header a browser sends to revalidate the card.
  */
 export const CORS_ALLOWED_HEADERS = [
   "Content-Type",
@@ -49,8 +36,7 @@ export const CORS_ALLOWED_HEADERS = [
   "If-None-Match",
 ];
 
-// Wide-open CORS is what the spec asks for: the documents are public and
-// read-only, and browser clients need ETag to revalidate.
+// Wide-open CORS is safe here: the documents are public and read-only.
 const DISCOVERY_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET",
@@ -88,8 +74,8 @@ function buildServerCard({ resource, version }: ServerCardOptions) {
 }
 
 function buildAiCatalog(options: ServerCardOptions) {
-  // Catalog identifiers are domain-anchored — `urn:air:{publisher}:{namespace}:{name}`
-  // — so the card's reverse-DNS namespace is read back as a domain.
+  // `urn:air:{publisher}:{namespace}:{name}` is domain-anchored, so the
+  // reverse-DNS namespace is read back as a domain.
   const [namespace, name] = registry.name.split("/");
 
   return {
@@ -104,7 +90,6 @@ function buildAiCatalog(options: ServerCardOptions) {
   };
 }
 
-/** Serves `document` as a cacheable, revalidatable discovery document. */
 function serveDocument<E extends Env>(
   app: Hono<E>,
   path: string,

@@ -188,9 +188,8 @@ describe("discovery on a live server", () => {
     );
   });
 
-  // SEP-2127 asks that a card not contradict what the live connection reports,
-  // and names `server/discover`'s supportedVersions as one of those values.
-  // This is the pin: bump mcp-use and the card follows, or this fails.
+  // SEP-2127 forbids the card contradicting server/discover. Pinning them here
+  // means a mcp-use bump fails loudly instead of drifting.
   it("advertises exactly the versions server/discover reports", async () => {
     const server = await buildLiveServer();
     const card = (await (
@@ -233,8 +232,8 @@ describe("discovery on a live server", () => {
     );
   });
 
-  // The framework answers preflights before any route runs, so a browser
-  // revalidating the card would be refused unless its header is allowed there.
+  // The route's own CORS headers never run for a preflight, so the framework's
+  // allow-list is what decides this.
   it("allows If-None-Match through the CORS preflight", async () => {
     const server = await buildLiveServer();
 

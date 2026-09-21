@@ -91,8 +91,7 @@ for (const path of [
   );
 }
 
-// SEP-2127 discovery: the Server Card at `/mcp/server-card` and the AI Catalog
-// that points at it, both unauthenticated.
+// Unauthenticated by design: clients read these before they hold a token.
 registerServerCard(server.app, {
   basePath: BASE_PATH,
   resource: RESOURCE,
