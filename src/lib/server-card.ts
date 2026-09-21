@@ -10,6 +10,11 @@ import registry from "../../server.json";
  * Both documents are public, read-only metadata, so they carry wide-open CORS
  * and a cacheable ETag. Identity is taken from `server.json` — the same
  * document the MCP Registry publishes — so the two cannot drift apart.
+ *
+ * mcp-use has no server-card support. The official TypeScript SDK it sits on
+ * does, in an open draft (typescript-sdk#2527, `experimental/server-card`), so
+ * this module can be swapped for the SDK's `serverCardResponse` /
+ * `aiCatalogResponse` once that lands and mcp-use picks it up.
  */
 
 const CARD_SCHEMA =
