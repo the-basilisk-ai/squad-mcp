@@ -3,6 +3,7 @@
   "name": "ai.meetsquad/squad",
   "title": "Squad",
   "description": "Decision intelligence for product teams. Turn scattered feedback into signal you can act on.",
+  "websiteUrl": "https://docs.meetsquad.ai/guides/squad-mcp",
   "repository": {
     "url": "https://github.com/the-basilisk-ai/squad-mcp",
     "source": "github"

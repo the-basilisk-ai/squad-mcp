@@ -4,7 +4,10 @@ This server is listed on the [MCP Registry](https://registry.modelcontextprotoco
 
 ## server.json
 
-The `server.json` file contains metadata published to the registry. It is not used at runtime.
+The `server.json` file contains metadata published to the registry. It is also
+the runtime source of the server's identity in the SEP-2127 Server Card
+(`src/lib/server-card.ts`), so the card and the registry listing cannot drift
+apart — only `version` and the endpoint URL come from elsewhere.
 
 release-please rewrites this file on every release (it re-serialises the whole
 document to bump `version`), which formats arrays differently to Biome. Biome

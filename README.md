@@ -200,6 +200,11 @@ curl http://localhost:3232/health
 # Check OAuth discovery
 curl http://localhost:3232/.well-known/oauth-protected-resource
 
+# Check server-card discovery (SEP-2127)
+curl -H 'Accept: application/mcp-server-card+json' \
+  http://localhost:3232/mcp/server-card
+curl http://localhost:3232/.well-known/ai-catalog.json
+
 # Test with the built-in inspector
 pnpm dev   # then open the inspector and connect to http://localhost:3232/mcp
 ```
@@ -231,7 +236,7 @@ squad-mcp/
 │   ├── gql/                    # Generated GraphQL types (pnpm codegen)
 │   ├── graphql/                # GraphQL operation documents
 │   ├── helpers/                # OAuth provider, token minting, workspace selection, KV/Redis
-│   └── lib/                    # Squad API client, logger, telemetry
+│   └── lib/                    # Squad API client, logger, telemetry, server card
 ├── railway.toml                # Railway deployment config
 └── .env.example                # Environment template
 ```
@@ -245,6 +250,7 @@ This is a hosted service maintained by Squad. Users connect via OAuth — no sel
 - Deployed on Railway with a `/health` readiness check
 - Stateless request handling, with Redis holding the per-user workspace selection and token cache, so instances scale horizontally
 - Follows the [MCP specification](https://modelcontextprotocol.io/specification) for streamable HTTP transport
+- Publishes [SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127) discovery documents: a Server Card at `https://mcp.meetsquad.ai/mcp/server-card` and an AI Catalog at `https://mcp.meetsquad.ai/.well-known/ai-catalog.json`, both public, cacheable and built from `server.json`
 
 ## 💬 Support
 

@@ -6,6 +6,7 @@ import { initKv } from "./src/helpers/kv.js";
 import { squadOAuthProvider } from "./src/helpers/oauth-provider.js";
 import { logger } from "./src/lib/logger.js";
 import { securityHeaders } from "./src/lib/security-headers.js";
+import { registerServerCard } from "./src/lib/server-card.js";
 import { initTelemetry, shutdownTelemetry } from "./src/lib/telemetry.js";
 import { registerPrompts } from "./src/prompts/index.js";
 import { registerResources } from "./src/resources/index.js";
@@ -86,6 +87,14 @@ for (const path of [
     }),
   );
 }
+
+// SEP-2127 discovery: the Server Card at `/mcp/server-card` and the AI Catalog
+// that points at it, both unauthenticated.
+registerServerCard(server.app, {
+  basePath: BASE_PATH,
+  resource: RESOURCE,
+  version: VERSION,
+});
 
 registerWorkspaceTools(server);
 registerSearchTools(server);
