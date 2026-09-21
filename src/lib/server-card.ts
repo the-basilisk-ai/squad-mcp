@@ -25,16 +25,13 @@ const CATALOG_PATH = "/.well-known/ai-catalog.json";
 const CATALOG_MEDIA_TYPE = "application/ai-catalog+json";
 const CATALOG_SPEC_VERSION = "1.0";
 
-// The revisions mcp-use negotiates. It exports no constant for these, so the
-// list is mirrored here and has to be revisited when the dependency is bumped.
-const SUPPORTED_PROTOCOL_VERSIONS = [
-  "2026-07-28",
-  "2025-11-25",
-  "2025-06-18",
-  "2025-03-26",
-  "2024-11-05",
-  "2024-10-07",
-];
+// What `server/discover` answers at runtime, which the card must not
+// contradict. The endpoint also still accepts the older revisions through the
+// initialize handshake (2025-11-25 back to 2024-10-07, all verified against a
+// live server), but `server/discover` enumerates only the modern revision, and
+// a card claiming a superset is the disagreement clients are told to reconcile
+// against the live connection. A test holds the two in step.
+const SUPPORTED_PROTOCOL_VERSIONS = ["2026-07-28"];
 
 /**
  * mcp-use answers CORS preflights itself, before any route runs, and its

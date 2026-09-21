@@ -3,13 +3,32 @@ import { describe, expect, it, vi } from "vitest";
 import registry from "../../server.json";
 import { CORS_ALLOWED_HEADERS, registerServerCard } from "./server-card.js";
 
-vi.mock("../helpers/oauth.js", () => ({ introspectToken: vi.fn() }));
+const mockIntrospect = vi.fn();
+vi.mock("../helpers/oauth.js", () => ({ introspectToken: mockIntrospect }));
+vi.mock("../lib/logger.js", () => ({
+  logger: { debug: vi.fn(), warn: vi.fn(), info: vi.fn(), error: vi.fn() },
+}));
+
+mockIntrospect.mockResolvedValue({
+  active: true,
+  sub: "user-1",
+  scope: "read:workspace",
+  client_id: "client-1",
+  exp: Math.floor(Date.now() / 1000) + 600,
+});
 
 const ORIGIN = "http://localhost:3232";
 const BASE_PATH = "/mcp";
 const RESOURCE = `${ORIGIN}${BASE_PATH}`;
 const CARD_PATH = `${BASE_PATH}/server-card`;
 const VERSION = "4.1.5";
+const PROTOCOL = "2026-07-28";
+
+/** The transport may answer as SSE, so unwrap a `data:` frame if present. */
+function parseJsonRpc(body: string): unknown {
+  const line = body.split("\n").find(l => l.startsWith("data:"));
+  return JSON.parse(line ? line.slice(5) : body);
+}
 
 function buildApp() {
   const app = new Hono();
@@ -166,6 +185,51 @@ describe("discovery on a live server", () => {
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toBe(
       "application/mcp-server-card+json",
+    );
+  });
+
+  // SEP-2127 asks that a card not contradict what the live connection reports,
+  // and names `server/discover`'s supportedVersions as one of those values.
+  // This is the pin: bump mcp-use and the card follows, or this fails.
+  it("advertises exactly the versions server/discover reports", async () => {
+    const server = await buildLiveServer();
+    const card = (await (
+      await server.fetch(new Request(`${ORIGIN}${CARD_PATH}`))
+    ).json()) as { remotes: { supportedProtocolVersions: string[] }[] };
+
+    const res = await server.fetch(
+      new Request(RESOURCE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json, text/event-stream",
+          Authorization: "Bearer good",
+          "MCP-Protocol-Version": PROTOCOL,
+          "Mcp-Method": "server/discover",
+        },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 1,
+          method: "server/discover",
+          params: {
+            _meta: {
+              "io.modelcontextprotocol/client-info": {
+                name: "sep2127-check",
+                version: "1.0.0",
+              },
+              "io.modelcontextprotocol/protocolVersion": PROTOCOL,
+              "io.modelcontextprotocol/clientCapabilities": {},
+            },
+          },
+        }),
+      }),
+    );
+    const discovered = parseJsonRpc(await res.text()) as {
+      result: { supportedVersions: string[] };
+    };
+
+    expect(card.remotes[0].supportedProtocolVersions).toEqual(
+      discovered.result.supportedVersions,
     );
   });
 
