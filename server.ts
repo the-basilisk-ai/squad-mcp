@@ -6,6 +6,10 @@ import { initKv } from "./src/helpers/kv.js";
 import { squadOAuthProvider } from "./src/helpers/oauth-provider.js";
 import { logger } from "./src/lib/logger.js";
 import { securityHeaders } from "./src/lib/security-headers.js";
+import {
+  CORS_ALLOWED_HEADERS,
+  registerServerCard,
+} from "./src/lib/server-card.js";
 import { initTelemetry, shutdownTelemetry } from "./src/lib/telemetry.js";
 import { registerPrompts } from "./src/prompts/index.js";
 import { registerResources } from "./src/resources/index.js";
@@ -51,7 +55,7 @@ const server = new MCPServer<SquadUser>({
   // CORS headers unless asked, which would break browser-based MCP clients. The
   // wildcard is safe without credentials: a page can only read a response it
   // already holds a bearer token for.
-  cors: { origin: "*" },
+  cors: { origin: "*", allowedHeaders: CORS_ALLOWED_HEADERS },
   oauth: squadOAuthProvider({
     authUrl: AUTH_URL,
     resource: RESOURCE,
@@ -86,6 +90,13 @@ for (const path of [
     }),
   );
 }
+
+// Unauthenticated by design: clients read these before they hold a token.
+registerServerCard(server.app, {
+  basePath: BASE_PATH,
+  resource: RESOURCE,
+  version: VERSION,
+});
 
 registerWorkspaceTools(server);
 registerSearchTools(server);
