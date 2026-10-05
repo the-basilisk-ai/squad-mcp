@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.2.1](https://github.com/the-basilisk-ai/squad-mcp/compare/v4.2.0...v4.2.1) (2026-10-05)
+
+
+### Bug Fixes
+
+* **deps:** remediate Dependabot security advisories ([#187](https://github.com/the-basilisk-ai/squad-mcp/issues/187)) ([ddeb478](https://github.com/the-basilisk-ai/squad-mcp/commit/ddeb478fb978011583c583684718e74b9e96c050))
+* **deps:** remediate Dependabot security advisories ([#190](https://github.com/the-basilisk-ai/squad-mcp/issues/190)) ([ec31946](https://github.com/the-basilisk-ai/squad-mcp/commit/ec31946e5acab10477a71b685f6b30ccb9e739de))
+* **security:** resolve Semgrep findings ([#189](https://github.com/the-basilisk-ai/squad-mcp/issues/189)) ([5584c09](https://github.com/the-basilisk-ai/squad-mcp/commit/5584c09270ed730a31f92a82b86378d23abdf51c))
+
 ## [4.2.0](https://github.com/the-basilisk-ai/squad-mcp/compare/v4.1.5...v4.2.0) (2026-09-22)
 
 
