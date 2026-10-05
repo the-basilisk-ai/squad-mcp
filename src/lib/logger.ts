@@ -35,24 +35,24 @@ const timestamp = (): string => {
 export const logger = {
   debug: (data: Record<string, unknown>, msg: string) => {
     if (shouldLog("debug"))
-      console.debug(`${timestamp()} [DEBUG] ${msg}`, data);
+      console.debug("%s [DEBUG] %s", timestamp(), msg, data);
   },
   info: (msg: string) => {
-    if (shouldLog("info")) console.info(`${timestamp()} ${msg}`);
+    if (shouldLog("info")) console.info("%s %s", timestamp(), msg);
   },
   warn: (data: Record<string, unknown>, msg: string) => {
-    if (shouldLog("warn")) console.warn(`${timestamp()} [WARN] ${msg}`, data);
+    if (shouldLog("warn")) console.warn("%s [WARN] %s", timestamp(), msg, data);
   },
   error: (data: Record<string, unknown>, msg: string) => {
     if (shouldLog("error"))
-      console.error(`${timestamp()} [ERROR] ${msg}`, data);
+      console.error("%s [ERROR] %s", timestamp(), msg, data);
   },
   fatal: (msgOrData: string | Record<string, unknown>, msg?: string) => {
     if (shouldLog("fatal")) {
       if (typeof msgOrData === "string") {
-        console.error(`${timestamp()} [FATAL] ${msgOrData}`);
+        console.error("%s [FATAL] %s", timestamp(), msgOrData);
       } else {
-        console.error(`${timestamp()} [FATAL] ${msg}`, msgOrData);
+        console.error("%s [FATAL] %s", timestamp(), msg, msgOrData);
       }
     }
   },
