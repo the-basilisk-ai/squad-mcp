@@ -1,0 +1,12 @@
+# Rules for the `mcp` Redis user, one per line, in `ACL LIST` order, no inline comments.
+# Why: docs/security/redis-access.md
+~mcp:*
+resetchannels
+-@all
+# node-redis connect handshake and keepalive
++client|setinfo
++ping
+# kv.ts
++get
++set
++del
