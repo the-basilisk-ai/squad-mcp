@@ -172,7 +172,7 @@ pnpm dev
 | `PROPELAUTH_API_KEY`                                              | ✅       | Backend integration key for minting service JWTs               |
 | `SQUAD_ENV`                                                       |          | `dev` or `production` (default `production`) — selects auth/API/app URLs |
 | `PORT` / `MCP_URL` / `BASE_URI`                                   |          | Server port and externally-advertised base URL                 |
-| `REDIS_URL`                                                       |          | Redis connection for deploy-safe workspace selection and token cache (in-memory if unset) |
+| `REDIS_URL`                                                       |          | Redis connection for deploy-safe workspace selection and token cache (in-memory if unset). Deployed as the restricted `mcp` user, see [Redis access control](docs/security/redis-access.md) |
 | `SQUAD_GRAPHQL_URL`                                               |          | Override the Squad GraphQL endpoint (also used by codegen)     |
 | `POSTHOG_API_KEY` / `POSTHOG_HOST`                                |          | Enable tool-call telemetry                                     |
 | `LOG_LEVEL`                                                       |          | Logger verbosity                                               |
