@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.3.0](https://github.com/the-basilisk-ai/squad-mcp/compare/v4.2.1...v4.3.0) (2026-10-08)
+
+
+### Features
+
+* **redis:** connect as a restricted mcp user ([#192](https://github.com/the-basilisk-ai/squad-mcp/issues/192)) ([8ed1046](https://github.com/the-basilisk-ai/squad-mcp/commit/8ed10461be9cbe7d17b97319aac68a7b010a33ad))
+
 ## [4.2.1](https://github.com/the-basilisk-ai/squad-mcp/compare/v4.2.0...v4.2.1) (2026-10-05)
 
 
