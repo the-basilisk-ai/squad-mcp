@@ -20,9 +20,9 @@ import {
 
 export type { OAuthServer } from "./helpers.js";
 
-export type ToolScope = "read" | "write";
+type ToolScope = "read" | "write";
 
-export type ToolContext = {
+type ToolContext = {
   userId: string;
   auth: AuthInfo;
   getContext: () => Promise<UserContext>;

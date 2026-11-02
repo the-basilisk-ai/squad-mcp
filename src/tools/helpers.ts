@@ -60,17 +60,6 @@ export function toolSuccess(data: unknown): {
 }
 
 /**
- * Standard success response with pretty-printed JSON
- */
-export function toolSuccessPretty(data: unknown): {
-  content: { type: "text"; text: string }[];
-} {
-  return {
-    content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
-  };
-}
-
-/**
  * Extract a human-readable error message from an API error.
  *
  * Status-aware handling (402 credits, 401/403 reconnect) returns with the
